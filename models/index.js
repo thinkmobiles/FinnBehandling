@@ -1,0 +1,61 @@
+/**
+ * Created by Roman on 23.02.2015.
+ */
+
+var TABLES = require('../constants/tables');
+
+var Models = function (PostGre) {
+    "use strict";
+    var _ = require('underscore');
+    PostGre.plugin('visibility');
+
+    var Model = PostGre.Model.extend({
+        hasTimestamps: true,
+        idAttribute: 'ID',
+        getName: function () {
+            return this.tableName.replace(/s$/, '')
+        }
+    }, {
+        fetchMe: function (queryObject, optionsObject) {
+            return this.forge(queryObject).fetch(optionsObject);
+        },
+        insert: function (requestBody, customBody, saveOptions) {
+            requestBody = _.mapObject(requestBody, function (val, key) {
+                if (val === 'null') {
+                    return null;
+                }
+                return val;
+            });
+
+            customBody = _.mapObject(customBody, function (val, key) {
+                if (val === 'null') {
+                    return null;
+                }
+                return val;
+            });
+            return this.forge(requestBody).save(customBody, saveOptions);
+            //return this.forge().save(requestBody, saveOptions);
+        }
+    });
+
+    /*In lowerCase and with 's prefix, because we dynamically load this model from Postgre.Models based on request tableName,
+     which is in lowerCase too
+
+     Request Example: {
+     "table": "members",
+     "deleted": [
+     "a234dc34",
+     "34bcf421",
+     "4bb2142a"
+     ],
+     "modified": [
+
+     */
+
+    /*this[TABLES.FEESES] = require('./feeses')(PostGre, Model);
+    this[TABLES.SYNCHRONIZES] = require('./synchronize')(PostGre, Model);
+    this[TABLES.KIT_ORDERS] = require('./kitOrders')(PostGre, Model);
+    this[TABLES.LOCATIONS] = require('./locations')(PostGre, Model);
+    this[TABLES.MEMBERS] = require('./members')(PostGre, Model);*/
+};
+module.exports = Models;
