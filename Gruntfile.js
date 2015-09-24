@@ -11,6 +11,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     grunt.initConfig({
         watch: {
@@ -31,6 +32,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         jshint: {
             app: [
                 'Gruntfile.js',
@@ -42,6 +44,7 @@ module.exports = function (grunt) {
         clean: {
             app: ["./dist/css/app_style.css"]
         },
+
         concat: {
             options: {
                 separator: ';\n'
@@ -62,6 +65,7 @@ module.exports = function (grunt) {
                 dest: 'public/dist/js/app.js'
             }
         },
+
         uglify: {
             app: {
                 files: {
@@ -72,6 +76,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         less: {
             app: {
                 options: {
@@ -84,6 +89,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         concat_css: {
             app: {
                 src: [
@@ -93,6 +99,7 @@ module.exports = function (grunt) {
                 dest: "./public/dist/css/style.css"
             }
         },
+
         cssmin: {
             app: {
                 files: [{
@@ -103,6 +110,17 @@ module.exports = function (grunt) {
                     ext: '.min.css'
                 }]
             }
+        },
+
+        jsdoc : {
+            dist : {
+                src: ['handlers/**/*.js', 'routes/**/*.js', 'models/**/*.js'],
+                options: {
+                    destination: 'doc',
+                    template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
+                    configure : "jsdoc.json"
+                }
+            }
         }
     });
 
@@ -111,7 +129,8 @@ module.exports = function (grunt) {
         'less:app',
         'concat:app',
         'concat_css:app',
-        'watch:app'
+        'watch:app',
+        'jsdoc'
     ]);
 
 
@@ -123,7 +142,8 @@ module.exports = function (grunt) {
         'clean:app',
         'concat_css:app',
         'cssmin:app',
-        'watch:app'
+        'watch:app',
+        'jsdoc'
     ]);
 
 };
