@@ -19,10 +19,7 @@ var Models = function (PostGre) {
 
 
 
-    /*this[TABLES.FEESES] = require('./feeses')(PostGre, Model);
-    this[TABLES.SYNCHRONIZES] = require('./synchronize')(PostGre, Model);
-    this[TABLES.KIT_ORDERS] = require('./kitOrders')(PostGre, Model);
-    this[TABLES.LOCATIONS] = require('./locations')(PostGre, Model);
-    this[TABLES.MEMBERS] = require('./members')(PostGre, Model);*/
+    this[TABLES.HOSPITALS] = require('./hospital')(PostGre, Model);
+
 };
 module.exports = Models;
