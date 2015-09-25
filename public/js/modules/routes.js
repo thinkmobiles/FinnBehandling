@@ -1,7 +1,9 @@
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
-        controller: 'indexController',
-        templateUrl: 'templates/index.html'
+        controller: 'startPageController',
+        templateUrl: 'templates/startPage.html',
+        controllerAs: 'startPageCtrl',
+        reloadOnSearch: false
     }).otherwise({
         redirectTo: '/'
     });

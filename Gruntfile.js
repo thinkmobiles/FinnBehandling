@@ -18,11 +18,13 @@ module.exports = function (grunt) {
             app: {
                 files: [
                     'Gruntfile.js',
-                    'public/js/modules/**/*.js'
+                    'public/js/modules/**/*.js',
+                    'public/css/*.css',
+                    'public/less/**/*.less',
+                    'public/less/*.less'
                 ],
                 tasks: [
                     'less:app',
-                    'clean:app',
                     'concat_css:app',
                     'jshint:app',
                     'concat:app'
