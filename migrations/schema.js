@@ -73,23 +73,6 @@ module.exports = function (knex) {
         });
     }
 
-   /* function createTable(tableName, crateFieldsFunc, callback) {
-        knex.schema.hasTable(tableName).then(function (exists) {
-            if (!exists) {
-                knex.schema.createTable(tableName, crateFieldsFunc)
-                    .exec(callback);
-            } else {
-                callback()
-            }
-        });
-    }*/
-
-    /*function dropTable(tableName, callback) {
-        knex.schema
-            .dropTableIfExists(tableName)
-            .exec(callback)
-    }*/
-
     function drop() {
         var tablesList = _.values(TABLES);
 
