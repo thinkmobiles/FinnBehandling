@@ -1,0 +1,22 @@
+<div id="start-page-static">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut turpis ullamcorper, cursus felis bibendum,
+    consequat turpis. Proin tortor nisl, vehicula quis pharetra non, feugiat ac leo. Proin vel aliquet metus.
+    Suspendisse potenti. Donec vel magna et turpis sagittis viverra. Integer aliquet malesuada feugiat. Aenean mattis
+    laoreet dignissim. Duis nulla orci, dapibus ut vestibulum euismod, volutpat at ex. Morbi odio tortor, semper eu
+    feugiat vel, viverra vel risus.
+    In in eleifend metus, id feugiat quam. Donec a magna ac mauris luctus tincidunt eu at elit. Curabitur ultrices
+    nulla tristique semper porttitor. Integer quis tempor lacus. Nullam imperdiet ac ante id suscipit. Morbi condimentum
+    sit amet eros consequat finibus. Ut porta tellus nec maximus sodales. Nullam vitae eleifend purus. Praesent bibendum
+    quam tellus, eu accumsan mauris euismod vitae. Aenean malesuada urna ut accumsan vulputate. Suspendisse potenti.
+    Mauris fermentum mi eget quam bibendum hendrerit.
+
+</div>
+
+<div>
+    <div ng-repeat="article in startPageCtrl.news" class="start-page-news">
+        <img ng-src="{{article.image}}"/>
+        <h5> {{article.title}} </h5>
+        <h5> {{article.date | date: "d MMM, y"}} </h5>
+        <h6> {{article.text}} </h6>
+    </div>
+</div>
