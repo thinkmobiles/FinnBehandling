@@ -6,8 +6,6 @@ var Models = function (PostGre) {
     PostGre.plugin('visibility');
 
     var Model = PostGre.Model.extend({
-        hasTimestamps: true,
-        idAttribute: 'id',
         getName: function () {
             return this.tableName.replace(/s$/, '')
         }
@@ -20,6 +18,12 @@ var Models = function (PostGre) {
 
 
     this[TABLES.HOSPITALS] = require('./hospital')(PostGre, Model);
+    this[TABLES.HOSPITAL_TYPES_LIST] = require('./hospitalTypesList')(PostGre, Model);
+    this[TABLES.REGIONS_LIST] = require('./regionsList')(PostGre, Model);
+    this[TABLES.TREATMENTS] = require('./treatment')(PostGre, Model);
+    this[TABLES.TREATMENTS_LIST] = require('./treatmentsList')(PostGre, Model);
+    this[TABLES.SUB_TREATMENTS] = require('./subTreatment')(PostGre, Model);
+    this[TABLES.SUB_TREATMENTS_LIST] = require('./subTreatmentsList')(PostGre, Model);
 
 };
 module.exports = Models;

@@ -15,9 +15,15 @@ module.exports = {
     // Validation errors
     NOT_UNIQUE_EMAIL: 'Email not unique',
     PHONE_ERROR:'Phone number is required',
+    CLINIC_TYPE_ERROR: 'Incorrect type of medical institution',
+    CLINIC_REGION_ERROR: 'Incorrect region of medical institution',
+    CLINIC_TREATMENT_ERROR: 'Incorrect treatment of medical institution',
+    CLINIC_SUB_TREATMENT_ERROR: 'Incorrect sub_treatment of medical institution',
+    NON_UNIQUE_NAME_ERROR: 'Medical institution with this name already exists',
+    SAVE_ERROR: 'Request does not save',
 
     CHANGE_PASSWORD: 'Password change successfully',
-    WAS_CREATED: 'was created successfully',
+    WAS_CREATED: 'Was created successfully',
     SAVING_ERROR: 'saving error',
     UPDATED_SUCCESS: 'was updated successfully',
     NOT_EXISTS: 'is not exist',

@@ -61,7 +61,10 @@ module.exports = {
                     'is_paid boolean NOT NULL, ' +
                     'type_id integer NOT NULL, ' +
                     'name varchar(80), ' +
+                    'phone_number varchar(80), ' +
                     'position text, ' +
+                    'updated_at timestamp without time zone,' +
+                    'created_at timestamp without time zone,' +
                     'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
                     'CONSTRAINT tb_hospitals_region_id_foreign FOREIGN KEY (region_id) REFERENCES tb_regions_dic (id) MATCH SIMPLE ' +
                     'ON UPDATE CASCADE ON DELETE CASCADE, ' +

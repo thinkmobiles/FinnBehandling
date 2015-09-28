@@ -5,9 +5,9 @@ var HospitalsHandler = require('../handlers/hospitals');
 module.exports = function (PostGre) {
     var hospitalsHandler = new HospitalsHandler(PostGre);
 
-    router.get('/', function (req, res, next) {
-        res.status(200).send('TEST')
-    });
+    router.post('/', hospitalsHandler.createHospital);
+
+    router.put('/', hospitalsHandler.updateHospital);
 
 
 
