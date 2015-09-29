@@ -1,12 +1,8 @@
+<div class="repeat-title"></div>
 <div class="hospitals-list">
     <div>
         <span class="dynamic-font-md">Viser resultater: {{sentereCtrl.hospitals.length}} av {{totalItems}}</span>
     </div>
-    <div>
-
-    </div>
-    <button class="btn btn-default">Vis alle</button>
-    <button class="btn btn-default">Liste</button>
 
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 
@@ -19,7 +15,7 @@
 
             <div ng-class="{'col-md-9': hospital.is_paid}">
 
-                <img  ng-class="{'col-md-3': !hospital.is_paid, 'col-md-8': hospital.is_paid}"
+                <img  ng-class="{'col-md-3': !hospital.is_paid, 'col-md-6': hospital.is_paid}"
                      ng-src="{{hospital.image}}"/>
 
                 <div class="dynamic-font-md" ng-class="{'col-md-6': !hospital.is_paid, 'hospital-details col-md-12': hospital.is_paid}">
@@ -35,7 +31,6 @@
 
                 <div ng-show="hospital.is_paid">
                     <a class="btn btn-default margin-top">Se hele profilen</a><br/>
-                    <a href="{{hospital.web_page}}" class="btn btn-default margin-top">Ga til nettside</a><br/>
                     <a class="btn btn-default margin-top">Vis pa kart</a>
                 </div>
 

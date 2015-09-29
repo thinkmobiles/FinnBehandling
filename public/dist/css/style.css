@@ -7419,8 +7419,8 @@ button.close {
 }
 
 .inner-block {
-    padding-left: 200px;
-    padding-right: 200px;
+    padding-left: 100px;
+    padding-right: 100px;
 }
 
 #main-logo {
@@ -7454,7 +7454,7 @@ button.close {
     border: 1px solid #CDCDCD;
     border-radius: 5px;
     list-style: none;
-    width: 880px;
+    width: 1080px;
     padding: 0;
 }
 
@@ -7462,7 +7462,7 @@ button.close {
     border-right: 1px solid #CDCDCD;
     vertical-align: middle;
     display:inline-block;
-    width: 213px;
+    width: 263px;
     padding: 3px;
     cursor: pointer;
     font-size: 11.0pt;
@@ -7470,11 +7470,6 @@ button.close {
 
 #main-menu-list li:last-child {
     border: none !important;
-}
-
-#side-bar {
-    background: #eee;
-    height: 600px;
 }
 
 .advertising {
@@ -7493,7 +7488,7 @@ button.close {
 
 .start-page-news {
     display: inline-block;
-    width: 210px;
+    width: 260px;
     overflow: hidden;
     margin-top: 15px;
     padding-left: 10px;
@@ -7507,7 +7502,7 @@ button.close {
 
 .start-page-news img {
     /*width: 192px;*/
-    height: 120px;
+    height: 180px;
     max-width:100%;
 }
 
@@ -7542,8 +7537,8 @@ button.close {
     border: 18px solid #009ec8;
     background: #fff;
     padding: 10px;
-    border-radius: 8px;
-    margin-top: 15px;
+    border-radius: 5px;
+    margin-top: 6px;
 }
 
 .hospital-item {
@@ -7561,7 +7556,70 @@ button.close {
 }
 
 .margin-top {
-    margin-top: 10px;
+    margin-top: 10px !important;
+}
+
+#side-bar .title {
+    line-height: 30px;
+    background: url(../../img/title-start.png) no-repeat left center;
+    padding: 0 0 0 29px;
+    margin: 0;
+}
+
+#side-bar .title .text {
+    vertical-align: middle;
+    padding: 0 10px 0 0;
+    display: table-cell;
+    word-break: keep-all;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#side-bar .title .end {
+    width: 100%;
+    display: table-cell;
+    height: 30px;
+    background: url(../../img/title-repeat.png) repeat-x center;
+}
+
+.repeat-title {
+    padding-top: 18px;
+    margin-top: 25px;
+    height: 0;
+    width: 100%;
+    background: url(../../img/title-repeat.png) repeat-x center;
+}
+
+.side-container {
+    padding: 25px 15px 15px;
+    border: 10px solid #009ec8;
+    border-radius: 5px;
+    margin: 0 0 15px;
+    background: #fff;
+}
+
+.side-container div {
+    margin: 0
+}
+
+.side-container div label {
+    margin: 0
+}
+
+.side-label-holder {
+    height: 34px;
+    padding: 7px 0;
+}
+
+.side-input {
+    display: inline-block;
+    width: 50%;
+}
+
+.side-input-sm {
+    display: inline-block;
+    width: 35%;
 }
 
 footer {
