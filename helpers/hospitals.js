@@ -20,63 +20,62 @@ Hospitals = function (PostGre) {
     var SubTreatmentsList = PostGre.Models[TABLES.SUB_TREATMENTS_LIST];
 
     var getQuery = 'SELECT array_to_json(array_agg(row_to_json(hospital))) ' +
-    'FROM (SELECT h.id, h.name, h.web_address, h.phone_number, ht.name as type, ' +
+        'FROM (SELECT h.id, h.name, h.web_address, h.phone_number, ht.name as type, ' +
         '(SELECT row_to_json(r) ' +
-    'FROM ( ' +
+        'FROM ( ' +
         'SELECT r.zip_code, r.kommune_name, r.fylke_name ' +
-    'FROM ' + TABLES.REGIONS_LIST + ' r WHERE r.id = h.region_id ' +
-    ') r ' +
-    ') AS adress, ' +
+        'FROM ' + TABLES.REGIONS_LIST + ' r WHERE r.id = h.region_id ' +
+        ') r ' +
+        ') AS adress, ' +
 
         '(SELECT array_to_json(array_agg(row_to_json(t))) ' +
-    'FROM ( ' +
+        'FROM ( ' +
         'SELECT t.name ' +
-    'FROM ' + TABLES.TREATMENTS_LIST + ' t ' +
-    'LEFT JOIN ' + TABLES.TREATMENTS + ' ht ON t.id = ht.treatment_id ' +
-    'WHERE ht.hospital_id = h.id ' +
-    ') t ' +
-    ') AS treatments, ' +
+        'FROM ' + TABLES.TREATMENTS_LIST + ' t ' +
+        'LEFT JOIN ' + TABLES.TREATMENTS + ' ht ON t.id = ht.treatment_id ' +
+        'WHERE ht.hospital_id = h.id ' +
+        ') t ' +
+        ') AS treatments, ' +
 
         '(SELECT array_to_json(array_agg(row_to_json(st))) ' +
-    'FROM ( ' +
+        'FROM ( ' +
         'SELECT st.name ' +
-    'FROM ' + TABLES.SUB_TREATMENTS_LIST + ' st ' +
-    'LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hst ON st.id = hst.sub_treatment_id ' +
-    'WHERE hst.hospital_id = h.id ' +
-    ') st ' +
-    ') AS sub_treatments, ' +
+        'FROM ' + TABLES.SUB_TREATMENTS_LIST + ' st ' +
+        'LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hst ON st.id = hst.sub_treatment_id ' +
+        'WHERE hst.hospital_id = h.id ' +
+        ') st ' +
+        ') AS sub_treatments, ' +
 
         '(SELECT array_to_json(array_agg(row_to_json(txt))) ' +
-    'FROM (' +
+        'FROM (' +
         'SELECT txt.content, txt.type ' +
-    'FROM ' + TABLES.HOSPITAL_TEXTS + ' txt ' +
-    'WHERE txt.hospital_id = h.id ' +
-    ') txt ' +
-    ') AS texts ' +
+        'FROM ' + TABLES.HOSPITAL_TEXTS + ' txt ' +
+        'WHERE txt.hospital_id = h.id ' +
+        ') txt ' +
+        ') AS texts ' +
 
-    'FROM ' + TABLES.HOSPITALS + ' h ' +
-    'LEFT JOIN ' + TABLES.HOSPITAL_TYPES_LIST + ' ht ON ht.id = h.type_id ' +
+        'FROM ' + TABLES.HOSPITALS + ' h ' +
+        'LEFT JOIN ' + TABLES.HOSPITAL_TYPES_LIST + ' ht ON ht.id = h.type_id ' +
         '/* mark */ ' +
-    ') AS hospital ';
+        ') AS hospital ';
 
     function createHospital(data, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + ' is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         Hospital
             .forge()
-            .save(data)
+            .save(data, {
+                require: true
+            })
             .asCallback(function (err, hospital) {
 
-                if (err || !(hospital && hospital.id)) {
-                    saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                    saveError.status = 500;
-
-                    return callback(saveError);
+                if (err) {
+                    return callback(err);
                 }
 
                 callback(null, hospital.id);
@@ -85,11 +84,11 @@ Hospitals = function (PostGre) {
     }
 
     function createHospitalTreatment(treatmentIds, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         async.eachSeries(treatmentIds, function (treatmentId, cb) {
@@ -99,14 +98,13 @@ Hospitals = function (PostGre) {
                 .save({
                     hospital_id: hospitalId,
                     treatment_id: treatmentId
+                }, {
+                    require: true
                 })
-                .asCallback(function (err, treatment) {
+                .asCallback(function (err) {
 
-                    if (err || !(treatment && treatment.id)) {
-                        saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                        saveError.status = 500;
-
-                        return cb(saveError);
+                    if (err) {
+                        return cb(err);
                     }
 
                     cb();
@@ -117,16 +115,17 @@ Hospitals = function (PostGre) {
             if (err) {
                 return callback(err)
             }
+
             callback()
         });
     }
 
     function createHospitalSubTreatment(subTreatmentIds, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + 'is not a function');
+            throw error;
         }
 
         async.eachSeries(subTreatmentIds, function (subTreatmentId, cb) {
@@ -136,14 +135,13 @@ Hospitals = function (PostGre) {
                 .save({
                     hospital_id: hospitalId,
                     sub_treatment_id: subTreatmentId
+                }, {
+                    require: true
                 })
-                .asCallback(function (err, subTreatment) {
+                .asCallback(function (err) {
 
-                    if (err || !(subTreatment && subTreatment.id)) {
-                        saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                        saveError.status = 500;
-
-                        return cb(saveError);
+                    if (err) {
+                        return cb(err);
                     }
 
                     cb();
@@ -154,17 +152,18 @@ Hospitals = function (PostGre) {
             if (err) {
                 return callback(err)
             }
+
             callback()
         });
 
     }
 
     function createHospitalText(options, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         HospitalText
@@ -173,14 +172,13 @@ Hospitals = function (PostGre) {
                 hospital_id: hospitalId,
                 content: options.description,
                 type: 'description'
+            }, {
+                require: true
             })
-            .asCallback(function (err, text) {
+            .asCallback(function (err) {
 
-                if (err || !(text && text.id)) {
-                    saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                    saveError.status = 500;
-
-                    return callback(saveError);
+                if (err) {
+                    return callback(err);
                 }
 
                 callback();
@@ -196,7 +194,8 @@ Hospitals = function (PostGre) {
                 id: hospitalId
             })
             .save(data, {
-                method: 'update'
+                method: 'update',
+                require: true
             })
             .asCallback(function (err, hospital) {
 
@@ -209,11 +208,11 @@ Hospitals = function (PostGre) {
     }
 
     function updateHospitalTreatment(treatmentIds, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         HospitalTreatment
@@ -235,14 +234,13 @@ Hospitals = function (PostGre) {
                         .save({
                             hospital_id: hospitalId,
                             treatment_id: treatmentId
+                        }, {
+                            require: true
                         })
-                        .asCallback(function (err, treatment) {
+                        .asCallback(function (err) {
 
-                            if (err || !(treatment && treatment.id)) {
-                                saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                                saveError.status = 500;
-
-                                return cb(saveError);
+                            if (err) {
+                                return cb(err);
                             }
 
                             cb();
@@ -253,17 +251,18 @@ Hospitals = function (PostGre) {
                     if (err) {
                         return callback(err)
                     }
+
                     callback()
                 });
             })
     }
 
     function updateHospitalSubTreatment(subTreatmentIds, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         HospitalSubTreatment
@@ -285,35 +284,36 @@ Hospitals = function (PostGre) {
                         .save({
                             hospital_id: hospitalId,
                             sub_treatment_id: subTreatmentId
+                        }, {
+                            require: true
                         })
                         .asCallback(function (err, subTreatment) {
 
-                            if (err || !(subTreatment && subTreatment.id)) {
-                                saveError = err || new Error(RESPONSES.SAVE_ERROR);
-                                saveError.status = 500;
-
-                                return cb(saveError);
+                            if (err) {
+                                return cb(err);
                             }
 
                             cb();
 
                         })
+
                 }, function (err) {
 
                     if (err) {
                         return callback(err)
                     }
+
                     callback()
                 });
             })
     }
 
     function updateHospitalText(options, hospitalId, callback) {
-        var saveError;
+        var error;
 
         if (typeof callback !== 'function') {
-            saveError = new Error(typeof callback + 'is not a function');
-            throw saveError
+            error = new Error(typeof callback + ' is not a function');
+            throw error;
         }
 
         HospitalText
@@ -325,7 +325,8 @@ Hospitals = function (PostGre) {
             .save({
                 content: options.description
             }, {
-                method: 'update'
+                method: 'update',
+                require: true
             })
             .asCallback(function (err) {
 
@@ -353,7 +354,7 @@ Hospitals = function (PostGre) {
             })
     }
 
-    function getHospitals (options, callback) {
+    function getHospitals(options, callback) {
         var getAllquery = getQuery.replace(/\/\* mark \*\//, 'ORDER BY h.created_at OFFSET ' + options.offset + ' LIMIT ' + options.limit);
 
         PostGre.knex
@@ -624,7 +625,7 @@ Hospitals = function (PostGre) {
             })
             .destroy()
             .asCallback(function (err) {
-                
+
                 if (err) {
                     return callback(err);
                 }
