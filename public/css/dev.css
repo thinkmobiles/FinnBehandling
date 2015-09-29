@@ -106,7 +106,7 @@
 
 .start-page-news {
     display: inline-block;
-    width: 185px;
+    width: 210px;
     overflow: hidden;
     margin-top: 15px;
     padding-left: 10px;
@@ -126,6 +126,55 @@
 
 .start-page-news h5 {
     font-weight: bold;
+}
+
+.hospital-logo {
+    height: 80px;
+    max-width:100%;
+}
+
+.hospital-details {
+    margin-top: 10px;
+}
+
+.contact-data {
+    color: #009ec8;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.blue {
+    color: #009ec8;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.hospitals-list {
+    border: 18px solid #009ec8;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.hospital-item {
+    background: #fff;
+    padding: 10px;
+    margin-top: 15px;
+}
+
+.hospital-item-paid {
+    border: 6px solid #009ec8;
+}
+
+.grey {
+    background: #ebebeb;
+}
+
+.margin-top {
+    margin-top: 10px;
 }
 
 footer {

@@ -4,6 +4,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/sentere', {
+        controller: 'sentereController',
+        templateUrl: 'templates/sentere/list.html',
+        controllerAs: 'sentereCtrl',
+        reloadOnSearch: false
     }).otherwise({
         redirectTo: '/'
     });
