@@ -15,34 +15,43 @@ Hospitals = function (PostGre) {
     this.createHospital = function (req, res, next) {
         var options = req.body;
 
-        hospitalHelper.createHospitalByOptions(options, function (err, result) {
-
-            if (err) {
-                return next(err)
-            }
-
-            res.status(201).send({
-                success: RESPONSES.WAS_CREATED,
-                hospital_id: result
-            })
-
-        }, {checkFunctions: [
+        hospitalHelper.createHospitalByOptions(options, {checkFunctions: [
             'checkHospitalType',
             'checkHospitalRegion',
             'checkHospitalTreatment',
             'checkHospitalSubTreatment',
             'checkUniqueHospitalName'
-        ]});
+
+        ]}, function (err, result) {
+
+            if (err) {
+                return next(err);
+            }
+
+            res.status(201).send({
+                success: RESPONSES.WAS_CREATED,
+                hospital_id: result
+            });
+
+        });
     };
 
     this.updateHospital = function (req, res, next) {
         var options = req.body;
         options.hospital_id = req.params.id;
 
-        hospitalHelper.updateHospitalByOptions(options, function (err, result) {
+        hospitalHelper.updateHospitalByOptions(options, {checkFunctions: [
+            'checkExistingHospital',
+            'checkHospitalType',
+            'checkHospitalRegion',
+            'checkHospitalTreatment',
+            'checkHospitalSubTreatment',
+            'checkUniqueHospitalName'
+
+        ]}, function (err, result) {
 
             if (err) {
-                return next(err)
+                return next(err);
             }
 
             res.status(200).send({
@@ -50,21 +59,14 @@ Hospitals = function (PostGre) {
                 hospital_id: result
             });
 
-        }, {checkFunctions: [
-            'checkExistingHospital',
-            'checkHospitalType',
-            'checkHospitalRegion',
-            'checkHospitalTreatment',
-            'checkHospitalSubTreatment',
-            'checkUniqueHospitalName'
-        ]})
+        })
     };
 
     this.getAllHospitals = function (req, res, next) {
-        var options = {
-            limit: req.query.limit || 25,
-            offset: req.query.offset - 1 || 0
-        };
+        var options = {};
+
+        options.limit = (parseInt(req.query.limit) < 0) ? 25 : req.query.limit || 25;
+        options.offset = (req.query.page - 1 < 0) ? 0 : req.query.page - 1 || 0;
 
         hospitalHelper.getHospitalByOptions(options, function (err, hospitals) {
 
@@ -72,7 +74,7 @@ Hospitals = function (PostGre) {
                 return next(err);
             }
 
-            res.status(200).send(hospitals)
+            res.status(200).send(hospitals);
         })
     };
 
@@ -85,7 +87,7 @@ Hospitals = function (PostGre) {
                 return next(err);
             }
 
-            res.status(200).send(hospital)
+            res.status(200).send(hospital);
         })
     };
 
@@ -98,7 +100,7 @@ Hospitals = function (PostGre) {
                 return next(err);
             }
 
-            res.status(200).send(RESPONSES.REMOVE_SUCCESSFULY)
+            res.status(200).send(RESPONSES.REMOVE_SUCCESSFULY);
         })
     }
 };

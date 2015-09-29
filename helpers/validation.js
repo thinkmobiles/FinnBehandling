@@ -1,14 +1,32 @@
-var async = require('../node_modules/async');
+var async = require('async');
 
 function Check(validJSON, objectOfValidationFunctions) {
     var self = this;
 
-    this.run = function (options, callback, settings) {
+    this.run = function () {
         var errors;
         var saveModelOptions = {};
         var result;
-        var objectRule;
         var key;
+        var argsLength = arguments.length;
+        var options;
+        var settings;
+        var callback;
+
+        if (argsLength === 3) {
+            options = arguments[0];
+            settings = arguments[1];
+            callback = arguments[2];
+
+        } else {
+            options = arguments[0];
+            callback = arguments[argsLength - 1];
+        }
+
+        if (typeof callback !== 'function') {
+            errors = new Error(typeof callback + ' is not a function');
+            throw errors;
+        }
 
         if (settings && !!settings.withoutValidation) {
 
@@ -76,7 +94,7 @@ function Check(validJSON, objectOfValidationFunctions) {
                 });
 
             } else {
-                callback();
+                callback(/*null, saveModelOptions*/);
             }
 
         } else {

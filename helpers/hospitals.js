@@ -3,8 +3,8 @@ var RESPONSES = require('../constants/responseMessages');
 var TABLES = require('../constants/tables');
 var Validation = require('../helpers/validation');
 var Session = require('../handlers/sessions');
-var _ = require('../node_modules/underscore');
-var async = require('../node_modules/async');
+var _ = require('underscore');
+var async = require('async');
 
 var Hospitals;
 
@@ -59,13 +59,20 @@ Hospitals = function (PostGre) {
         '/* mark */ ' +
         ') AS hospital ';
 
-    function createHospital(data, callback) {
+    function assert(fn) {
         var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
+        if (typeof fn !== 'function') {
+            error = new Error(typeof fn + ' is not a function');
             throw error;
         }
+
+
+    }
+
+    function createHospital(data, callback) {
+
+        assert(callback);
 
         Hospital
             .forge()
@@ -84,12 +91,8 @@ Hospitals = function (PostGre) {
     }
 
     function createHospitalTreatment(treatmentIds, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
-            throw error;
-        }
+        assert(callback);
 
         async.eachSeries(treatmentIds, function (treatmentId, cb) {
 
@@ -121,12 +124,8 @@ Hospitals = function (PostGre) {
     }
 
     function createHospitalSubTreatment(subTreatmentIds, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + 'is not a function');
-            throw error;
-        }
+        assert(callback);
 
         async.eachSeries(subTreatmentIds, function (subTreatmentId, cb) {
 
@@ -159,12 +158,8 @@ Hospitals = function (PostGre) {
     }
 
     function createHospitalText(options, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
-            throw error;
-        }
+        assert(callback);
 
         HospitalText
             .forge()
@@ -188,6 +183,7 @@ Hospitals = function (PostGre) {
     }
 
     function updateHospital(hospitalId, data, callback) {
+        assert(callback);
 
         Hospital
             .forge({
@@ -200,20 +196,16 @@ Hospitals = function (PostGre) {
             .asCallback(function (err, hospital) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
-                callback(null, hospital.id)
+                callback(null, hospital.id);
             })
     }
 
     function updateHospitalTreatment(treatmentIds, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
-            throw error;
-        }
+        assert(callback);
 
         HospitalTreatment
             .forge()
@@ -224,7 +216,7 @@ Hospitals = function (PostGre) {
             .asCallback(function (err) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
                 async.eachSeries(treatmentIds, function (treatmentId, cb) {
@@ -249,21 +241,17 @@ Hospitals = function (PostGre) {
                 }, function (err) {
 
                     if (err) {
-                        return callback(err)
+                        return callback(err);
                     }
 
-                    callback()
+                    callback();
                 });
             })
     }
 
     function updateHospitalSubTreatment(subTreatmentIds, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
-            throw error;
-        }
+        assert(callback);
 
         HospitalSubTreatment
             .forge()
@@ -287,7 +275,7 @@ Hospitals = function (PostGre) {
                         }, {
                             require: true
                         })
-                        .asCallback(function (err, subTreatment) {
+                        .asCallback(function (err) {
 
                             if (err) {
                                 return cb(err);
@@ -300,21 +288,17 @@ Hospitals = function (PostGre) {
                 }, function (err) {
 
                     if (err) {
-                        return callback(err)
+                        return callback(err);
                     }
 
-                    callback()
+                    callback();
                 });
             })
     }
 
     function updateHospitalText(options, hospitalId, callback) {
-        var error;
 
-        if (typeof callback !== 'function') {
-            error = new Error(typeof callback + ' is not a function');
-            throw error;
-        }
+        assert(callback);
 
         HospitalText
             .forge()
@@ -340,6 +324,9 @@ Hospitals = function (PostGre) {
     }
 
     function getHospitalById(id, callback) {
+
+        assert(callback);
+
         var getByIdQuery = 'WHERE hospital.id = ' + id;
 
         PostGre.knex
@@ -347,43 +334,45 @@ Hospitals = function (PostGre) {
             .asCallback(function (err, querResult) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
-                callback(null, querResult.rows[0].array_to_json[0])
+                callback(null, querResult.rows[0].array_to_json[0]);
             })
     }
 
     function getHospitals(options, callback) {
-        var getAllquery = getQuery.replace(/\/\* mark \*\//, 'ORDER BY h.created_at OFFSET ' + options.offset + ' LIMIT ' + options.limit);
+        var getAllquery;
+        assert(callback);
+
+        getAllquery = getQuery.replace(/\/\* mark \*\//, 'ORDER BY h.created_at OFFSET ' + options.offset + ' LIMIT ' + options.limit);
 
         PostGre.knex
             .raw(getAllquery)
             .asCallback(function (err, querResult) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
-                callback(null, querResult.rows[0].array_to_json)
+                callback(null, querResult.rows[0].array_to_json);
             })
     }
 
     this.checkFunctions = {
         checkHospitalType: function (options, validatedOptions, callback) {
-            var typeError;
+           assert(callback);
 
             HospitalType
                 .forge({
                     id: validatedOptions.type_id
                 })
-                .fetch()
-                .asCallback(function (err, type) {
-                    if (err || !(type && type.id)) {
-                        typeError = err || new Error(RESPONSES.CLINIC_TYPE_ERROR);
-                        typeError.status = 400;
-
-                        return callback(typeError);
+                .fetch({
+                    require: true
+                })
+                .asCallback(function (err) {
+                    if (err) {
+                        return callback(err);
                     }
 
                     callback();
@@ -392,20 +381,20 @@ Hospitals = function (PostGre) {
         },
 
         checkHospitalRegion: function (options, validatedOptions, callback) {
-            var regionError;
+            assert(callback);
 
             Region
                 .forge({
                     id: validatedOptions.region_id
                 })
-                .fetch()
-                .asCallback(function (err, region) {
+                .fetch({
+                    require: true
+                })
+                .asCallback(function (err) {
 
-                    if (err || !(region && region.id)) {
-                        regionError = err || new Error(RESPONSES.CLINIC_REGION_ERROR);
-                        regionError.status = 400;
+                    if (err) {
 
-                        return callback(regionError);
+                        return callback(err);
                     }
 
                     callback();
@@ -415,15 +404,18 @@ Hospitals = function (PostGre) {
 
         checkHospitalTreatment: function (options, validatedOptions, callback) {
             var treatmentError;
+            assert(callback);
 
             TreatmentsList
                 .query(function (qb) {
                     qb.whereIn('id', options.treatment_ids)
                 })
-                .fetchAll()
+                .fetchAll({
+                    require: true
+                })
                 .asCallback(function (err, treatment) {
 
-                    if (err || !treatment || !treatment.models || treatment.models.length !== options.treatment_ids.length) {
+                    if (err || treatment.models.length !== options.treatment_ids.length) {
                         treatmentError = err || new Error(RESPONSES.CLINIC_TREATMENT_ERROR);
                         treatmentError.status = 400;
 
@@ -437,15 +429,18 @@ Hospitals = function (PostGre) {
 
         checkHospitalSubTreatment: function (options, validatedOptions, callback) {
             var subTreatmentError;
+            assert(callback);
 
             SubTreatmentsList
                 .query(function (qb) {
                     qb.whereIn('id', options.sub_treatments)
                 })
-                .fetchAll()
+                .fetchAll({
+                    require: true
+                })
                 .asCallback(function (err, subTreatment) {
 
-                    if (err || !subTreatment || !subTreatment.models || subTreatment.models.length !== options.sub_treatments.length) {
+                    if (err || subTreatment.models.length !== options.sub_treatments.length) {
                         subTreatmentError = err || new Error(RESPONSES.CLINIC_SUB_TREATMENT_ERROR);
                         subTreatmentError.status = 400;
 
@@ -459,6 +454,7 @@ Hospitals = function (PostGre) {
 
         checkUniqueHospitalName: function (options, validatedOptions, callback) {
             var nonUniqueNameError;
+            assert(callback);
 
             Hospital
                 .forge({
@@ -467,31 +463,28 @@ Hospitals = function (PostGre) {
                 .fetch()
                 .asCallback(function (err, hospital) {
 
-                    if (err || (hospital && hospital.id && hospital.id !== parseInt(options.hospital_id))) {
+                    if (err || (hospital && hospital.id !== parseInt(options.hospital_id))) {
                         nonUniqueNameError = err || new Error(RESPONSES.NON_UNIQUE_NAME_ERROR);
                         nonUniqueNameError.status = 400;
 
                         return callback(nonUniqueNameError);
                     }
-                    callback()
+                    callback();
                 })
 
         },
 
         checkExistingHospital: function (options, validatedOptions, callback) {
-            var hospitalError;
+            assert(callback);
 
             Hospital
                 .forge({
                     id: validatedOptions.hospital_id
                 })
                 .fetch()
-                .asCallback(function (err, hospital) {
-                    if (err || !(hospital && hospital.id)) {
-                        hospitalError = err || new Error(RESPONSES.CLINIC_ERROR);
-                        hospitalError.status = 400;
-
-                        return callback(hospitalError);
+                .asCallback(function (err) {
+                    if (err) {
+                        return callback(err);
                     }
 
                     callback();
@@ -520,9 +513,9 @@ Hospitals = function (PostGre) {
         web_address: ['isString']
     }, self.checkFunctions);
 
-    this.createHospitalByOptions = function (options, callback, settings) {
+    this.createHospitalByOptions = function (options, settings, callback) {
 
-        self.checkCreateHospitalOptions.run(options, function (errors, validOptions) {
+        self.checkCreateHospitalOptions.run(options, settings, function (errors, validOptions) {
 
             if (errors) {
                 return callback(errors)
@@ -539,12 +532,7 @@ Hospitals = function (PostGre) {
 
                     if (err) {
 
-                        Hospital
-                            .forge({
-                                id: hospitalId
-                            })
-                            .destroy()
-                            .asCallback(function () {
+                        self.deleteHospital(hospitalId, function () {
                                 return callback(err);
                             })
                     }
@@ -553,17 +541,18 @@ Hospitals = function (PostGre) {
                 })
             })
 
-        }, settings);
+        });
     };
 
-    this.updateHospitalByOptions = function (options, callback, settings) {
+    this.updateHospitalByOptions = function (options, settings, callback) {
 
-        self.checkUpdateHospitalOptions.run(options, function (errors, validOptions) {
+        self.checkUpdateHospitalOptions.run(options, settings, function (errors, validOptions) {
             var hospitalId;
 
             if (errors) {
                 return callback(errors)
             }
+
             hospitalId = validOptions.hospital_id;
             delete validOptions.hospital_id;
 
@@ -586,33 +575,18 @@ Hospitals = function (PostGre) {
             })
 
 
-        }, settings);
+        });
     };
 
     this.getHospitalByOptions = function (options, callback) {
-        var limit = options.limit || 10;
 
         if (typeof options === 'number') {
 
-            getHospitalById(options, function (err, hospital) {
-
-                if (err) {
-                    return callback(err);
-                }
-
-                callback(null, hospital)
-            })
+            getHospitalById(options, callback)
 
         } else {
 
-            getHospitals(options, function (err, hospital) {
-
-                if (err) {
-                    return callback(err);
-                }
-
-                callback(null, hospital)
-            })
+            getHospitals(options, callback)
         }
 
     };
