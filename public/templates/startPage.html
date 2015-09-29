@@ -1,4 +1,4 @@
-<div id="start-page-static">
+<div id="start-page-static" class="dynamic-font-md">
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut turpis ullamcorper, cursus felis bibendum,
     consequat turpis. Proin tortor nisl, vehicula quis pharetra non, feugiat ac leo. Proin vel aliquet metus.
     Suspendisse potenti. Donec vel magna et turpis sagittis viverra. Integer aliquet malesuada feugiat. Aenean mattis
@@ -15,8 +15,8 @@
 <div>
     <div ng-repeat="article in startPageCtrl.news" class="start-page-news">
         <img ng-src="{{article.image}}"/>
-        <h5> {{article.title}} </h5>
-        <h5> {{article.date | date: "d MMM, y"}} </h5>
-        <h6> {{article.text}} </h6>
+        <h5 class="dynamic-font-md"> {{article.title}} </h5>
+        <h5 class="dynamic-font-md"> {{article.date | date: "d MMM, y"}} </h5>
+        <h6  class="dynamic-font-sm"> {{article.text}} </h6>
     </div>
 </div>
