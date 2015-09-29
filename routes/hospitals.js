@@ -7,7 +7,12 @@ module.exports = function (PostGre) {
 
     router.post('/', hospitalsHandler.createHospital);
 
-    router.put('/', hospitalsHandler.updateHospital);
+    router.get('/', hospitalsHandler.getAllHospitals);
+    router.get('/:id', hospitalsHandler.getHospital);
+
+    router.delete('/:id', hospitalsHandler.deleteHospital);
+
+    router.put('/:id', hospitalsHandler.updateHospital);
 
 
 

@@ -61,6 +61,7 @@ module.exports = {
                     'is_paid boolean NOT NULL, ' +
                     'type_id integer NOT NULL, ' +
                     'name varchar(80), ' +
+                    'web_address varchar(80), ' +
                     'phone_number varchar(80), ' +
                     'position text, ' +
                     'updated_at timestamp without time zone,' +
@@ -83,10 +84,10 @@ module.exports = {
                                 ') WITHOUT OIDS;',
     HOSPITAL_SUB_TREATMENTS: 'CREATE TABLE tb_hospital_sub_treatments ( ' +
                                 'id serial NOT NULL, ' +
-                                'treatment_id integer NOT NULL, ' +
+                                'hospital_id integer NOT NULL, ' +
                                 'sub_treatment_id integer NOT NULL, ' +
                                 'CONSTRAINT tb_hospital_sub_treatments_pkey PRIMARY KEY (id),' +
-                                'CONSTRAINT tb_hospital_sub_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_hospital_treatments (id) MATCH SIMPLE ' +
+                                'CONSTRAINT tb_hospital_sub_treatments_hospital_id_foreign FOREIGN KEY (hospital_id) REFERENCES tb_hospitals (id) MATCH SIMPLE ' +
                                 'ON UPDATE CASCADE ON DELETE CASCADE, ' +
                                 'CONSTRAINT tb_hospital_sub_treatments_sub_treatment_id_foreign FOREIGN KEY (sub_treatment_id) REFERENCES tb_sub_treatments_dic (id) MATCH SIMPLE ' +
                                 'ON UPDATE CASCADE ON DELETE CASCADE ' +

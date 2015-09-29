@@ -15,6 +15,7 @@ module.exports = {
     // Validation errors
     NOT_UNIQUE_EMAIL: 'Email not unique',
     PHONE_ERROR:'Phone number is required',
+    CLINIC_ERROR: 'Such clinic does not exist',
     CLINIC_TYPE_ERROR: 'Incorrect type of medical institution',
     CLINIC_REGION_ERROR: 'Incorrect region of medical institution',
     CLINIC_TREATMENT_ERROR: 'Incorrect treatment of medical institution',

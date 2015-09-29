@@ -87,77 +87,99 @@ function Check(validJSON, objectOfValidationFunctions) {
 }
 
 Check.prototype = {
+
     required: function (val) {
+
         if (val === undefined && val !== null) {
+            return null;
         } else {
             return val;
         }
-        ;
     },
+
     isEmail: function (val) {
         var regexp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
         if (regexp.test(val)) {
             return val;
         }
     },
+
     isInt: function (val) {
+
         if (val !== null && val !== undefined) {
+
             if (val === null) {
                 return null;
+
             } else {
                 return parseInt(val);
             }
-            ;
         }
-        ;
     },
+
     isFloat: function (val) {
+
         if (!isNaN(+val)) {
             return parseFloat(val);
         }
-        ;
     },
+
     isDate: function (val) {
+
         if (val instanceof Date) {
+
             if (!isNaN(val.valueOf())) {
                 return val;
             }
+
         } else {
             var date = new Date(val);
+
             if (!isNaN(date.valueOf())) {
                 return date;
             }
         }
     },
+
     isBoolean: function (val) {
         if (typeof(val) === 'boolean') {
             return val;
         } else if (val === 'true' || val === 'false') {
             return Boolean(val);
         }
-        ;
     },
+
     isString: function (val) {
         if (typeof(val) === 'string' || typeof(val) === 'number') {
             return val + '';
         }
-        ;
     },
+
     isTime: function (val) {
         var regexp = /^(?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9]$/;
         if (regexp.test(val)) {
             return val;
         }
-        ;
     },
+
     isNotNull: function (val) {
         if (val !== 'null' && val !== null) {
             return val
         }
     },
+
     isNotEmptyString: function (val) {
         if (typeof val === 'string' && val !== '') {
             return val
+        }
+    },
+
+    isPhone: function (val) {
+        var regexp = /^\+[1-9]\d{4,14}$/;
+
+        if (regexp.test(val)) {
+            return val;
         }
     }
 };
