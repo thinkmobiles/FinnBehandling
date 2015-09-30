@@ -2,7 +2,7 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     function ($scope, $location, GeneralHelpers) {
 
     $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-    $scope.chosenBehandling =  GeneralHelpers.getLocalData('kategori') || 'Alle';
+    $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
     $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
     $scope.fylkes = [
