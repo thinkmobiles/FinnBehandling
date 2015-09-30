@@ -75,7 +75,7 @@ Hospitals = function (PostGre) {
         }
 
         if (offset && !isNaN(offset) && offset - 1 > 0) {
-            options.limit = limit - 1;
+            options.limit = offset - 1;
         }
 
         hospitalHelper.getHospitalByOptions(options, function (err, hospitals) {
