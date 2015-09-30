@@ -38881,27 +38881,24 @@ app.config(['$routeProvider', function ($routeProvider) {
     }).when('/sentere', {
         controller: 'sentereController',
         templateUrl: 'templates/sentere/list.html',
-        controllerAs: 'sentereCtrl',
-        reloadOnSearch: false
+        controllerAs: 'sentereCtrl'
     }).otherwise({
         redirectTo: '/'
     });
 
-}]).run(
-    ['$rootScope',
-        function ($rootScope) {
+}]).run(['$rootScope', function ($rootScope) {
 
 
-        }
-    ]
-);
+}]);
 ;
-app.controller('sentereController', ['$scope', function ($scope) {
+app.controller('sentereController', ['$scope', 'GeneralHelpers',
+    function ($scope, GeneralHelpers) {
     var self = this;
 
     $scope.curPage = 1;
     $scope.totalItems = 2;
-    $scope.itemsPerPage = 2;
+    $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+    //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
 
     this.hospitals = [{
         image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
@@ -38914,10 +38911,8 @@ app.controller('sentereController', ['$scope', function ($scope) {
         'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
         'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
         'varius justo, ut rhoncus velit.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        address: '93 Cottonwood Drive  North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: true,
         latitude: 32,
         longitude: 23
@@ -38930,19 +38925,59 @@ app.controller('sentereController', ['$scope', function ($scope) {
         details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
         ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
         'Suspendisse ipsum ex, hendrerit ac dolor.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        address: '93 Cottonwood Drive North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: false,
         latitude: 32,
         longitude: 23
     }];
+
+    function getHospitals () {
+        var kategori = GeneralHelpers.getLocalData('kategori');
+        var fylke = GeneralHelpers.getLocalData('fylke');
+        var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+        var resultater = GeneralHelpers.getLocalData('resultater');
+
+        //alert('kategori: ' + kategori + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+    }
+
+    getHospitals();
 }]);;
-app.controller('sideBarController', ['$scope', '$rootScope', function ($scope, $rootScope) {
-    var self = this;
+app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
+    function ($scope, $location, GeneralHelpers) {
 
+    $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
+    $scope.chosenKategori =  GeneralHelpers.getLocalData('kategori') || 'Alle';
+    $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
+    $scope.fylkes = [
+        'Alle',
+        'Østfold',
+        'Akershus',
+        'Oslo',
+        'Hedmark',
+        'Oppland',
+        'Buskerud'
+    ];
+
+    $scope.kategories = [
+        'Alle',
+        'Kategori 1',
+        'Kategori 2',
+        'Kategori 3',
+        'Kategori 4',
+        'Kategori 5',
+        'Kategori 6'
+    ];
+
+    $scope.search = function () {
+        GeneralHelpers.saveAsLocalData('kategori', $scope.chosenKategori);
+        GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+        GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
+        GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
+        $location.path('sentere');
+    };
 }]);;
 app.controller('startPageController', ['$scope', function ($scope) {
     var self = this;
@@ -38986,4 +39021,32 @@ app.controller('startPageController', ['$scope', function ($scope) {
         'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
         ' Suspendisse potenti.'
     }];
+}]);;
+app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
+    "use strict";
+    var self = this;
+
+    this.saveAsLocalData = function (key, value) {
+        $location.search(key, value).replace();
+        $rootScope[key] = value;
+    };
+
+    this.getLocalData = function (key) {
+        var locationSearch = $location.search();
+
+        if ($rootScope[key]) {
+
+            $location.search(key, $rootScope[key]).replace();
+            return $rootScope[key];
+
+        } else if (locationSearch[key]) {
+
+            $rootScope[key] = locationSearch[key];
+            return locationSearch[key];
+        } else {
+            return null;
+        }
+    };
+
+    return this;
 }]);

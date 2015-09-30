@@ -1,9 +1,11 @@
-app.controller('sentereController', ['$scope', function ($scope) {
+app.controller('sentereController', ['$scope', 'GeneralHelpers',
+    function ($scope, GeneralHelpers) {
     var self = this;
 
     $scope.curPage = 1;
     $scope.totalItems = 2;
-    $scope.itemsPerPage = 2;
+    $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+    //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
 
     this.hospitals = [{
         image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
@@ -16,10 +18,8 @@ app.controller('sentereController', ['$scope', function ($scope) {
         'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
         'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
         'varius justo, ut rhoncus velit.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        address: '93 Cottonwood Drive  North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: true,
         latitude: 32,
         longitude: 23
@@ -32,12 +32,21 @@ app.controller('sentereController', ['$scope', function ($scope) {
         details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
         ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
         'Suspendisse ipsum ex, hendrerit ac dolor.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        address: '93 Cottonwood Drive North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: false,
         latitude: 32,
         longitude: 23
     }];
+
+    function getHospitals () {
+        var kategori = GeneralHelpers.getLocalData('kategori');
+        var fylke = GeneralHelpers.getLocalData('fylke');
+        var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+        var resultater = GeneralHelpers.getLocalData('resultater');
+
+        //alert('kategori: ' + kategori + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+    }
+
+    getHospitals();
 }]);

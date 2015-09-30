@@ -63,8 +63,12 @@
 
                                 <label for="fylke" class="pull-left side-label-holder dynamic-font-md">Fylke:</label>
 
-                                <select id="fylke" class="pull-right form-control side-input">
-                                    <option>Alle</option>
+                                <select
+                                        id="fylke"
+                                        class="pull-right form-control side-input"
+                                        ng-model="chosenFylke"
+                                        ng-change="search()"
+                                        ng-options="fylke for fylke in fylkes">
                                 </select>
                             </div>
                         </div>
@@ -78,8 +82,11 @@
 
                                 <label for="kategori" class="pull-left side-label-holder dynamic-font-md">Kategori:</label>
 
-                                <select id="kategori" class="pull-right form-control side-input">
-                                    <option>Alle</option>
+                                <select
+                                        id="kategori"
+                                        class="pull-right form-control side-input"
+                                        ng-model="chosenKategori"
+                                        ng-options="kategori for kategori in kategories">
                                 </select>
                             </div>
 
@@ -87,23 +94,32 @@
 
                                 <label for="tekstsøk" class="pull-left side-label-holder dynamic-font-md">Tekstsøk:</label>
 
-                                <input type="text" id="tekstsøk" placeholder="Skriv ord..." class="pull-right form-control side-input"/>
+                                <input
+                                        type="text"
+                                        id="tekstsøk"
+                                        placeholder="Skriv ord..."
+                                        class="pull-right form-control side-input"
+                                        ng-model="tekstsok"/>
                             </div>
 
                             <div class="form-group clearfix margin-top">
 
                                 <label for="resultater" class="pull-left side-label-holder dynamic-font-md">Resultater:</label>
 
-                                <select id="resultater" class="pull-right form-control side-input-sm">
-                                    <option>10</option>
-                                    <option>25</option>
-                                    <option>50</option>
+                                <select
+                                        id="resultater"
+                                        class="pull-right form-control side-input-sm"
+                                        ng-change="search()"
+                                        ng-model="resultater">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
                                 </select>
                             </div>
 
                             <div class="form-group clearfix margin-top">
 
-                                <a class="btn btn-default btn-block">Søk</a>
+                                <a class="btn btn-default btn-block" ng-click="search()">Søk</a>
                             </div>
                         </div>
                         <h2 class="title">

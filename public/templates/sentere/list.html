@@ -7,7 +7,7 @@
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 
     <div class="hospital-item" ng-class="{'hospital-item-paid': hospital.is_paid, grey: !($index % 2)}"
-         dir-paginate="hospital in sentereCtrl.hospitals | itemsPerPage: itemsPerPage" total-items="totalItems" current-page="curPage">
+         dir-paginate="hospital in sentereCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="curPage">
 
         <h4 class="blue bold dynamic-font-lg">{{hospital.title | uppercase}}</h4>
 
