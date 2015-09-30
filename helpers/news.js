@@ -13,7 +13,20 @@ var news = function (PostGre) {
     var News = PostGre.Models[TABLES.NEWS];
     var self = this;
 
+    function assert(fn) {
+        var error;
+
+        if (typeof fn !== 'function') {
+            error = new Error(typeof fn + ' is not a function');
+            throw error;
+        }
+    }
+
     this.getNewsByParams = function (options, callback) {
+
+        var error;
+
+        assert(callback);
 
         if (+options && typeof +options === 'number') {
 
@@ -25,7 +38,6 @@ var news = function (PostGre) {
 
         } else if (typeof options === 'null'){
 
-            var error;
             error = new Error(RESPONSES.NOT_ENOUGH_PARAMETERS);
             error.status = 400;
 
@@ -37,13 +49,7 @@ var news = function (PostGre) {
         News
             .forge({id: newsId})
             .fetch()
-            .asCallback(function (err, news){
-                if(err){
-                    return callback(err);
-                }
-
-                return callback(null, news);
-            });
+            .asCallback(callback);
     }
 
     function getAllNews (options, callback){
@@ -55,13 +61,7 @@ var news = function (PostGre) {
                 }
             })
             .fetchAll()
-            .asCallback(function (err, news){
-                if(err){
-                    return callback(err);
-                }
-
-                return callback(null, news);
-            });
+            .asCallback(callback);
     }
 
     this.checkCreateNewsOptions = new Validation.Check({
@@ -73,6 +73,8 @@ var news = function (PostGre) {
 
     this.createArticle = function (options, callback){
 
+        assert(callback);
+
         self.checkCreateNewsOptions.run(options, function (err, validOptions) {
 
             if (err) {
@@ -82,15 +84,7 @@ var news = function (PostGre) {
             News
                 .forge()
                 .save(validOptions, {require: true})
-                .asCallback(function (err, news){
-
-                    if(err){
-
-                        return callback(err);
-                    }
-
-                    return callback(null, news);
-                });
+                .asCallback(callback);
         });
     };
 
@@ -104,6 +98,8 @@ var news = function (PostGre) {
 
     this.updateArticle = function (options, callback){
 
+        assert(callback);
+
         self.checkUpdateNewsOptions.run(options, function (err, validOptions) {
 
             if (err) {
@@ -113,21 +109,15 @@ var news = function (PostGre) {
             News
                 .where({id: options.id})
                 .save(validOptions, {method: 'update', require: true})
-                .asCallback(function (err, news){
-
-                    if(err){
-
-                        return callback(err);
-                    }
-
-                    return callback(null, news);
-                });
+                .asCallback(callback);
         });
     };
 
     this.deleteArticle = function (newsId, callback) {
 
         var error;
+
+        assert(callback);
 
         if (!newsId) {
             error = new Error(RESPONSES.NOT_ENOUGH_PARAMETERS);
@@ -139,17 +129,7 @@ var news = function (PostGre) {
         News
             .where({id: newsId})
             .destroy()
-            .asCallback(function (err) {
-
-                if (err) {
-                    error = err || new Error(RESPONSES.REMOVING_ERROR);
-                    error.status = 500;
-
-                    return callback(error);
-                }
-
-                return callback();
-            });
+            .asCallback(callback);
     };
 };
 
