@@ -40,12 +40,12 @@ app.controller('sentereController', ['$scope', 'GeneralHelpers',
     }];
 
     function getHospitals () {
-        var kategori = GeneralHelpers.getLocalData('kategori');
+        var behandling = GeneralHelpers.getLocalData('behandling');
         var fylke = GeneralHelpers.getLocalData('fylke');
         var tekstsok = GeneralHelpers.getLocalData('tekstsok');
         var resultater = GeneralHelpers.getLocalData('resultater');
 
-        //alert('kategori: ' + kategori + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+        //alert('behandling: ' + behandling + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
     }
 
     getHospitals();
