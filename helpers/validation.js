@@ -16,7 +16,7 @@ function Check(validJSON, objectOfValidationFunctions) {
                 validJSON[key].forEach(function (element) {
                     if (key in options) {
                         result = self[element](options[key]);
-                        if (result !== undefined) {
+                        if (typeof (result) !== 'undefined') {
                             saveModelOptions[key] = result;
                         } else {
                             if (errors) {
