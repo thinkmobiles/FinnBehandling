@@ -41,25 +41,29 @@ function Check(validJSON, objectOfValidationFunctions) {
 
                     result = self[element](options[key]);
 
-                    if (typeof result !== 'undefined') {
+                    if (typeof result !== 'undefined' && result !== null) {
                         saveModelOptions[key] = result;
 
                     } else {
 
                         if (errors) {
                             errors += key + ': The validation "' + element + '" failed.\r\n';
+                            throw errors;
 
                         } else {
                             errors = key + ': The validation "' + element + '" failed.\r\n';
+                            throw errors;
                         }
                     }
                 } else if (element === 'required') {
 
                     if (errors) {
                         errors += key + ': The validation "' + element + '" failed.\r\n';
+                        throw errors;
 
                     } else {
                         errors = key + ': The validation "' + element + '" failed.\r\n';
+                        throw errors;
                     }
                 }
             })
@@ -67,6 +71,7 @@ function Check(validJSON, objectOfValidationFunctions) {
 
         if (!errors && !Object.keys(saveModelOptions).length) {
             errors = 'Save object is empty, wrong name of fields';
+            throw errors;
         }
 
         if (settings) {
@@ -94,7 +99,7 @@ function Check(validJSON, objectOfValidationFunctions) {
                 });
 
             } else {
-                callback(/*null, saveModelOptions*/);
+                callback();
             }
 
         } else {
@@ -108,8 +113,9 @@ Check.prototype = {
 
     required: function (val) {
 
-        if (val === undefined && val !== null) {
+        if (typeof val === 'undefined' && val !== null) {
             return null;
+
         } else {
             return val;
         }
@@ -125,13 +131,13 @@ Check.prototype = {
 
     isInt: function (val) {
 
-        if (val !== null && val !== undefined) {
+        if (val !== null && typeof val !== 'undefined') {
 
-            if (val === null) {
+            if (isNaN(+val)) {
                 return null;
 
             } else {
-                return parseInt(val);
+                return +val;
             }
         }
     },
@@ -163,6 +169,7 @@ Check.prototype = {
     isBoolean: function (val) {
         if (typeof(val) === 'boolean') {
             return val;
+
         } else if (val === 'true' || val === 'false') {
             return Boolean(val);
         }

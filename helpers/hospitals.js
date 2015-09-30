@@ -333,7 +333,8 @@ Hospitals = function (PostGre) {
             .raw(getQuery + getByIdQuery)
             .asCallback(function (err, querResult) {
 
-                if (err) {
+                if (err || !querResult.rows || !querResult.rows[0] || !querResult.rows[0].array_to_json || querResult.rows[0].array_to_json[0]) {
+                    err = err || new Error(RESPONSES.NOT_FOUND);
                     return callback(err);
                 }
 
@@ -481,7 +482,9 @@ Hospitals = function (PostGre) {
                 .forge({
                     id: validatedOptions.hospital_id
                 })
-                .fetch()
+                .fetch({
+                    require: true
+                })
                 .asCallback(function (err) {
                     if (err) {
                         return callback(err);

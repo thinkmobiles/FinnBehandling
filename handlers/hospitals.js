@@ -63,10 +63,20 @@ Hospitals = function (PostGre) {
     };
 
     this.getAllHospitals = function (req, res, next) {
-        var options = {};
+        var limit = req.query.limit;
+        var offset = req.query.page;
+        var options = {
+            limit: 25,
+            offset: 0
+        };
 
-        options.limit = (parseInt(req.query.limit) < 0) ? 25 : req.query.limit || 25;
-        options.offset = (req.query.page - 1 < 0) ? 0 : req.query.page - 1 || 0;
+        if (limit && !isNaN(limit) && limit > 0) {
+            options.limit = limit;
+        }
+
+        if (offset && !isNaN(offset) && offset - 1 > 0) {
+            options.limit = limit - 1;
+        }
 
         hospitalHelper.getHospitalByOptions(options, function (err, hospitals) {
 

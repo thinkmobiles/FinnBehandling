@@ -2,7 +2,7 @@
  * Created by Roman on 24.02.2015.
  */
 module.exports = {
-    PAGE_NOT_FOUND: 'Page Not Found',
+    NOT_FOUND: 'Not Found',
 
     NOT_ENOUGH_PARAMETERS: 'Not enough incoming parameters',
     INVALID_PARAMETERS: 'Invalid incoming parameters',
