@@ -1,6 +1,3 @@
-/**
- * Created by Roman on 24.02.2015.
- */
 module.exports = {
     NOT_FOUND: 'Not Found',
 
@@ -26,7 +23,7 @@ module.exports = {
     CHANGE_PASSWORD: 'Password change successfully',
     WAS_CREATED: 'Was created successfully',
     SAVING_ERROR: 'saving error',
-    UPDATED_SUCCESS: 'was updated successfully',
+    UPDATED_SUCCESS: 'Was updated successfully',
     NOT_EXISTS: 'is not exist',
     REMOVE_SUCCESSFULY: 'was removed successfully',
     YOUR_DATA_ALREADY_UPDATE: "your data already update",

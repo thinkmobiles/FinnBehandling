@@ -333,7 +333,7 @@ Hospitals = function (PostGre) {
             .raw(getQuery + getByIdQuery)
             .asCallback(function (err, querResult) {
 
-                if (err || !querResult.rows || !querResult.rows[0] || !querResult.rows[0].array_to_json || querResult.rows[0].array_to_json[0]) {
+                if (err || !querResult.rows || !querResult.rows[0] || !querResult.rows[0].array_to_json || !querResult.rows[0].array_to_json[0]) {
                     err = err || new Error(RESPONSES.NOT_FOUND);
                     return callback(err);
                 }

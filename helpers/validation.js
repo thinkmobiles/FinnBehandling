@@ -48,22 +48,22 @@ function Check(validJSON, objectOfValidationFunctions) {
 
                         if (errors) {
                             errors += key + ': The validation "' + element + '" failed.\r\n';
-                            throw errors;
+                            throw new Error(errors);
 
                         } else {
                             errors = key + ': The validation "' + element + '" failed.\r\n';
-                            throw errors;
+                            throw new Error(errors);
                         }
                     }
                 } else if (element === 'required') {
 
                     if (errors) {
                         errors += key + ': The validation "' + element + '" failed.\r\n';
-                        throw errors;
+                        throw new Error(errors);
 
                     } else {
                         errors = key + ': The validation "' + element + '" failed.\r\n';
-                        throw errors;
+                        throw new Error(errors);
                     }
                 }
             })
@@ -71,7 +71,7 @@ function Check(validJSON, objectOfValidationFunctions) {
 
         if (!errors && !Object.keys(saveModelOptions).length) {
             errors = 'Save object is empty, wrong name of fields';
-            throw errors;
+            throw new Error(errors);
         }
 
         if (settings) {

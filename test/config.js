@@ -6,5 +6,5 @@ app = require('../app.js');
 
 module.exports = function () {
     this.app = app;
-    this.host = 'http://localhost:8789';
+    this.host = 'http://localhost:8790';
 };
