@@ -38922,55 +38922,62 @@ app.controller('hospitalController', ['$scope', 'GeneralHelpers',
     }]);;
 app.controller('sentereController', ['$scope', 'GeneralHelpers',
     function ($scope, GeneralHelpers) {
-    var self = this;
+        var self = this;
 
-    $scope.curPage = 1;
-    $scope.totalItems = 2;
-    $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
-    //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
+        $scope.curPage = 1;
+        $scope.totalItems = 2;
+        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
 
-    this.hospitals = [{
-        image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
-        title: 'New Hospital',
-        created_at: new Date(),
-        phone: '+9379992',
-        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed tortor dolor. Nullam eu aliquam ' +
-        'libero. In ac ultrices odio, eu imperdiet arcu. Nullam sagittis consectetur orci. Aliquam lacinia nisi eu ' +
-        'vestibulum suscipit. Proin finibus leo ac dapibus ornare. Pellentesque nisi massa, scelerisque sit amet ' +
-        'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
-        'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
-        'varius justo, ut rhoncus velit.',
-        address: '93 Cottonwood Drive  North York' +
-        ' ON M3C 2B3 Canada',
-        is_paid: true,
-        latitude: 32,
-        longitude: 23
-    },
-    {
-        image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
-        title: 'Old Hospital',
-        created_at: new Date(),
-        phone: '+9379992',
-        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
-        ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
-        'Suspendisse ipsum ex, hendrerit ac dolor.',
-        address: '93 Cottonwood Drive North York' +
-        ' ON M3C 2B3 Canada',
-        is_paid: false,
-        latitude: 32,
-        longitude: 23
-    }];
+        this.setCoordinates = function (lat, long) {
+            $scope.$parent.coordinates = {
+                latitude: lat,
+                longitude: long
+            };
+        };
 
-    function getHospitals () {
-        var behandling = GeneralHelpers.getLocalData('behandling');
-        var fylke = GeneralHelpers.getLocalData('fylke');
-        var tekstsok = GeneralHelpers.getLocalData('tekstsok');
-        var resultater = GeneralHelpers.getLocalData('resultater');
+        this.hospitals = [{
+            image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
+            title: 'New Hospital',
+            created_at: new Date(),
+            phone: '+9379992',
+            details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed tortor dolor. Nullam eu aliquam ' +
+            'libero. In ac ultrices odio, eu imperdiet arcu. Nullam sagittis consectetur orci. Aliquam lacinia nisi eu ' +
+            'vestibulum suscipit. Proin finibus leo ac dapibus ornare. Pellentesque nisi massa, scelerisque sit amet ' +
+            'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
+            'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
+            'varius justo, ut rhoncus velit.',
+            address: '93 Cottonwood Drive  North York' +
+            ' ON M3C 2B3 Canada',
+            is_paid: true,
+            latitude: 43.730376,
+            longitude: -79.342842
+        },
+        {
+            image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
+            title: 'Old Hospital',
+            created_at: new Date(),
+            phone: '+9379992',
+            details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
+            ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
+            'Suspendisse ipsum ex, hendrerit ac dolor.',
+            address: '93 Cottonwood Drive North York' +
+            ' ON M3C 2B3 Canada',
+            is_paid: false,
+            latitude: 32,
+            longitude: 23
+        }];
 
-        //alert('behandling: ' + behandling + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
-    }
+        function getHospitals () {
+            var behandling = GeneralHelpers.getLocalData('behandling');
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+            var resultater = GeneralHelpers.getLocalData('resultater');
 
-    getHospitals();
+            //alert('behandling: ' + behandling + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+        }
+
+        getHospitals();
 }]);;
 app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     function ($scope, $location, GeneralHelpers) {
@@ -39050,6 +39057,133 @@ app.controller('startPageController', ['$scope', function ($scope) {
         ' Suspendisse potenti.'
     }];
 }]);;
+app.directive('gmap', function () {
+    return {
+        restrict: "A",
+        scope: {
+            latitude: "=",
+            longitude: "=",
+            address: "=",
+            result: "="
+        },
+        template: "<div id='map-canvas'  style='height: 400px; width: 600px; border-radius: 6px'></div>",
+        link: function (scope, elem, attr) {
+
+            if (attr.result) {
+                var myLatlng = new google.maps.LatLng(40, 0);
+                var mapOptions = {
+                    zoom: 1,
+                    center: myLatlng,
+                    scrollwheel: true,
+                    navigationControl: true,
+                    mapTypeControl: false,
+                    scaleControl: false,
+                    draggable: true
+                };
+
+                var geocoder = new google.maps.Geocoder();
+                var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    if (scope.marker instanceof google.maps.Marker) {
+                        scope.marker.setMap(null);
+                    }
+
+                    scope.marker = new google.maps.Marker({
+                        position: event.latLng,
+                        map: map
+                    });
+
+                    map.setCenter(event.latLng);
+
+                    scope.latitude = event.latLng.A;
+                    scope.longitude = event.latLng.F;
+
+                    geocoder.geocode({
+                        latLng: event.latLng
+                    }, function (responses) {
+                        var responsesIsExists = responses && responses.length;
+                        var resultOptions = {
+                            latitude: scope.latitude,
+                            longitude: scope.longitude
+                        };
+
+                        resultOptions.address = responsesIsExists ? responses[0].formatted_address : '';
+
+                        if (scope.result) {
+                            scope.result(resultOptions);
+                            scope.$apply();
+                        }
+                    });
+                });
+            }
+
+
+            if (attr.address) {
+                scope.$watch('address', function () {
+                    geocoder.geocode({
+                            address: scope.address,
+                            region: 'no'
+                        },
+                        function (results, status) {
+                            if (status.toLowerCase() == 'ok') {
+                                if (scope.marker instanceof google.maps.Marker) {
+                                    scope.marker.setMap(null);
+                                }
+
+                                var coords = new google.maps.LatLng(
+                                    results[0]['geometry']['location'].lat(),
+                                    results[0]['geometry']['location'].lng()
+                                );
+
+                                map.setCenter(coords);
+
+                                if (scope.result) {
+                                    scope.result({
+                                        latitude: results[0]['geometry']['location'].lat(),
+                                        longitude: results[0]['geometry']['location'].lng()
+                                    });
+                                    scope.$apply();
+                                }
+
+                                map.setCenter(coords);
+
+                                scope.marker = new google.maps.Marker({
+                                    position: coords,
+                                    map: map
+                                });
+                            }
+                        }
+                    );
+                });
+            }
+
+            if (attr.latitude && attr.longitude) {
+                scope.$watchGroup(['latitude', 'longitude'], function () {
+                    var myLatlng = new google.maps.LatLng(scope.latitude, scope.longitude);
+                    var mapOptions = {
+                        zoom: 6,
+                        center: myLatlng,
+                        scrollwheel: true,
+                        navigationControl: true,
+                        mapTypeControl: false,
+                        scaleControl: false,
+                        draggable: true
+                    };
+
+                    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+                    var marker = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map
+                    });
+
+                    marker.setMap(map);
+                });
+            }
+        }
+    }
+});;
 app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
     "use strict";
     var self = this;

@@ -31,7 +31,15 @@
 
                 <div ng-show="hospital.is_paid">
                     <a class="btn btn-default margin-top" href="#/sentere/3">Se hele profilen</a><br/>
-                    <a class="btn btn-default margin-top">Vis pa kart</a>
+                    <a
+                            class="btn btn-default margin-top"
+                            ng-click="sentereCtrl.setCoordinates(hospital.latitude, hospital.longitude)"
+                            data-animation="am-fade-and-scale"
+                            data-template-url="templates/modal/map.tpl.html"
+                            bs-modal="modal"
+                            >
+                        Vis pa kart
+                    </a>
                 </div>
 
             </div>
