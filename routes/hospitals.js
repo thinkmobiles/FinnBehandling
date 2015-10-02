@@ -1,22 +1,20 @@
 var express = require('express');
-var router = express.Router();
+var hospitalsRouter = express.Router();
 var HospitalsHandler = require('../handlers/hospitals');
 
 module.exports = function (PostGre) {
     var hospitalsHandler = new HospitalsHandler(PostGre);
 
-    router.post('/', hospitalsHandler.createHospital);
+    hospitalsRouter.route('/')
+        .post(hospitalsHandler.createHospital)
+        .get(hospitalsHandler.getAllHospitals);
 
-    router.get('/', hospitalsHandler.getAllHospitals);
-    router.get('/:id', hospitalsHandler.getHospital);
+    hospitalsRouter.route('/:id')
+        .get( hospitalsHandler.getHospital)
+        .delete(hospitalsHandler.deleteHospital)
+        .put(hospitalsHandler.updateHospital);
 
-    router.delete('/:id', hospitalsHandler.deleteHospital);
-
-    router.put('/:id', hospitalsHandler.updateHospital);
-
-
-
-    return router;
+    return hospitalsRouter;
 };
 
 

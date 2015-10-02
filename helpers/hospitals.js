@@ -20,13 +20,12 @@ Hospitals = function (PostGre) {
     var SubTreatmentsList = PostGre.Models[TABLES.SUB_TREATMENTS_LIST];
 
     var getQuery = 'SELECT array_to_json(array_agg(row_to_json(hospital))) ' +
-        'FROM (SELECT h.id, h.name, h.web_address, h.phone_number, ht.name as type, ' +
-        '(SELECT row_to_json(r) ' +
-        'FROM ( ' +
-        'SELECT r.zip_code, r.kommune_name, r.fylke_name ' +
+        'FROM (SELECT h.id, h.description, h.name, h.web_address, h.phone_number, h.is_paid, ' +
+        'to_char(h.created_at, \'D. Mon YYYY\') AS created_at,  ' +
+        'ST_X(h.position::geometry) AS latitude,  ST_Y(h.position::geometry) AS longitude, h.email, ht.name as type, ' +
+        '( h.address || \'\n\' || (SELECT (r.zip_code || \' \' || r.kommune_name || \' \' || r.fylke_name) ' +
         'FROM ' + TABLES.REGIONS_LIST + ' r WHERE r.id = h.region_id ' +
-        ') r ' +
-        ') AS adress, ' +
+        ')) AS address, ' +
 
         '(SELECT array_to_json(array_agg(row_to_json(t))) ' +
         'FROM ( ' +
@@ -44,15 +43,15 @@ Hospitals = function (PostGre) {
         'LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hst ON st.id = hst.sub_treatment_id ' +
         'WHERE hst.hospital_id = h.id ' +
         ') st ' +
-        ') AS sub_treatments, ' +
+        ') AS sub_treatments ' +
 
-        '(SELECT array_to_json(array_agg(row_to_json(txt))) ' +
+        /*'(SELECT array_to_json(array_agg(row_to_json(txt))) ' +
         'FROM (' +
         'SELECT txt.content, txt.type ' +
         'FROM ' + TABLES.HOSPITAL_TEXTS + ' txt ' +
         'WHERE txt.hospital_id = h.id ' +
         ') txt ' +
-        ') AS texts ' +
+        ') AS texts ' +*/
 
         'FROM ' + TABLES.HOSPITALS + ' h ' +
         'LEFT JOIN ' + TABLES.HOSPITAL_TYPES_LIST + ' ht ON ht.id = h.type_id ' +
@@ -94,7 +93,7 @@ Hospitals = function (PostGre) {
 
         assert(callback);
 
-        async.eachSeries(treatmentIds, function (treatmentId, cb) {
+        async.eachSeries(treatmentIds, function (treatmentId, innerCallback) {
 
             HospitalTreatment
                 .forge()
@@ -104,30 +103,15 @@ Hospitals = function (PostGre) {
                 }, {
                     require: true
                 })
-                .asCallback(function (err) {
-
-                    if (err) {
-                        return cb(err);
-                    }
-
-                    cb();
-
-                })
-        }, function (err) {
-
-            if (err) {
-                return callback(err)
-            }
-
-            callback()
-        });
+                .asCallback(innerCallback)
+        }, callback);
     }
 
     function createHospitalSubTreatment(subTreatmentIds, hospitalId, callback) {
 
         assert(callback);
 
-        async.eachSeries(subTreatmentIds, function (subTreatmentId, cb) {
+        async.eachSeries(subTreatmentIds, function (subTreatmentId, innerCallback) {
 
             HospitalSubTreatment
                 .forge()
@@ -137,23 +121,8 @@ Hospitals = function (PostGre) {
                 }, {
                     require: true
                 })
-                .asCallback(function (err) {
-
-                    if (err) {
-                        return cb(err);
-                    }
-
-                    cb();
-
-                })
-        }, function (err) {
-
-            if (err) {
-                return callback(err)
-            }
-
-            callback()
-        });
+                .asCallback(innerCallback)
+        }, callback);
 
     }
 
@@ -194,7 +163,7 @@ Hospitals = function (PostGre) {
                     return callback(err);
                 }
 
-                async.eachSeries(treatmentIds, function (treatmentId, cb) {
+                async.eachSeries(treatmentIds, function (treatmentId, innerCallback) {
 
                     HospitalTreatment
                         .forge()
@@ -204,23 +173,8 @@ Hospitals = function (PostGre) {
                         }, {
                             require: true
                         })
-                        .asCallback(function (err) {
-
-                            if (err) {
-                                return cb(err);
-                            }
-
-                            cb();
-
-                        })
-                }, function (err) {
-
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    callback();
-                });
+                        .asCallback(innerCallback)
+                }, callback);
             })
     }
 
@@ -240,7 +194,7 @@ Hospitals = function (PostGre) {
                     return callback(err)
                 }
 
-                async.eachSeries(subTreatmentIds, function (subTreatmentId, cb) {
+                async.eachSeries(subTreatmentIds, function (subTreatmentId, innerCallback) {
 
                     HospitalSubTreatment
                         .forge()
@@ -250,24 +204,9 @@ Hospitals = function (PostGre) {
                         }, {
                             require: true
                         })
-                        .asCallback(function (err) {
+                        .asCallback(innerCallback)
 
-                            if (err) {
-                                return cb(err);
-                            }
-
-                            cb();
-
-                        })
-
-                }, function (err) {
-
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    callback();
-                });
+                }, callback);
             })
     }
 
@@ -319,14 +258,7 @@ Hospitals = function (PostGre) {
                 .fetch({
                     require: true
                 })
-                .asCallback(function (err) {
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    callback();
-
-                })
+                .asCallback(callback);
         },
 
         checkHospitalRegion: function (options, validatedOptions, callback) {
@@ -339,16 +271,7 @@ Hospitals = function (PostGre) {
                 .fetch({
                     require: true
                 })
-                .asCallback(function (err) {
-
-                    if (err) {
-
-                        return callback(err);
-                    }
-
-                    callback();
-
-                })
+                .asCallback(callback);
         },
 
         checkHospitalTreatment: function (options, validatedOptions, callback) {
@@ -433,14 +356,7 @@ Hospitals = function (PostGre) {
                 .fetch({
                     require: true
                 })
-                .asCallback(function (err) {
-                    if (err) {
-                        return callback(err);
-                    }
-
-                    callback();
-
-                })
+                .asCallback(callback);
         }
     };
 
@@ -535,11 +451,10 @@ Hospitals = function (PostGre) {
 
         if (typeof options === 'number') {
 
-            getHospitalById(options, callback)
-
+            getHospitalById(options, callback);
         } else {
 
-            getHospitals(options, callback)
+            getHospitals(options, callback);
         }
 
     };
@@ -551,17 +466,8 @@ Hospitals = function (PostGre) {
                 id: hospitalId
             })
             .destroy()
-            .asCallback(function (err) {
-
-                if (err) {
-                    return callback(err);
-                }
-
-                callback()
-            })
+            .asCallback(callback);
     }
-
-
 };
 
 module.exports = Hospitals;

@@ -38895,39 +38895,32 @@ app.config(['$routeProvider', function ($routeProvider) {
 
 }]);
 ;
-app.controller('hospitalController', ['$scope', 'GeneralHelpers',
-    function ($scope, GeneralHelpers) {
+app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
         var self = this;
+        var hospitalId = $routeParams.id;
 
-        //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
+        $location.hash('main-menu');
 
-        this.hospital = {
-            image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
-            title: 'New Hospital',
-            created_at: new Date(),
-            phone: '+9379992',
-            details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed tortor dolor. Nullam eu aliquam ' +
-            'libero. In ac ultrices odio, eu imperdiet arcu. Nullam sagittis consectetur orci. Aliquam lacinia nisi eu ' +
-            'vestibulum suscipit. Proin finibus leo ac dapibus ornare. Pellentesque nisi massa, scelerisque sit amet ' +
-            'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
-            'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
-            'varius justo, ut rhoncus velit.',
-            address: '93 Cottonwood Drive  North York' +
-            ' ON M3C 2B3 Canada',
-            is_paid: true,
-            email: 'new@hosp.com',
-            latitude: 32,
-            longitude: 23
-        };
+        function getHospital () {
+
+            HospitalManager.getHospital(hospitalId, function(err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        getHospital();
     }]);;
-app.controller('sentereController', ['$scope', 'GeneralHelpers',
-    function ($scope, GeneralHelpers) {
+app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
         $scope.curPage = 1;
-        $scope.totalItems = 2;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
-        //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
 
         this.setCoordinates = function (lat, long) {
             $scope.$parent.coordinates = {
@@ -38936,45 +38929,20 @@ app.controller('sentereController', ['$scope', 'GeneralHelpers',
             };
         };
 
-        this.hospitals = [{
-            image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
-            title: 'New Hospital',
-            created_at: new Date(),
-            phone: '+9379992',
-            details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed tortor dolor. Nullam eu aliquam ' +
-            'libero. In ac ultrices odio, eu imperdiet arcu. Nullam sagittis consectetur orci. Aliquam lacinia nisi eu ' +
-            'vestibulum suscipit. Proin finibus leo ac dapibus ornare. Pellentesque nisi massa, scelerisque sit amet ' +
-            'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
-            'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
-            'varius justo, ut rhoncus velit.',
-            address: '93 Cottonwood Drive  North York' +
-            ' ON M3C 2B3 Canada',
-            is_paid: true,
-            latitude: 43.730376,
-            longitude: -79.342842
-        },
-        {
-            image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
-            title: 'Old Hospital',
-            created_at: new Date(),
-            phone: '+9379992',
-            details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
-            ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
-            'Suspendisse ipsum ex, hendrerit ac dolor.',
-            address: '93 Cottonwood Drive North York' +
-            ' ON M3C 2B3 Canada',
-            is_paid: false,
-            latitude: 32,
-            longitude: 23
-        }];
-
         function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
-            //alert('behandling: ' + behandling + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+            HospitalManager.getHospitalsList(function(err, hospitals) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = hospitals.length;
+                self.hospitals = hospitals;
+            });
         }
 
         getHospitals();
@@ -39208,6 +39176,65 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
         } else {
             return null;
         }
+    };
+
+    this.showErrorMessage = function (err) {
+        switch (err.status) {
+            case 400:
+                if (err.message) {
+                    $rootScope.errMsg = err.message;
+                } else {
+                    $rootScope.errMsg = 'Bad Request. The request was invalid or cannot be otherwise served.';
+                }
+                alert($rootScope.errMsg);
+                break;
+            case 404:
+                $rootScope.errMsg = 'Page not found ';
+                alert($rootScope.errMsg);
+                break;
+            case 500:
+                $rootScope.errMsg = 'Something is broken. Please contact to site administrator.';
+                alert($rootScope.errMsg);
+                break;
+            case 401:
+                window.location = '/';
+                break;
+            case 403:
+                window.location = '/';
+                break;
+            case 413:
+                $rootScope.errMsg = 'File is too big.';
+                alert($rootScope.errMsg);
+                break;
+            default:
+                console.log(err);
+        }
+    };
+
+    return this;
+}]);;
+app.factory('HospitalManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getHospitalsList = function (callback) {
+        $http({
+            url: '/hospitals',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;

@@ -66,6 +66,7 @@ module.exports = {
                     'email text[3], ' +
                     'position point, ' +
                     'description text, ' +
+                    'address varchar(40), ' +
                     'updated_at timestamp without time zone,' +
                     'created_at timestamp without time zone,' +
                     'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
