@@ -29,7 +29,8 @@ describe('Hospitals', function () {
         treatment_ids: [2,1,3],
         sub_treatments: [1,2,4,3,5],
         description: 'Lorem ipsum dolor si',
-        phone_number: '+380660237194',
+        phone_number: ['+380660237194'],
+        email: ['dummy@mail.com'],
         web_address: 'www.clinic.com'
     };
 
@@ -41,7 +42,8 @@ describe('Hospitals', function () {
         treatment_ids: [1,3],
         sub_treatments: [1,2,4],
         description: 'Lorem ipsum dolor si',
-        phone_number: '+380660237194',
+        phone_number: ['+380660237194'],
+        email: ['dummy@mail.com'],
         web_address: 'www.clinic.com'
     };
     var response;

@@ -9,6 +9,6 @@ process.env.DB_PORT = 5432;
 
 process.env.UPLOADING_TYPE = 'FileSystem';
 
-process.env.REDIS_HOST = '134.249.164.53';
+process.env.REDIS_HOST = 'localhost';
 process.env.REDIS_PORT = 6379;
 

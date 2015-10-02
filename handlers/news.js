@@ -4,6 +4,12 @@ var TABLES = require('../constants/tables');
 
 //helpers
 
+/**
+ * @description  News management module
+ * @module news
+ *
+ */
+
 var News = function (PostGre) {
 
     var NewsHelper = require('../helpers/news.js');
