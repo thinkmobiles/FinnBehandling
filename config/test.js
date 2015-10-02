@@ -1,5 +1,4 @@
-
-process.env.APP_HOST = 'http://localhost:8866';
+process.env.APP_HOST = 'http://localhost';
 process.env.PORT = 8790;
 process.env.DB_HOST = 'localhost';
 //process.env.DB_HOST = '192.168.88.250';

@@ -4,14 +4,18 @@ var http = require('http');
 //TODO change NODE_ENV for production server
 process.env.NODE_ENV = 'development';
 
-//development only
-if (process.env.NODE_ENV === 'production') {
-    console.log('-----Server start success in Production version--------');
-    require('../config/production');
-} else {
-    console.log('-----Server start success in Development version--------');
-    require('../config/development');
-}
+    //development only
+    if (process.env.NODE_ENV === 'production') {
+        console.log('-----Server start success in Production version--------');
+        require('../config/production');
+
+    } else if (process.env.NODE_ENV === 'test') {
+        console.log('-----Server start success in Test version--------');
+        require('../config/test');
+    } else {
+        console.log('-----Server start success in Development version--------');
+        require('../config/development');
+    }
 
 var Knex = require('knex');
 var pg = require('pg');
