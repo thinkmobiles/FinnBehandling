@@ -25,4 +25,7 @@ var defaultData = require('./db/defaultData');
         ], done);
     });
 
+
     require('./handlers/hospitals');
+    require('./handlers/news');
+

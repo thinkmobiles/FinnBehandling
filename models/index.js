@@ -17,6 +17,8 @@ var Models = function (PostGre) {
 
 
 
+
+    this[TABLES.NEWS] = require('./news')(PostGre, Model);
     this[TABLES.HOSPITALS] = require('./hospital')(PostGre, Model);
     this[TABLES.HOSPITAL_TYPES_LIST] = require('./hospitalTypesList')(PostGre, Model);
     this[TABLES.REGIONS_LIST] = require('./regionsList')(PostGre, Model);

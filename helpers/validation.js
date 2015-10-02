@@ -19,6 +19,7 @@ function Check(validJSON, objectOfValidationFunctions) {
             callback = arguments[2];
 
         } else {
+
             options = arguments[0];
             callback = arguments[argsLength - 1];
         }
@@ -178,6 +179,12 @@ Check.prototype = {
     isString: function (val) {
         if (typeof(val) === 'string' || typeof(val) === 'number') {
             return val + '';
+        }
+    },
+
+    isArray: function (val) {
+        if (Object.prototype.toString.call(val).slice(8,-1) === 'Array') {
+            return val;
         }
     },
 

@@ -38881,47 +38881,39 @@ app.config(['$routeProvider', function ($routeProvider) {
     }).when('/sentere', {
         controller: 'sentereController',
         templateUrl: 'templates/sentere/list.html',
-        controllerAs: 'sentereCtrl',
-        reloadOnSearch: false
+        controllerAs: 'sentereCtrl'
     }).otherwise({
         redirectTo: '/'
     });
 
-}]).run(
-    ['$rootScope',
-        function ($rootScope) {
+}]).run(['$rootScope', function ($rootScope) {
 
 
-        }
-    ]
-);
+}]);
 ;
-app.controller('sentereController', ['$scope', function ($scope) {
+app.controller('sentereController', ['$scope', 'GeneralHelpers',
+    function ($scope, GeneralHelpers) {
     var self = this;
 
     $scope.curPage = 1;
     $scope.totalItems = 2;
-    $scope.itemsPerPage = 2;
+    $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+    //$scope.itemsPerPage = GeneralHelpers.getLocalData('resultater');
 
     this.hospitals = [{
         image: 'http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png',
         title: 'New Hospital',
         created_at: new Date(),
         phone: '+9379992',
-        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend nisi lectus, ut maximus mauris ' +
-        'condimentum eget. Nulla facilisi. Mauris vel ante aliquet, feugiat nulla eu, mollis libero. Fusce tristique ' +
-        'tellus at urna porttitor hendrerit. Maecenas vel facilisis sem. Vivamus eu pretium ipsum, sed blandit sapien. ' +
-        'Quisque finibus aliquet nulla, id venenatis erat elementum ac. Quisque fringilla nulla lorem, eget suscipit ' +
-        'massa porttitor non. Donec tempus mi velit, non venenatis erat condimentum sit amet. Nunc vehicula nulla nec ' +
-        'massa vestibulum ornare. Pellentesque a metus et ligula mattis faucibus. Mauris ultricies nisl sit amet nunc ' +
-        'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
-        ' Suspendisse potenti.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed tortor dolor. Nullam eu aliquam ' +
+        'libero. In ac ultrices odio, eu imperdiet arcu. Nullam sagittis consectetur orci. Aliquam lacinia nisi eu ' +
+        'vestibulum suscipit. Proin finibus leo ac dapibus ornare. Pellentesque nisi massa, scelerisque sit amet ' +
+        'quam nec, porta lobortis odio. Aliquam ullamcorper, nibh varius fringilla molestie, felis lorem aliquam ' +
+        'arcu, eget posuere erat leo id leo. Nam pulvinar mauris vulputate magna mollis ornare. Quisque vitae ' +
+        'varius justo, ut rhoncus velit.',
+        address: '93 Cottonwood Drive  North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: true,
-        web_page: 'https://www.google.com',
         latitude: 32,
         longitude: 23
     },
@@ -38930,23 +38922,61 @@ app.controller('sentereController', ['$scope', function ($scope) {
         title: 'Old Hospital',
         created_at: new Date(),
         phone: '+9379992',
-        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend nisi lectus, ut maximus mauris ' +
-        'condimentum eget. Nulla facilisi. Mauris vel ante aliquet, feugiat nulla eu, mollis libero. Fusce tristique ' +
-        'tellus at urna porttitor hendrerit. Maecenas vel facilisis sem. Vivamus eu pretium ipsum, sed blandit sapien. ' +
-        'Quisque finibus aliquet nulla, id venenatis erat elementum ac. Quisque fringilla nulla lorem, eget suscipit ' +
-        'massa porttitor non. Donec tempus mi velit, non venenatis erat condimentum sit amet. Nunc vehicula nulla nec ' +
-        'massa vestibulum ornare. Pellentesque a metus et ligula mattis faucibus. Mauris ultricies nisl sit amet nunc ' +
-        'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
-        ' Suspendisse potenti.',
-        address: '93 Cottonwood Drive' +
-        ' North York' +
-        ' ON M3C 2B3' +
-        ' Canada',
+        details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi placerat odio dui, et hendrerit nunc' +
+        ' posuere vehicula. Aliquam placerat tellus eu pharetra egestas. Integer sodales et elit eu rhoncus. ' +
+        'Suspendisse ipsum ex, hendrerit ac dolor.',
+        address: '93 Cottonwood Drive North York' +
+        ' ON M3C 2B3 Canada',
         is_paid: false,
-        web_page: 'https://www.google.com',
         latitude: 32,
         longitude: 23
     }];
+
+    function getHospitals () {
+        var behandling = GeneralHelpers.getLocalData('behandling');
+        var fylke = GeneralHelpers.getLocalData('fylke');
+        var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+        var resultater = GeneralHelpers.getLocalData('resultater');
+
+        //alert('behandling: ' + behandling + ' || ' + 'fylke: ' + fylke + ' || ' + 'tekstsok: ' + tekstsok + ' || ' + 'resultater: ' + resultater);
+    }
+
+    getHospitals();
+}]);;
+app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
+    function ($scope, $location, GeneralHelpers) {
+
+    $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
+    $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
+    $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
+
+    $scope.fylkes = [
+        'Alle',
+        'Østfold',
+        'Akershus',
+        'Oslo',
+        'Hedmark',
+        'Oppland',
+        'Buskerud'
+    ];
+
+    $scope.behandlings = [
+        'Alle',
+        'ear',
+        'nose',
+        'mouth treatment',
+        'plastic surgery',
+        'bone problems'
+    ];
+
+    $scope.search = function () {
+        GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
+        GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+        GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
+        GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
+        $location.path('sentere');
+    };
 }]);;
 app.controller('startPageController', ['$scope', function ($scope) {
     var self = this;
@@ -38990,4 +39020,32 @@ app.controller('startPageController', ['$scope', function ($scope) {
         'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
         ' Suspendisse potenti.'
     }];
+}]);;
+app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
+    "use strict";
+    var self = this;
+
+    this.saveAsLocalData = function (key, value) {
+        $location.search(key, value).replace();
+        $rootScope[key] = value;
+    };
+
+    this.getLocalData = function (key) {
+        var locationSearch = $location.search();
+
+        if ($rootScope[key]) {
+
+            $location.search(key, $rootScope[key]).replace();
+            return $rootScope[key];
+
+        } else if (locationSearch[key]) {
+
+            $rootScope[key] = locationSearch[key];
+            return locationSearch[key];
+        } else {
+            return null;
+        }
+    };
+
+    return this;
 }]);

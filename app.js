@@ -33,7 +33,6 @@ if (app.get('env') === 'development') {
     require('./config/development');
 
 } else if (app.get('env') === 'test') {
-
     require('./config/test');
 
 } else {

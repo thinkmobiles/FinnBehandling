@@ -7,17 +7,12 @@ app.config(['$routeProvider', function ($routeProvider) {
     }).when('/sentere', {
         controller: 'sentereController',
         templateUrl: 'templates/sentere/list.html',
-        controllerAs: 'sentereCtrl',
-        reloadOnSearch: false
+        controllerAs: 'sentereCtrl'
     }).otherwise({
         redirectTo: '/'
     });
 
-}]).run(
-    ['$rootScope',
-        function ($rootScope) {
+}]).run(['$rootScope', function ($rootScope) {
 
 
-        }
-    ]
-);
+}]);

@@ -23,9 +23,15 @@ module.exports = {
     CHANGE_PASSWORD: 'Password change successfully',
     WAS_CREATED: 'Was created successfully',
     SAVING_ERROR: 'saving error',
+<<<<<<< HEAD
     UPDATED_SUCCESS: 'Was updated successfully',
+=======
+    UPDATING_ERROR: 'updating error',
+    UPDATED_SUCCESS: 'was updated successfully',
+>>>>>>> feature
     NOT_EXISTS: 'is not exist',
     REMOVE_SUCCESSFULY: 'was removed successfully',
+    REMOVING_ERROR: 'removing error',
     YOUR_DATA_ALREADY_UPDATE: "your data already update",
     SUCCESSFUL_LOGIN: 'Login successful',
     SUCCESSFUL_LOGOUT: 'Logout successful',

@@ -62,8 +62,10 @@ module.exports = {
                     'type_id integer NOT NULL, ' +
                     'name varchar(80), ' +
                     'web_address varchar(80), ' +
-                    'phone_number varchar(80), ' +
-                    'position text, ' +
+                    'phone_number text[3], ' +
+                    'email text[3], ' +
+                    'position point, ' +
+                    'description text, ' +
                     'updated_at timestamp without time zone,' +
                     'created_at timestamp without time zone,' +
                     'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
@@ -91,15 +93,5 @@ module.exports = {
                                 'ON UPDATE CASCADE ON DELETE CASCADE, ' +
                                 'CONSTRAINT tb_hospital_sub_treatments_sub_treatment_id_foreign FOREIGN KEY (sub_treatment_id) REFERENCES tb_sub_treatments_dic (id) MATCH SIMPLE ' +
                                 'ON UPDATE CASCADE ON DELETE CASCADE ' +
-                                ') WITHOUT OIDS;',
-    HOSPITAL_TEXTS: 'CREATE TABLE IF NOT EXISTS tb_hospital_texts ( ' +
-                    'id serial NOT NULL, ' +
-                    'hospital_id integer NOT NULL, ' +
-                    'type varchar(35) NOT NULL, ' +
-                    'content text, ' +
-                    'CONSTRAINT tb_hospital_texts_pkey PRIMARY KEY (id), ' +
-                    'CONSTRAINT tb_hospital_texts_hospital_id_foreign FOREIGN KEY (hospital_id) REFERENCES tb_hospitals (id) MATCH SIMPLE ' +
-                    'ON UPDATE CASCADE ON DELETE CASCADE ' +
-                    ') WITHOUT OIDS;'
-
+                                ') WITHOUT OIDS;'
 };
