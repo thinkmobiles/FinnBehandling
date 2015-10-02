@@ -1,0 +1,51 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list">
+    <div>
+        <span class="dynamic-font-md">Viser resultater: {{sentereCtrl.hospitals.length}} av {{totalItems}}</span>
+    </div>
+
+    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
+
+    <div class="hospital-item" ng-class="{'hospital-item-paid': hospital.is_paid, grey: !($index % 2)}"
+         dir-paginate="hospital in sentereCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="curPage">
+
+        <h4 class="blue bold dynamic-font-lg">{{hospital.title | uppercase}}</h4>
+
+        <div class="clearfix">
+
+            <div ng-class="{'col-md-9': hospital.is_paid}">
+
+                <img  ng-class="{'col-md-3': !hospital.is_paid, 'col-md-6': hospital.is_paid}"
+                     ng-src="{{hospital.image}}"/>
+
+                <div class="dynamic-font-md" ng-class="{'col-md-6': !hospital.is_paid, 'hospital-details col-md-12': hospital.is_paid}">
+                    {{hospital.details | limitTo: 400}}<span ng-show="hospital.details.length > 400">...</span>
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <span class="contact-data">{{hospital.address}}</span> <br/>
+                <span class="contact-data">{{hospital.phone}}</span>
+
+                <div ng-show="hospital.is_paid">
+                    <a class="btn btn-default margin-top">Se hele profilen</a><br/>
+                    <a class="btn btn-default margin-top">Vis pa kart</a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="clearfix margin-top">
+
+            <div class="col-md-12">
+                <a class="pull-left dynamic-font-md">Ga til nettside></a>
+                <span class="pull-right blue dynamic-font-md">Sist oppdatert: {{hospital.created_at | date: 'd. MMM yyyy'}}</span>
+            </div>
+
+        </div>
+    </div>
+
+    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
+</div>
