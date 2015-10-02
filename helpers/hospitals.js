@@ -157,31 +157,6 @@ Hospitals = function (PostGre) {
 
     }
 
-    function createHospitalText(options, hospitalId, callback) {
-
-        assert(callback);
-
-        HospitalText
-            .forge()
-            .save({
-                hospital_id: hospitalId,
-                content: options.description,
-                type: 'description'
-            }, {
-                require: true
-            })
-            .asCallback(function (err) {
-
-                if (err) {
-                    return callback(err);
-                }
-
-                callback();
-
-            })
-
-    }
-
     function updateHospital(hospitalId, data, callback) {
         assert(callback);
 
@@ -293,33 +268,6 @@ Hospitals = function (PostGre) {
 
                     callback();
                 });
-            })
-    }
-
-    function updateHospitalText(options, hospitalId, callback) {
-
-        assert(callback);
-
-        HospitalText
-            .forge()
-            .where({
-                hospital_id: hospitalId,
-                type: 'description'
-            })
-            .save({
-                content: options.description
-            }, {
-                method: 'update',
-                require: true
-            })
-            .asCallback(function (err) {
-
-                if (err) {
-                    return callback(err);
-                }
-
-                callback();
-
             })
     }
 
@@ -501,7 +449,9 @@ Hospitals = function (PostGre) {
         is_paid: ['required', 'isBoolean'],
         type_id: ['required', 'isInt'],
         name: ['required', 'isString'],
-        phone_number: ['isPhone'],
+        description: ['isString'],
+        phone_number: ['isArray'],
+        email: ['isArray'],
         web_address: ['isString']
 
     }, self.checkFunctions);
@@ -512,7 +462,9 @@ Hospitals = function (PostGre) {
         is_paid: ['required', 'isBoolean'],
         type_id: ['required', 'isInt'],
         name: ['required', 'isString'],
-        phone_number: ['isPhone'],
+        description: ['isString'],
+        phone_number: ['isArray'],
+        email: ['isArray'],
         web_address: ['isString']
     }, self.checkFunctions);
 
@@ -528,8 +480,7 @@ Hospitals = function (PostGre) {
 
                 async.parallel([
                     async.apply(createHospitalTreatment, options.treatment_ids, hospitalId),
-                    async.apply(createHospitalSubTreatment, options.sub_treatments, hospitalId),
-                    async.apply(createHospitalText, options, hospitalId)
+                    async.apply(createHospitalSubTreatment, options.sub_treatments, hospitalId)
 
                 ], function (err) {
 
@@ -563,8 +514,7 @@ Hospitals = function (PostGre) {
 
                 async.parallel([
                     async.apply(updateHospitalTreatment, options.treatment_ids, hospitalId),
-                    async.apply(updateHospitalSubTreatment, options.sub_treatments, hospitalId),
-                    async.apply(updateHospitalText, options, hospitalId)
+                    async.apply(updateHospitalSubTreatment, options.sub_treatments, hospitalId)
 
                 ], function (err) {
 

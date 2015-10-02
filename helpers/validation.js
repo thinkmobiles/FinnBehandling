@@ -181,6 +181,12 @@ Check.prototype = {
         }
     },
 
+    isArray: function (val) {
+        if (Object.prototype.toString.call(val).slice(8,-1) === 'Array') {
+            return val;
+        }
+    },
+
     isTime: function (val) {
         var regexp = /^(?:2[0-3]|[01]?[0-9]):[0-5][0-9]:[0-5][0-9]$/;
         if (regexp.test(val)) {
