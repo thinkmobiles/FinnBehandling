@@ -34,7 +34,8 @@ Hospitals = function (PostGre) {
          *     "treatment_ids": [2,1,3],
          *     "sub_treatments": [1,2,4,3,5],
          *     "description": "Lorem ipsum...",
-         *     "phone_number": "+380548954782",
+         *     "email": ["some@mail.com", "some2@mail.com"]
+         *     "phone_number": ["+380548954782", "+380548951111"]
          *     "web_address": "www.clinic.com"
          *
          * }
@@ -45,7 +46,8 @@ Hospitals = function (PostGre) {
          * @param {array} treatment_ids - list of treatments
          * @param {array} sub_treatments - list of sub_treatments
          * @param {string} description - description of clinic
-         * @param {number} phone_number - phone number of clinic
+         * @param {array} phone_number - phone number of clinic
+         * @param {array} email - emails of clinic
          * @param {string} web_address - web address of clinic
          *
          * @example Response example:
@@ -96,7 +98,8 @@ Hospitals = function (PostGre) {
          *     "treatment_ids": [2,1,3],
          *     "sub_treatments": [1,2,4,3,5],
          *     "description": "Lorem ipsum...",
-         *     "phone_number": "+380548954782",
+         *     "email": ["some@mail.com", "some2@mail.com"]
+         *     "phone_number": ["+380548954782", "+380548951111"]
          *     "web_address": "www.clinic.com"
          *
          * }
@@ -107,7 +110,8 @@ Hospitals = function (PostGre) {
          * @param {array} treatment_ids - list of treatments
          * @param {array} sub_treatments - list of sub_treatments
          * @param {string} description - description of clinic
-         * @param {number} phone_number - phone number of clinic
+         * @param {array} phone_number - phone number of clinic
+         * @param {array} email - emails of clinic
          * @param {string} web_address - web address of clinic
          *
          * @example Response example:
