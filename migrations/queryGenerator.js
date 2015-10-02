@@ -44,6 +44,8 @@ module.exports = {
                         'subject varchar(80), ' +
                         'content text, ' +
                         'source varchar(50), ' +
+                        'created_at timestamp without time zone,' +
+                        'updated_at timestamp without time zone,' +
                         'CONSTRAINT tb_news_pkey PRIMARY KEY (id)' +
                         ') WITHOUT OIDS; ',
     IMAGES: 'CREATE TABLE tb_images ( ' +
