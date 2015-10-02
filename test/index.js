@@ -26,3 +26,4 @@ var defaultData = require('./db/defaultData');
     });
 
     //require('./handlers/instant');
+    require('./handlers/news');
