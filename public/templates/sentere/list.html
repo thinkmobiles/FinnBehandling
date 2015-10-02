@@ -30,8 +30,16 @@
                 <span class="contact-data">{{hospital.phone}}</span>
 
                 <div ng-show="hospital.is_paid">
-                    <a class="btn btn-default margin-top">Se hele profilen</a><br/>
-                    <a class="btn btn-default margin-top">Vis pa kart</a>
+                    <a class="btn btn-default margin-top" href="#/sentere/3">Se hele profilen</a><br/>
+                    <a
+                            class="btn btn-default margin-top"
+                            ng-click="sentereCtrl.setCoordinates(hospital.latitude, hospital.longitude)"
+                            data-animation="am-fade-and-scale"
+                            data-template-url="templates/modal/map.tpl.html"
+                            bs-modal="modal"
+                            >
+                        Vis pa kart
+                    </a>
                 </div>
 
             </div>
@@ -40,7 +48,7 @@
         <div class="clearfix margin-top">
 
             <div class="col-md-12">
-                <a class="pull-left dynamic-font-md">Ga til nettside></a>
+                <a class="pull-left dynamic-font-md" href="#/sentere/3">Ga til nettside></a>
                 <span class="pull-right blue dynamic-font-md">Sist oppdatert: {{hospital.created_at | date: 'd. MMM yyyy'}}</span>
             </div>
 

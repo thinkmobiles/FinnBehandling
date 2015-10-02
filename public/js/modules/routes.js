@@ -8,6 +8,10 @@ app.config(['$routeProvider', function ($routeProvider) {
         controller: 'sentereController',
         templateUrl: 'templates/sentere/list.html',
         controllerAs: 'sentereCtrl'
+    }).when('/sentere/:id', {
+        controller: 'hospitalController',
+        templateUrl: 'templates/sentere/view.html',
+        controllerAs: 'hospitalCtrl'
     }).otherwise({
         redirectTo: '/'
     });
