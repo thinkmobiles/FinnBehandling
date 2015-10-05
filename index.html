@@ -1,12 +1,157 @@
 <!DOCTYPE html>
 <html>
     <head lang="en">
+        <title>Finnbehanding</title>
         <link rel="stylesheet" type="text/css" href="dist/css/style.css"/>
         <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
         <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMozaLCHWMIwPCHCwjCpdZwAse-62PJpo"></script>
+        <style type="text/css" id="dynamic-styles">
+            .dynamic-font-sm { font-size: {{$root.fontSize || 12}}px !important }
+            .dynamic-font-md { font-size: {{($root.fontSize || 12) + 2}}px !important }
+            .dynamic-font-md-lg { font-size: {{($root.fontSize || 12) + 4}}px !important }
+            .dynamic-font-lg { font-size: {{($root.fontSize || 12) + 6}}px !important }
+        </style>
     </head>
     <body>
-        <div class="page-content" ng-view></div>
+        <div id="main-container">
+            <div id="top-menu">
+                <div class="inner-block clearfix">
+                    <ul id="top-menu-list" class="pull-right">
+                        <li>
+                            <a class="normal" ng-click="$root.fontSize = 12">A</a>
+                            <a class="medium" ng-click="$root.fontSize = 14">A</a>
+                            <a class="large" ng-click="$root.fontSize = 16">A</a>
+                        </li>
+                        <li>
+                            <a class="dynamic-font-sm">OM OSS</a>
+                        </li>
+                        <li>
+                            <a class="dynamic-font-sm">BETINGELSER</a>
+                        </li>
+                        <li>
+                            <a class="dynamic-font-sm">ANNONSERING</a>
+                        </li>
+                        <li>
+                            <a class="dynamic-font-sm">PERSONOPPLYSNINGER</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="inner-block">
+                <div id="main-logo">
+                    <h2 class="pull-right">FinnBehanding.no</h2>
+                </div>
+
+                <div id="main-menu">
+                    <ul id="main-menu-list">
+                        <li class="text-center dynamic-font-md"><a href="#/">STARTSIDE</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/sentere">SENTERE</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/nyheter">NYHETER</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/kontakt">KONTAKT</a></li>
+                    </ul>
+                </div>
+
+                <div class="content row">
+                    <div id="side-bar" class="col-md-3" ng-controller="sideBarController">
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Velg</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <div class="form-group clearfix">
+
+                                <label for="fylke" class="pull-left side-label-holder dynamic-font-md">Fylke:</label>
+
+                                <select
+                                        id="fylke"
+                                        class="pull-right form-control side-input"
+                                        ng-model="chosenFylke"
+                                        ng-change="search()"
+                                        ng-options="fylke for fylke in fylkes">
+                                </select>
+                            </div>
+                        </div>
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Søk</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+
+                            <div class="form-group clearfix">
+
+                                <label for="behandling" class="pull-left side-label-holder dynamic-font-md">Behandling:</label>
+
+                                <select
+                                        id="behandling"
+                                        class="pull-right form-control side-input"
+                                        ng-model="chosenBehandling"
+                                        ng-options="behandling for behandling in behandlings">
+                                </select>
+                            </div>
+
+                            <div class="form-group clearfix  margin-top">
+
+                                <label for="tekstsøk" class="pull-left side-label-holder dynamic-font-md">Tekstsøk:</label>
+
+                                <input
+                                        type="text"
+                                        id="tekstsøk"
+                                        placeholder="Skriv ord..."
+                                        class="pull-right form-control side-input"
+                                        ng-model="tekstsok"/>
+                            </div>
+
+                            <div class="form-group clearfix margin-top">
+
+                                <label for="resultater" class="pull-left side-label-holder dynamic-font-md">Resultater:</label>
+
+                                <select
+                                        id="resultater"
+                                        class="pull-right form-control side-input-sm"
+                                        ng-change="search()"
+                                        ng-model="resultater">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group clearfix margin-top">
+
+                                <a class="btn btn-default btn-block" ng-click="search()">Søk</a>
+                            </div>
+                        </div>
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Relaterte nettsider</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <h5 class="bold  dynamic-font-md">Privat:</h5>
+                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
+                                <li class="margin-top">Lommelegen</li>
+                                <li class="margin-top">Legemiddelindustrien</li>
+                                <li class="margin-top">Felleskatalogen</li>
+                            </ul>
+                            <h5 class="bold  dynamic-font-md">Offentig:</h5>
+                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
+                                <li class="margin-top">Nasjonalt folkehelseinstitut</li>
+                                <li class="margin-top">Helse- og omsorgsdepartamentet</li>
+                                <li class="margin-top">Legemiddelverket</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="advertising"></div>
+                        <div class="page-content clearfix" ng-view></div>
+                    </div>
+                </div>
+            </div>
+
+            <footer></footer>
+        </div>
         <script type="text/javascript" src="dist/js/app.js"></script>
     </body>
 </html>

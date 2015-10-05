@@ -31,6 +31,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 if (app.get('env') === 'development') {
     require('./config/development');
+
+} else if (app.get('env') === 'test') {
+    require('./config/test');
+
 } else {
     require('./config/production');
 }

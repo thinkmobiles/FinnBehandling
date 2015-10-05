@@ -9,7 +9,10 @@ module.exports = function (app, PostGre) {
     var CONSTANTS = require('../constants/constants');
     var RESPONSES = require('../constants/responseMessages');
 
-    var membersRouter = require('./members')(PostGre);
+
+    var newsRouter = require('./news')(PostGre);
+    var hospitalsRouter = require('./hospitals')(PostGre);
+
 
 
     var session = new Session(PostGre);
@@ -20,7 +23,9 @@ module.exports = function (app, PostGre) {
 
     app.get('/isAuth', session.isAuthorizedUser);
 
-    app.use('/members', membersRouter);
+    app.use('/hospitals', hospitalsRouter);
+
+    app.use('/news', newsRouter);
 
     app.post('/authenticate', function (req, res, next) {
         var cid = req.body.cid;

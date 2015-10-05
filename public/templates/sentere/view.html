@@ -1,0 +1,26 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix">
+    <h1 class="bold blue">{{hospitalCtrl.hospital.name}}</h1>
+    <hr/>
+    <div class="clearfix">
+        <div class="col-md-6">
+            {{hospitalCtrl.hospital.address}}
+        </div>
+        <div class="col-md-6 dynamic-font-md">
+            <span><span class="bold">Telefon:</span> {{hospitalCtrl.hospital.phone_number[0]}} </span><br/>
+            <span><span class="bold">E-post:</span> {{hospitalCtrl.hospital.email[0]}} </span>
+        </div>
+    </div>
+    <hr/>
+    <br/>
+    <div class="clearfix">
+        <!--<img class="col-md-6" ng-src="{{hospitalCtrl.hospital.image}}"/>-->
+        <img class="col-md-6" ng-src="http://www.freelargeimages.com/wp-content/uploads/2015/05/Hospital_Logo_02.png"/>
+        <div class="col-md-6 dynamic-font-md">
+            {{hospitalCtrl.hospital.description}}
+        </div>
+    </div>
+    <br/>
+    <hr/>
+    <h5 class="blue dynamic-font-md">Sist oppdatert: {{hospitalCtrl.hospital.created_at}}</h5>
+</div>
