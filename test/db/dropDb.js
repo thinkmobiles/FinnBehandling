@@ -10,7 +10,7 @@ module.exports = function (knex, callback) {
     var tablesNames = _.difference(allTables, exeptionTable);
     var dropTableFunction;
 
-    async.each(tablesNames, function (constantsTableName, callback) {
+    async.each(allTables, function (constantsTableName, callback) {
 
         dropTableFunction = function (callback) {
             knex(TABLES[constantsTableName]).del().asCallback(callback);

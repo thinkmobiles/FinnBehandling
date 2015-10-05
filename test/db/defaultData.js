@@ -1,28 +1,60 @@
 'use strict';
 var async = require('async');
+var fixtures;
 
 module.exports.setUp = function (db, callback) {
     var factory = require('./factories')(db);
-    var fixtures;
 
-    function createInstance () {
-        fixtures = {
-            trainerUser: {},
-            clients: [],
-            memberships: [],
-            sessions: [],
-            subscriptions: [],
-            workouts: [],
-            exercises: [],
-            sets: [],
-            requests: [],
-            trainers: [],
-            trainers_subscriptions: [],
-            groups: []
+    function preparedFunction (name, count, result) {
+
+        return function (callback) {
+            createFakeData(result, name, count, callback);
+        }
+    }
+
+    function createFakeData (result, name, count, callback) {
+
+        factory.createMany(name, count, function (err, created) {
+
+            var createdLength = created.length;
+
+            if (err) {
+                return callback(err);
+            }
+
+            for (var i = 0; i < createdLength; i++) {
+                result[name][i] = created[i].id
+            }
+
+            callback();
+        });
+    }
+
+    function createInstance (mainCallback) {
+        var createStack = [];
+        var fixturesObj = {
+            hospital_type: [],
+            region: [],
+            treatment: [],
+            sub_treatment: []
         };
 
-        // some functions to create fake data
+        var fixturesNames = Object.keys(fixturesObj);
+        var fixturesLength = fixturesNames.length;
 
+        var _preparedFunc;
+
+        while (fixturesLength--) {
+
+            _preparedFunc = preparedFunction(fixturesNames[fixturesLength], 4, fixturesObj);
+
+            createStack.push(_preparedFunc);
+        }
+
+        async.parallel(createStack, function () {
+
+            mainCallback(fixturesObj);
+        });
     }
 
     if (callback && typeof callback === 'function') {
@@ -31,9 +63,14 @@ module.exports.setUp = function (db, callback) {
 
     return (function () {
         if (!fixtures) {
-            fixtures = createInstance();
-        }
+            createInstance(function (result) {
+                fixtures = result;
 
-        return fixtures;
+                return fixtures;
+            });
+        } else {
+
+            return fixtures;
+        }
     })();
 };

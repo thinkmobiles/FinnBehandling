@@ -21,7 +21,7 @@ var News = function (PostGre) {
          * __Type__ `GET`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows get _one_article_
+         * This __method__ allows get _one article_
          *
          * @example Request example:
          *         http://192.168.88.250:8787/news/:id
@@ -60,7 +60,7 @@ var News = function (PostGre) {
          * __Type__ `GET`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows get _all_news_
+         * This __method__ allows get _all news_
          *
          * @example Request example:
          *         http://192.168.88.250:8787/news
@@ -90,10 +90,15 @@ var News = function (PostGre) {
          * @instance
          */
 
-        var options = {
-            page: req.query.page || 1,
-            count: req.query.count || 25
-        };
+        var options = {};
+        var limit = req.query.limit;
+        var page = req.query.page;
+
+        var limitIsValid = limit && !isNaN(limit) && limit > 0;
+        var offsetIsValid = page && !isNaN(page) && page > 1;
+
+        options.limit = limitIsValid ? limit : 25;
+        options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
 
         newsHelper.getNewsByParams(options, function (err, news) {
             if (err) {
@@ -105,13 +110,44 @@ var News = function (PostGre) {
         });
     };
 
+    this.getNewsCount = function (req, res, next) {
+
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get _news count_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/news/count
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "count": 3
+         *      }
+         *
+         * @method getNewsCount
+         * @instance
+         */
+
+        newsHelper.getNewsCount(function (err, count) {
+            if (err) {
+
+                return next(err);
+            }
+
+            res.status(200).send({count: count});
+        });
+    };
+
     this.createArticle = function (req, res, next){
 
         /**
          * __Type__ `POST`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows create article
+         * This __method__ allows create _article_
          *
          * @example Request example:
          *         http://192.168.88.250:8787/news
@@ -152,7 +188,7 @@ var News = function (PostGre) {
          * __Type__ `PUT`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows update article
+         * This __method__ allows update _article_
          *
          * @example Request example:
          *         http://192.168.88.250:8787/news/:id
@@ -197,7 +233,7 @@ var News = function (PostGre) {
          * __Type__ `DELETE`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows delete article
+         * This __method__ allows delete _article_
          *
          * @example Request example:
          *         http://192.168.88.250:8787/news/:id

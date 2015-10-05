@@ -9,6 +9,9 @@ module.exports = function (PostGre) {
         .post(hospitalsHandler.createHospital)
         .get(hospitalsHandler.getAllHospitals);
 
+    hospitalsRouter.route('/count')
+        .get(hospitalsHandler.getHospitalsCount);
+
     hospitalsRouter.route('/:id')
         .get( hospitalsHandler.getHospital)
         .delete(hospitalsHandler.deleteHospital)
