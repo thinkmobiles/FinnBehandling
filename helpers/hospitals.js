@@ -226,7 +226,7 @@ Hospitals = function (PostGre) {
                 }
 
                 callback(null, querResult.rows[0].array_to_json[0]);
-            })
+            });
     }
 
     function getHospitals(options, callback) {
@@ -366,6 +366,7 @@ Hospitals = function (PostGre) {
         type_id: ['required', 'isInt'],
         name: ['required', 'isString'],
         description: ['isString'],
+        address: ['isString'],
         phone_number: ['isArray'],
         email: ['isArray'],
         web_address: ['isString']
@@ -379,6 +380,7 @@ Hospitals = function (PostGre) {
         type_id: ['required', 'isInt'],
         name: ['required', 'isString'],
         description: ['isString'],
+        address: ['isString'],
         phone_number: ['isArray'],
         email: ['isArray'],
         web_address: ['isString']
@@ -449,13 +451,43 @@ Hospitals = function (PostGre) {
 
     this.getHospitalByOptions = function (options, callback) {
 
-        if (typeof options === 'number') {
+        var error;
+        var errorMessage;
+
+        if (+options && typeof +options === 'number') {
 
             getHospitalById(options, callback);
-        } else {
+        } else if (typeof options === 'object') {
 
             getHospitals(options, callback);
+        } else {
+            errorMessage = !options ? RESPONSES.NOT_ENOUGH_PARAMETERS : RESPONSES.INVALID_PARAMETERS;
+
+            error = new Error(errorMessage);
+            error.status = 400;
+
+            callback(error);
         }
+
+    };
+
+    this.getHospitalsCount = function (callback) {
+
+        assert(callback);
+
+        PostGre.knex(TABLES.HOSPITALS)
+            .count()
+            .asCallback(function (err, queryResult) {
+               var  clientsCount;
+
+                if (err) {
+                    return callback(err);
+                }
+
+                clientsCount = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                callback(null, clientsCount);
+            });
 
     };
 

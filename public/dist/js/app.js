@@ -38929,23 +38929,34 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
             };
         };
 
-        function getHospitals () {
+        function getHospitalsCount () {
+            HospitalManager.getHospitalsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getHospitalsCount();
+
+        this.getHospitals = function () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
-            HospitalManager.getHospitalsList(function(err, hospitals) {
+            HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                $scope.totalItems = hospitals.length;
                 self.hospitals = hospitals;
             });
-        }
+        };
 
-        getHospitals();
+        this.getHospitals();
 }]);;
 app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     function ($scope, $location, GeneralHelpers) {
@@ -39217,10 +39228,11 @@ app.factory('HospitalManager', ['$http', function ($http) {
     "use strict";
     var self = this;
 
-    this.getHospitalsList = function (callback) {
+    this.getHospitalsList = function (params, callback) {
         $http({
             url: '/hospitals',
-            method: "GET"
+            method: "GET",
+            params: params
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
@@ -39230,6 +39242,16 @@ app.factory('HospitalManager', ['$http', function ($http) {
     this.getHospital = function (id, callback) {
         $http({
             url: '/hospitals/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospitalsCount = function (callback) {
+        $http({
+            url: '/hospitals/count',
             method: "GET"
         }).then(function (response) {
             if (callback)

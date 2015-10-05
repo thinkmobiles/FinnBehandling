@@ -12,21 +12,32 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
             };
         };
 
-        function getHospitals () {
+        function getHospitalsCount () {
+            HospitalManager.getHospitalsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getHospitalsCount();
+
+        this.getHospitals = function () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
-            HospitalManager.getHospitalsList(function(err, hospitals) {
+            HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                $scope.totalItems = hospitals.length;
                 self.hospitals = hospitals;
             });
-        }
+        };
 
-        getHospitals();
+        this.getHospitals();
 }]);

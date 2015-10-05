@@ -36,7 +36,7 @@
     "chai": "2.1.*",
     "factory-girl": "1.2.0",
     "factory-girl-bookshelf": "1.0.2",
-    "faker": "2.1.2",
+    "faker": "3.0.1",
     "grunt": "~0.4.5",
     "grunt-jsdoc": "^0.6.8",
     "grunt": "^0.4.5",

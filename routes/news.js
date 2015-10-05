@@ -9,6 +9,9 @@ module.exports = function (PostGre) {
         .get(newsHandler.getNews)
         .post(newsHandler.createArticle);
 
+    newsRouter.route('/count')
+        .get(newsHandler.getNewsCount);
+
     newsRouter.route('/:id')
         .get(newsHandler.getArticle)
         .put(newsHandler.updateArticle)

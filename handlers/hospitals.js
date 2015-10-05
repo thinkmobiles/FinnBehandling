@@ -199,20 +199,16 @@ Hospitals = function (PostGre) {
          * @method getAllHospitals
          * @instance
          */
+
+        var options = {};
         var limit = req.query.limit;
-        var offset = req.query.page;
-        var options = {
-            limit: 25,
-            offset: 0
-        };
+        var page = req.query.page;
 
-        if (limit && !isNaN(limit) && limit > 0) {
-            options.limit = limit;
-        }
+        var limitIsValid = limit && !isNaN(limit) && limit > 0;
+        var offsetIsValid = page && !isNaN(page) && page > 1;
 
-        if (offset && !isNaN(offset) && offset - 1 > 0) {
-            options.limit = offset - 1;
-        }
+        options.limit = limitIsValid ? limit : 25;
+        options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
 
         hospitalHelper.getHospitalByOptions(options, function (err, hospitals) {
 
@@ -221,6 +217,38 @@ Hospitals = function (PostGre) {
             }
 
             res.status(200).send(hospitals);
+        })
+    };
+
+    this.getHospitalsCount = function (req, res, next) {
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get hospitals count
+         *
+         * @example Request example:
+         *         http://localhost:8787/hospitals/count
+         *
+
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "count": 3
+         *      }
+         *
+         * @method getHospitalsCount
+         * @instance
+         */
+
+        hospitalHelper.getHospitalsCount(function (err, count) {
+
+            if (err) {
+                return next(err);
+            }
+
+            res.status(200).send({count: count});
         })
     };
 
@@ -276,7 +304,7 @@ Hospitals = function (PostGre) {
          * @method getHospital
          * @instance
          */
-        var hospitalId = parseInt(req.params.id);
+        var hospitalId = req.params.id;
 
         hospitalHelper.getHospitalByOptions(hospitalId, function (err, hospital) {
 

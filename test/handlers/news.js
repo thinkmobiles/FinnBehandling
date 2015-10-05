@@ -7,7 +7,6 @@ var Config = require('../config');
 var Helpers = require('../helpers');
 var files = require('./../db/base64Fixtures/files');
 var images = require('./../db/base64Fixtures/images');
-
 var TABLES = require('../../constants/tables');
 
 describe('News', function () {
@@ -15,6 +14,8 @@ describe('News', function () {
     var app = conf.app;
     var PostGre = app.get('PostGre');
     var helpers = new Helpers(PostGre.knex);
+    var factory = require('../db/factories')(PostGre);
+
 
     var url = conf.host;
     var agent = request.agent(url);
@@ -23,7 +24,16 @@ describe('News', function () {
 
     before(function (done) {
         console.log('>>> before');
-        done();
+
+        factory.createMany('news_article', 4, function (err, news) {
+            if (err) {
+                return done(err);
+            }
+
+            articleId = news[0].id;
+
+            done();
+        });
     });
 
     it('should create a new article', function (done) {
@@ -60,8 +70,6 @@ describe('News', function () {
                     expect(article).to.have.property('source');
                     expect(article.source).equal('Newspaper');
 
-                    articleId = article.id;
-
                     done();
                 });
 
@@ -76,18 +84,16 @@ describe('News', function () {
                 if (err) {
                    return done(err);
                 }
-                    var article = res.body;
 
-                    expect(article).to.exist;
-                    expect(article).to.be.instanceOf(Object);
-                    expect(article).to.have.property('subject');
-                    expect(article.subject).equal('Clinic research');
-                    expect(article).to.have.property('content');
-                    expect(article.content).equal('Lorem ipsum dolor si');
-                    expect(article).to.have.property('source');
-                    expect(article.source).equal('Newspaper');
+                var article = res.body;
 
-                    done();
+                expect(article).to.exist;
+                expect(article).to.be.instanceOf(Object);
+                expect(article).to.have.property('subject');
+                expect(article).to.have.property('content');
+                expect(article).to.have.property('source');
+
+                done();
 
             });
     });
@@ -105,13 +111,33 @@ describe('News', function () {
 
                 expect(article).to.be.not.empty;
                 expect(article).to.be.instanceOf(Array);
+                expect(article.length).least(4);
                 expect(article[0]).to.be.instanceOf(Object);
                 expect(article[0]).to.have.property('subject');
                 expect(article[0]).to.have.property('content');
                 expect(article[0]).to.have.property('source');
 
                 done();
+            });
+    });
 
+    it('should get news count', function (done) {
+        agent
+            .get('/news/count')
+            .expect(200)
+            .end(function (err, res) {
+                if (err) {
+                    return done(err);
+                }
+
+                var result = res.body;
+
+                expect(result).to.be.not.empty;
+                expect(result).to.be.instanceOf(Object);
+                expect(result.count).to.be.not.empty;
+                expect(result.count).least(4);
+
+                done();
             });
     });
 
@@ -153,7 +179,6 @@ describe('News', function () {
 
                     done();
                 });
-
             });
     });
 

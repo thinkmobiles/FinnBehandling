@@ -25,6 +25,7 @@ var news = function (PostGre) {
     this.getNewsByParams = function (options, callback) {
 
         var error;
+        var errorMessage;
 
         assert(callback);
 
@@ -32,13 +33,14 @@ var news = function (PostGre) {
 
            getArticle(options, callback);
 
-        } else if (typeof options === 'object'){
+        } else if (typeof options === 'object') {
 
             getAllNews(options, callback);
 
-        } else if (typeof options === 'null'){
+        } else {
+            errorMessage = !options ? RESPONSES.NOT_ENOUGH_PARAMETERS : RESPONSES.INVALID_PARAMETERS;
 
-            error = new Error(RESPONSES.NOT_ENOUGH_PARAMETERS);
+            error = new Error(errorMessage);
             error.status = 400;
 
             callback(error);
@@ -56,12 +58,29 @@ var news = function (PostGre) {
         News
             .query(function (qb) {
                 qb.limit(options.limit);
-                if (options.page) {
-                    qb.offset((options.page - 1) * options.limit);
-                }
+                qb.offset(options.offset);
             })
             .fetchAll()
             .asCallback(callback);
+    }
+
+    this.getNewsCount = function (callback){
+
+        assert(callback);
+
+        PostGre.knex(TABLES.NEWS)
+            .count()
+            .asCallback(function (err, queryResult) {
+                var  clientsCount;
+
+                if (err) {
+                    return callback(err);
+                }
+
+                clientsCount = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                callback(null, clientsCount);
+            });
     }
 
     this.checkCreateNewsOptions = new Validation.Check({
