@@ -1,4 +1,4 @@
-app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelpers',
+app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'GeneralHelpers',
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
@@ -30,10 +30,14 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
+            $scope.pending = true;
+
             HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
+
+                $scope.pending = false;
 
                 self.hospitals = hospitals;
             });
