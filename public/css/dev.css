@@ -101,6 +101,7 @@
 
 .start-page-news {
     display: inline-block;
+    vertical-align: top;
     width: 260px;
     overflow: hidden;
     margin-top: 15px;
