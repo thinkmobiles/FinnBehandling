@@ -25,10 +25,13 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     ];
 
     $scope.search = function () {
+        GeneralHelpers.saveAsLocalData('curPage', 1);
         GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
         GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
         GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
         GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
+        $scope.$parent.searchResponse = true;
 
         $location.path('behandlingstilbud');
     };

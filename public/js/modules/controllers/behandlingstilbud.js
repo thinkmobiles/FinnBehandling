@@ -2,7 +2,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = 1;
+        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
 
         this.setCoordinates = function (lat, long) {
@@ -24,7 +24,15 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitalsCount();
 
-        this.getHospitals = function () {
+        this.updateHospitals = function () {
+            if (!$scope.$parent.searchResponse) {
+                GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
+            }
+
+            getHospitals();
+        };
+
+        function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
@@ -38,10 +46,11 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
                 }
 
                 $scope.pending = false;
+                $scope.$parent.searchResponse = false;
 
                 self.hospitals = hospitals;
             });
-        };
+        }
 
-        this.getHospitals();
+        getHospitals();
 }]);

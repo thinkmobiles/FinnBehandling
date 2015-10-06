@@ -38899,7 +38899,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = 1;
+        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
 
         this.setCoordinates = function (lat, long) {
@@ -38921,7 +38921,15 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitalsCount();
 
-        this.getHospitals = function () {
+        this.updateHospitals = function () {
+            if (!$scope.$parent.searchResponse) {
+                GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
+            }
+
+            getHospitals();
+        };
+
+        function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
@@ -38935,12 +38943,13 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
                 }
 
                 $scope.pending = false;
+                $scope.$parent.searchResponse = false;
 
                 self.hospitals = hospitals;
             });
-        };
+        }
 
-        this.getHospitals();
+        getHospitals();
 }]);;
 app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
@@ -38989,10 +38998,13 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     ];
 
     $scope.search = function () {
+        GeneralHelpers.saveAsLocalData('curPage', 1);
         GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
         GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
         GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
         GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
+        $scope.$parent.searchResponse = true;
 
         $location.path('behandlingstilbud');
     };
