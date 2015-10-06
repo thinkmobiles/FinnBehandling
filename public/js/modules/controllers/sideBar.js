@@ -30,6 +30,6 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
         GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
         GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
 
-        $location.path('sentere');
+        $location.path('behandlingstilbud');
     };
 }]);

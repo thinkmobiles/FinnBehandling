@@ -38878,13 +38878,13 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
-    }).when('/sentere', {
-        controller: 'sentereController',
-        templateUrl: 'templates/sentere/list.html',
-        controllerAs: 'sentereCtrl'
-    }).when('/sentere/:id', {
+    }).when('/behandlingstilbud', {
+        controller: 'behandlingstilbudController',
+        templateUrl: 'templates/behandlingstilbud/list.html',
+        controllerAs: 'behandlingstilbudCtrl'
+    }).when('/behandlingstilbud/:id', {
         controller: 'hospitalController',
-        templateUrl: 'templates/sentere/view.html',
+        templateUrl: 'templates/behandlingstilbud/view.html',
         controllerAs: 'hospitalCtrl'
     }).otherwise({
         redirectTo: '/'
@@ -38895,27 +38895,7 @@ app.config(['$routeProvider', function ($routeProvider) {
 
 }]);
 ;
-app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
-        var self = this;
-        var hospitalId = $routeParams.id;
-
-        $location.hash('main-menu');
-
-        function getHospital () {
-
-            HospitalManager.getHospital(hospitalId, function(err, hospital) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
-
-                self.hospital = hospital;
-            });
-        }
-
-        getHospital();
-    }]);;
-app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelpers',
+app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'GeneralHelpers',
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
@@ -38947,10 +38927,14 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
+            $scope.pending = true;
+
             HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
+
+                $scope.pending = false;
 
                 self.hospitals = hospitals;
             });
@@ -38958,6 +38942,26 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
 
         this.getHospitals();
 }]);;
+app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
+        var self = this;
+        var hospitalId = $routeParams.id;
+
+        $location.hash('main-menu');
+
+        function getHospital () {
+
+            HospitalManager.getHospital(hospitalId, function(err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        getHospital();
+    }]);;
 app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     function ($scope, $location, GeneralHelpers) {
 
@@ -38990,7 +38994,7 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
         GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
         GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
 
-        $location.path('sentere');
+        $location.path('behandlingstilbud');
     };
 }]);;
 app.controller('startPageController', ['$scope', function ($scope) {

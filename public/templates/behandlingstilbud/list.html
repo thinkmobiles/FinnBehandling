@@ -1,13 +1,22 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list">
-    <div>
-        <span class="dynamic-font-md">Viser resultater: {{sentereCtrl.hospitals.length}} av {{totalItems}}</span>
+    <div ng-show="behandlingstilbudCtrl.hospitals.length">
+        <span class="dynamic-font-md">Viser resultater: {{behandlingstilbudCtrl.hospitals.length}} av {{totalItems}}</span>
     </div>
 
-    <dir-pagination-controls on-page-change="sentereCtrl.getHospitals()"></dir-pagination-controls>
+    <div ng-show="pending">
+        <h3>Loading...</h3>
+    </div>
+
+    <dir-pagination-controls
+            on-page-change="behandlingstilbudCtrl.getHospitals()"
+            class="dynamic-font-md"
+            ng-show="behandlingstilbudCtrl.hospitals.length">
+
+    </dir-pagination-controls>
 
     <div class="hospital-item" ng-class="{'hospital-item-paid': hospital.is_paid, grey: !($index % 2)}"
-         dir-paginate="hospital in sentereCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="curPage">
+         dir-paginate="hospital in behandlingstilbudCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="curPage">
 
         <h4 class="blue bold dynamic-font-lg">{{hospital.name | uppercase}}</h4>
 
@@ -32,10 +41,10 @@
                 <span class="contact-data">{{hospital.phone_number[0]}}</span>
 
                 <div ng-show="hospital.is_paid">
-                    <a class="btn btn-default margin-top" href="#/sentere/3">Se hele profilen</a><br/>
+                    <a class="btn btn-default margin-top" href="#/behandlingstilbud/{{hospital.id}}">Se hele profilen</a><br/>
                     <a
                             class="btn btn-default margin-top"
-                            ng-click="sentereCtrl.setCoordinates(hospital.latitude, hospital.longitude)"
+                            ng-click="behandlingstilbudCtrl.setCoordinates(hospital.latitude, hospital.longitude)"
                             data-animation="am-fade-and-scale"
                             data-template-url="templates/modal/map.tpl.html"
                             bs-modal="modal"
@@ -50,12 +59,17 @@
         <div class="clearfix margin-top">
 
             <div class="col-md-12">
-                <a class="pull-left dynamic-font-md" href="#/sentere/{{hospital.id}}">Ga til nettside></a>
+                <a class="pull-left dynamic-font-md" href="#/behandlingstilbud/{{hospital.id}}">Ga til nettside></a>
                 <span class="pull-right blue dynamic-font-md">Sist oppdatert: {{hospital.created_at}}</span>
             </div>
 
         </div>
     </div>
 
-    <dir-pagination-controls on-page-change="sentereCtrl.getHospitals()"></dir-pagination-controls>
+    <dir-pagination-controls
+            on-page-change="behandlingstilbudCtrl.getHospitals()"
+            class="dynamic-font-md"
+            ng-show="behandlingstilbudCtrl.hospitals.length">
+
+    </dir-pagination-controls>
 </div>
