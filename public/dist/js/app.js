@@ -38943,7 +38943,10 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
                 }
 
                 $scope.pending = false;
-                $scope.$parent.searchResponse = false;
+
+                if ($scope.$parent) {
+                    $scope.$parent.searchResponse = false;
+                }
 
                 self.hospitals = hospitals;
             });

@@ -182,9 +182,9 @@ var Hospitals = function (PostGre) {
                         '   FROM ( ' +
                         '       SELECT treatment.name ' +
                         '           FROM ' + TABLES.TREATMENTS_LIST + ' treatment ' +
-                        '           LEFT JOIN ' + TABLES.TREATMENTS + ' hotel_treatment ' +
-                        '               ON treatment.id = hotel_treatment.treatment_id ' +
-                        '           WHERE hotel_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
+                        '           LEFT JOIN ' + TABLES.TREATMENTS + ' hospital_treatment ' +
+                        '               ON treatment.id = hospital_treatment.treatment_id ' +
+                        '           WHERE hospital_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
                         '       ) treatments_result ' +
                         ') AS treatments '
                     ),
@@ -194,9 +194,9 @@ var Hospitals = function (PostGre) {
                         '   FROM ( ' +
                         '       SELECT sub_treatment.name ' +
                         '           FROM ' + TABLES.SUB_TREATMENTS_LIST + ' sub_treatment ' +
-                        '           LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hotel_sub_treatment ' +
-                        '               ON sub_treatment.id = hotel_sub_treatment.sub_treatment_id ' +
-                        '           WHERE hotel_sub_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
+                        '           LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hospital_sub_treatment ' +
+                        '               ON sub_treatment.id = hospital_sub_treatment.sub_treatment_id ' +
+                        '           WHERE hospital_sub_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
                         '       ) sub_treatments_result ' +
                         ') AS sub_treatments '
                     ),
