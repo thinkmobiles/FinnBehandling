@@ -8,5 +8,6 @@ module.exports = {
     SUB_TREATMENTS_LIST: 'tb_sub_treatments_dic',
     TREATMENTS_LIST: 'tb_treatments_dic',
     USERS: 'tb_users',
-    NEWS: 'tb_news'
+    NEWS: 'tb_news',
+    STATIC_DATA: 'tb_static_data'
 };
