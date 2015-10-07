@@ -6,57 +6,18 @@ var Session = require('../handlers/sessions');
 var _ = require('underscore');
 var async = require('async');
 
-var Hospitals;
-
-Hospitals = function (PostGre) {
+var Hospitals = function (PostGre) {
     var self = this;
     var Hospital = PostGre.Models[TABLES.HOSPITALS];
     var HospitalType = PostGre.Models[TABLES.HOSPITAL_TYPES_LIST];
     var Region = PostGre.Models[TABLES.REGIONS_LIST];
     var HospitalTreatment = PostGre.Models[TABLES.TREATMENTS];
-    var HospitalText = PostGre.Models[TABLES.HOSPITAL_TEXTS];
     var HospitalSubTreatment = PostGre.Models[TABLES.SUB_TREATMENTS];
     var TreatmentsList = PostGre.Models[TABLES.TREATMENTS_LIST];
     var SubTreatmentsList = PostGre.Models[TABLES.SUB_TREATMENTS_LIST];
 
-    var getQuery = 'SELECT array_to_json(array_agg(row_to_json(hospital))) ' +
-        'FROM (SELECT h.id, h.description, h.name, h.web_address, h.phone_number, h.is_paid, ' +
-        'to_char(h.created_at, \'D. Mon YYYY\') AS created_at,  ' +
-        'ST_X(h.position::geometry) AS latitude,  ST_Y(h.position::geometry) AS longitude, h.email, ht.name as type, ' +
-        '( h.address || \'\n\' || (SELECT (r.zip_code || \' \' || r.kommune_name || \' \' || r.fylke_name) ' +
-        'FROM ' + TABLES.REGIONS_LIST + ' r WHERE r.id = h.region_id ' +
-        ')) AS address, ' +
-
-        '(SELECT array_to_json(array_agg(row_to_json(t))) ' +
-        'FROM ( ' +
-        'SELECT t.name ' +
-        'FROM ' + TABLES.TREATMENTS_LIST + ' t ' +
-        'LEFT JOIN ' + TABLES.TREATMENTS + ' ht ON t.id = ht.treatment_id ' +
-        'WHERE ht.hospital_id = h.id ' +
-        ') t ' +
-        ') AS treatments, ' +
-
-        '(SELECT array_to_json(array_agg(row_to_json(st))) ' +
-        'FROM ( ' +
-        'SELECT st.name ' +
-        'FROM ' + TABLES.SUB_TREATMENTS_LIST + ' st ' +
-        'LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hst ON st.id = hst.sub_treatment_id ' +
-        'WHERE hst.hospital_id = h.id ' +
-        ') st ' +
-        ') AS sub_treatments ' +
-
-        /*'(SELECT array_to_json(array_agg(row_to_json(txt))) ' +
-        'FROM (' +
-        'SELECT txt.content, txt.type ' +
-        'FROM ' + TABLES.HOSPITAL_TEXTS + ' txt ' +
-        'WHERE txt.hospital_id = h.id ' +
-        ') txt ' +
-        ') AS texts ' +*/
-
-        'FROM ' + TABLES.HOSPITALS + ' h ' +
-        'LEFT JOIN ' + TABLES.HOSPITAL_TYPES_LIST + ' ht ON ht.id = h.type_id ' +
-        '/* mark */ ' +
-        ') AS hospital ';
+    var Image = require('./images');
+    var image = new Image(PostGre);
 
     function assert(fn) {
         var error;
@@ -65,8 +26,6 @@ Hospitals = function (PostGre) {
             error = new Error(typeof fn + ' is not a function');
             throw error;
         }
-
-
     }
 
     function createHospital(data, callback) {
@@ -123,7 +82,6 @@ Hospitals = function (PostGre) {
                 })
                 .asCallback(innerCallback)
         }, callback);
-
     }
 
     function updateHospital(hospitalId, data, callback) {
@@ -144,7 +102,7 @@ Hospitals = function (PostGre) {
                 }
 
                 callback(null, hospital.id);
-            })
+            });
     }
 
     function updateHospitalTreatment(treatmentIds, hospitalId, callback) {
@@ -191,7 +149,7 @@ Hospitals = function (PostGre) {
             .asCallback(function (err) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
                 async.eachSeries(subTreatmentIds, function (subTreatmentId, innerCallback) {
@@ -204,7 +162,7 @@ Hospitals = function (PostGre) {
                         }, {
                             require: true
                         })
-                        .asCallback(innerCallback)
+                        .asCallback(innerCallback);
 
                 }, callback);
             })
@@ -214,37 +172,88 @@ Hospitals = function (PostGre) {
 
         assert(callback);
 
-        var getByIdQuery = 'WHERE hospital.id = ' + id;
+        Hospital
+            .query(function(qb){
+                qb.select(
+                    PostGre.knex.raw('TO_CHAR( ' + TABLES.HOSPITALS + '.created_at, \'D. Mon YYYY\') AS created_at '),
 
-        PostGre.knex
-            .raw(getQuery + getByIdQuery)
-            .asCallback(function (err, querResult) {
+                    PostGre.knex.raw(
+                        '(SELECT JSON_AGG(treatments_result) ' +
+                        '   FROM ( ' +
+                        '       SELECT treatment.name ' +
+                        '           FROM ' + TABLES.TREATMENTS_LIST + ' treatment ' +
+                        '           LEFT JOIN ' + TABLES.TREATMENTS + ' hotel_treatment ' +
+                        '               ON treatment.id = hotel_treatment.treatment_id ' +
+                        '           WHERE hotel_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
+                        '       ) treatments_result ' +
+                        ') AS treatments '
+                    ),
 
-                if (err || !querResult.rows || !querResult.rows[0] || !querResult.rows[0].array_to_json || !querResult.rows[0].array_to_json[0]) {
-                    err = err || new Error(RESPONSES.NOT_FOUND);
-                    return callback(err);
-                }
+                    PostGre.knex.raw(
+                        '(SELECT JSON_AGG(sub_treatments_result) ' +
+                        '   FROM ( ' +
+                        '       SELECT sub_treatment.name ' +
+                        '           FROM ' + TABLES.SUB_TREATMENTS_LIST + ' sub_treatment ' +
+                        '           LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hotel_sub_treatment ' +
+                        '               ON sub_treatment.id = hotel_sub_treatment.sub_treatment_id ' +
+                        '           WHERE hotel_sub_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
+                        '       ) sub_treatments_result ' +
+                        ') AS sub_treatments '
+                    ),
 
-                callback(null, querResult.rows[0].array_to_json[0]);
-            });
+                    TABLES.HOSPITALS + '.id',
+                    TABLES.HOSPITALS + '.is_paid',
+                    TABLES.HOSPITALS + '.name',
+                    TABLES.HOSPITALS + '.address',
+                    TABLES.HOSPITALS + '.phone_number',
+                    TABLES.HOSPITALS + '.email',
+                    TABLES.HOSPITALS + '.description'
+                );
+
+                qb.leftJoin(TABLES.HOSPITAL_TYPES_LIST, TABLES.HOSPITAL_TYPES_LIST + '.id', TABLES.HOSPITALS + '.type_id');
+                qb.where(TABLES.HOSPITALS + '.id', id);
+            })
+            .fetch({
+                withRelated: [
+                    'logo'
+                ],
+                require: true
+            })
+            .asCallback(callback);
     }
 
     function getHospitals(options, callback) {
-        var getAllquery;
+
         assert(callback);
 
-        getAllquery = getQuery.replace(/\/\* mark \*\//, 'ORDER BY h.created_at OFFSET ' + options.offset + ' LIMIT ' + options.limit);
+        Hospital
+            .query(function(qb){
+                qb.select(
+                    PostGre.knex.raw('TO_CHAR( ' + TABLES.HOSPITALS + '.created_at, \'D. Mon YYYY\') AS created_at '),
 
-        PostGre.knex
-            .raw(getAllquery)
-            .asCallback(function (err, querResult) {
+                    PostGre.knex.raw('ST_X(' + TABLES.HOSPITALS + '.position::geometry) AS latitude '),
+                    PostGre.knex.raw('ST_Y(' + TABLES.HOSPITALS + '.position::geometry) AS longitude '),
 
-                if (err) {
-                    return callback(err);
-                }
+                    TABLES.HOSPITALS + '.id',
+                    TABLES.HOSPITALS + '.is_paid',
+                    TABLES.HOSPITALS + '.name',
+                    TABLES.HOSPITALS + '.address',
+                    TABLES.HOSPITALS + '.phone_number',
+                    TABLES.HOSPITALS + '.email',
+                    TABLES.HOSPITALS + '.description'
+                );
 
-                callback(null, querResult.rows[0].array_to_json);
+                qb.leftJoin(TABLES.HOSPITAL_TYPES_LIST, TABLES.HOSPITAL_TYPES_LIST + '.id', TABLES.HOSPITALS + '.type_id');
+                qb.orderBy(TABLES.HOSPITALS + '.created_at', 'DESC');
+                qb.limit(options.limit);
+                qb.offset(options.offset);
             })
+            .fetchAll({
+                withRelated: [
+                    'logo'
+                ]
+            })
+            .asCallback(callback);
     }
 
     this.checkFunctions = {
@@ -275,7 +284,7 @@ Hospitals = function (PostGre) {
         },
 
         checkHospitalTreatment: function (options, validatedOptions, callback) {
-            var treatmentError;
+
             assert(callback);
 
             TreatmentsList
@@ -286,6 +295,7 @@ Hospitals = function (PostGre) {
                     require: true
                 })
                 .asCallback(function (err, treatment) {
+                    var treatmentError;
 
                     if (err || treatment.models.length !== options.treatment_ids.length) {
                         treatmentError = err || new Error(RESPONSES.CLINIC_TREATMENT_ERROR);
@@ -300,7 +310,7 @@ Hospitals = function (PostGre) {
         },
 
         checkHospitalSubTreatment: function (options, validatedOptions, callback) {
-            var subTreatmentError;
+
             assert(callback);
 
             SubTreatmentsList
@@ -311,6 +321,7 @@ Hospitals = function (PostGre) {
                     require: true
                 })
                 .asCallback(function (err, subTreatment) {
+                    var subTreatmentError;
 
                     if (err || subTreatment.models.length !== options.sub_treatments.length) {
                         subTreatmentError = err || new Error(RESPONSES.CLINIC_SUB_TREATMENT_ERROR);
@@ -320,8 +331,7 @@ Hospitals = function (PostGre) {
                     }
 
                     callback();
-
-                })
+                });
         },
 
         checkUniqueHospitalName: function (options, validatedOptions, callback) {
@@ -342,11 +352,11 @@ Hospitals = function (PostGre) {
                         return callback(nonUniqueNameError);
                     }
                     callback();
-                })
-
+                });
         },
 
         checkExistingHospital: function (options, validatedOptions, callback) {
+
             assert(callback);
 
             Hospital
@@ -369,7 +379,8 @@ Hospitals = function (PostGre) {
         address: ['isString'],
         phone_number: ['isArray'],
         email: ['isArray'],
-        web_address: ['isString']
+        web_address: ['isString'],
+        position: ['isString']
 
     }, self.checkFunctions);
 
@@ -383,7 +394,8 @@ Hospitals = function (PostGre) {
         address: ['isString'],
         phone_number: ['isArray'],
         email: ['isArray'],
-        web_address: ['isString']
+        web_address: ['isString'],
+        position: ['isString']
     }, self.checkFunctions);
 
     this.createHospitalByOptions = function (options, settings, callback) {
@@ -396,23 +408,34 @@ Hospitals = function (PostGre) {
 
             createHospital(validOptions, function (err, hospitalId) {
 
-                async.parallel([
+                var functionsToExecute = [
                     async.apply(createHospitalTreatment, options.treatment_ids, hospitalId),
                     async.apply(createHospitalSubTreatment, options.sub_treatments, hospitalId)
+                ];
 
-                ], function (err) {
+                if (options.logo) {
+                    var  imageParams = {
+                        imageUrl: options.logo,
+                        imageable_id: hospitalId,
+                        imageable_type: TABLES.HOSPITALS,
+                        imageable_field: 'logo'
+                    };
+
+                    functionsToExecute.push(async.apply(image.newImage, imageParams));
+                }
+
+                async.parallel(functionsToExecute, function (err) {
 
                     if (err) {
 
                         self.deleteHospital(hospitalId, function () {
-                                return callback(err);
-                            })
+                            return callback(err);
+                        });
                     }
 
                     callback(null, hospitalId);
-                })
-            })
-
+                });
+            });
         });
     };
 
@@ -429,23 +452,34 @@ Hospitals = function (PostGre) {
             delete validOptions.hospital_id;
 
             updateHospital(hospitalId, validOptions, function (err, hospitalId) {
+                var  imageParams;
 
-                async.parallel([
+                var functionsToExecute = [
                     async.apply(updateHospitalTreatment, options.treatment_ids, hospitalId),
                     async.apply(updateHospitalSubTreatment, options.sub_treatments, hospitalId)
+                ];
 
-                ], function (err) {
+                if (options.logo) {
+
+                    imageParams = {
+                        imageUrl: options.logo,
+                        imageable_id: hospitalId,
+                        imageable_type: TABLES.HOSPITALS,
+                        imageable_field: 'logo'
+                    };
+
+                    functionsToExecute.push(async.apply(image.updateOrCreateImageByClientProfileId, imageParams));
+                }
+
+                async.parallel(functionsToExecute, function (err) {
 
                     if (err) {
                         return callback(err);
                     }
 
                     callback(null, hospitalId);
-                })
-
-            })
-
-
+                });
+            });
         });
     };
 
@@ -468,7 +502,6 @@ Hospitals = function (PostGre) {
 
             callback(error);
         }
-
     };
 
     this.getHospitalsCount = function (callback) {
@@ -488,7 +521,6 @@ Hospitals = function (PostGre) {
 
                 callback(null, clientsCount);
             });
-
     };
 
     this.deleteHospital = function (hospitalId, callback) {
