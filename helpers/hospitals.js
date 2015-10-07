@@ -380,7 +380,7 @@ var Hospitals = function (PostGre) {
         phone_number: ['isArray'],
         email: ['isArray'],
         web_address: ['isString'],
-        position: ['isString']
+        position: ['isPosition']
 
     }, self.checkFunctions);
 
@@ -395,7 +395,7 @@ var Hospitals = function (PostGre) {
         phone_number: ['isArray'],
         email: ['isArray'],
         web_address: ['isString'],
-        position: ['isString']
+        position: ['isPosition']
     }, self.checkFunctions);
 
     this.createHospitalByOptions = function (options, settings, callback) {

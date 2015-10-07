@@ -182,6 +182,13 @@ Check.prototype = {
         }
     },
 
+    isPosition: function (val) {
+        var regexp = /^\([-+]?([1-8]?\d(\.|\.\d+)?|90(\.|\.0+)?)\s*,\s*[-+]?(180(\.|\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.|\.\d+)?)\)$/i;
+        if (typeof(val) === 'string' && regexp.test(val)) {
+            return val + '';
+        }
+    },
+
     isArray: function (val) {
         if (Object.prototype.toString.call(val).slice(8,-1) === 'Array') {
             return val;
