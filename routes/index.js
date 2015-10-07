@@ -12,6 +12,7 @@ module.exports = function (app, PostGre) {
 
     var newsRouter = require('./news')(PostGre);
     var hospitalsRouter = require('./hospitals')(PostGre);
+    var staticDataRouter = require('./staticData')(PostGre);
 
 
 
@@ -26,6 +27,8 @@ module.exports = function (app, PostGre) {
     app.use('/hospitals', hospitalsRouter);
 
     app.use('/news', newsRouter);
+
+    app.use('/staticData', staticDataRouter);
 
     app.post('/authenticate', function (req, res, next) {
         var cid = req.body.cid;
