@@ -171,9 +171,7 @@ describe('Hospitals', function () {
                 expect(response).to.have.property('id');
                 expect(response.id).equal(hospitalId);
                 expect(response).to.have.property('name');
-                expect(response).to.have.property('web_address');
                 expect(response).to.have.property('phone_number');
-                expect(response).to.have.property('type');
                 expect(response).to.have.property('address');
                 expect(response).to.have.property('treatments');
                 expect(response).to.have.property('sub_treatments');

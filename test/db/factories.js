@@ -86,6 +86,7 @@ module.exports = function (db) {
     });
 
     factory.define('static_data', db.Models[TABLES.STATIC_DATA], {
+        id: 1,
         text: function() {
             return faker.lorem.sentence(10, 0);
         }

@@ -25,20 +25,26 @@ describe('StaticData', function () {
     before(function (done) {
         console.log('>>> before');
 
-        factory.createMany('static_data', 4, function (err, staticData) {
+        factory.build('static_data', function (err, staticData) {
             if (err) {
                 return done(err);
             }
 
-            staticDataId = staticData[0].id;
+            staticData
+                .save(null, {method: 'insert'})
+                .asCallback(function (err){
+                    if (err) {
+                        return done(err);
+                    }
 
-            done();
+                    done();
+                });
         });
     });
 
     it('should get one static entry', function (done) {
         agent
-            .get('/staticData/' + staticDataId)
+            .get('/staticData')
             .expect(200)
             .end(function (err, res) {
                 if (err) {
@@ -62,7 +68,7 @@ describe('StaticData', function () {
         };
 
         agent
-            .put('/staticData/' + staticDataId)
+            .put('/staticData')
             .send(data)
             .expect(200)
             .end(function (err, res) {
@@ -74,7 +80,7 @@ describe('StaticData', function () {
 
                 expect(success).equal(RESPONSES.UPDATED_SUCCESS);
 
-                helpers.getOne(TABLES.STATIC_DATA, staticDataId, function (err, staticEntry) {
+                helpers.getOne(TABLES.STATIC_DATA, 1, function (err, staticEntry) {
                     if (err) {
                         return done(err);
                     }
