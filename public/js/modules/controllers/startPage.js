@@ -1,22 +1,34 @@
-app.controller('startPageController', ['$scope', 'NewsManager', 'GeneralHelpers',
-    function ($scope, NewsManager, GeneralHelpers) {
+app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
+    function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
 
-    var self = this;
+        var self = this;
 
-    function getNews () {
+        function getStaticData () {
 
-        var params = {
-            limit: 3
-        };
+            StaticDataManager.getStaticData(function(err, staticData) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
 
-        NewsManager.getNewsList(params, function(err, hospitals) {
-            if (err) {
-                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-            }
+                self.staticData = staticData ? staticData.text : '';
+            });
+        }
 
-            self.news = hospitals;
-        });
-    }
+        function getNews () {
 
-    getNews();
+            var params = {
+                limit: 3
+            };
+
+            NewsManager.getNewsList(params, function(err, hospitals) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.news = hospitals;
+            });
+        }
+
+        getStaticData();
+        getNews();
 }]);
