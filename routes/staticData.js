@@ -5,7 +5,7 @@ var StaticDataHandler = require('../handlers/staticData');
 module.exports = function (PostGre) {
     var staticDataHandler = new StaticDataHandler(PostGre);
 
-    staticDataRouter.route('/:id')
+    staticDataRouter.route('/')
         .get(staticDataHandler.getStaticData)
         .put(staticDataHandler.updateStaticData);
 
