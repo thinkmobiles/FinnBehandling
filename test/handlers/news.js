@@ -4,10 +4,16 @@ var expect = require("chai").expect;
 var async = require('async');
 var RESPONSES = require('../../constants/responseMessages');
 var Config = require('../config');
-var Helpers = require('../helpers');
-var files = require('./../db/base64Fixtures/files');
+var Helpers = require('../helpers/general');
 var images = require('./../db/base64Fixtures/images');
 var TABLES = require('../../constants/tables');
+var imageGenerator = require('./../helpers/imageGenerator');
+var fs = require('fs');
+var imageUploaderConfig = {
+    type: 'FileSystem',
+    directory: process.env.LOCAL_IMAGE_STORAGE
+};
+var getImageUrl = require('../../helpers/imageUploader/imageUploader')(imageUploaderConfig).getImageUrl;
 
 describe('News', function () {
     var conf = new Config();
@@ -21,6 +27,9 @@ describe('News', function () {
     var agent = request.agent(url);
 
     var articleId;
+    var updatingArticleId;
+    var articleImage;
+    var updatingArticleImage;
 
     before(function (done) {
         console.log('>>> before');
@@ -30,9 +39,19 @@ describe('News', function () {
                 return done(err);
             }
 
-            articleId = news[0].id;
+            imageGenerator(news, TABLES.NEWS, 'image', factory, function (err, images) {
+                if (err) {
+                    return done(err);
+                }
 
-            done();
+                articleImage = images[0].toJSON();
+                updatingArticleImage = images[1].toJSON();
+
+                articleId = articleImage.imageable_id;
+                updatingArticleId = updatingArticleImage.imageable_id;
+
+                done();
+            });
         });
     });
 
@@ -40,7 +59,8 @@ describe('News', function () {
         var data = {
             subject: 'Clinic research',
             content: 'Lorem ipsum dolor si',
-            source: 'Newspaper'
+            source: 'Newspaper',
+            image: images[TABLES.NEWS][0]
         };
 
         agent
@@ -56,23 +76,57 @@ describe('News', function () {
 
                 expect(success).equal(RESPONSES.WAS_CREATED);
 
-                helpers.getOneJustCreated(TABLES.NEWS, function (err, article) {
-                    if (err) {
-                        return done(err);
+                async.waterfall([
+                    function (callback) {
+
+                        helpers.getOneJustCreated(TABLES.NEWS, function (err, article) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(article).to.exist;
+                            expect(article).to.be.instanceOf(Object);
+                            expect(article).to.have.property('subject');
+                            expect(article.subject).equal(data.subject);
+                            expect(article).to.have.property('content');
+                            expect(article.content).equal(data.content);
+                            expect(article).to.have.property('source');
+                            expect(article.source).equal(data.source);
+
+                            callback( null, article);
+                        });
+                    },
+                    function (article, callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: article.id, imageable_type: TABLES.NEWS}, function (err, images) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            var image = images[0];
+                            var imageUrl;
+
+                            expect(image).to.exist;
+                            expect(image).to.be.instanceOf(Object);
+                            expect(image).to.have.property('name');
+                            expect(image).to.have.property('imageable_id');
+                            expect(image.imageable_id).equal(article.id);
+                            expect(image).to.have.property('imageable_type');
+                            expect(image.imageable_type).equal(TABLES.NEWS);
+                            expect(image).to.have.property('imageable_field');
+                            expect(image.imageable_field).equal('image');
+
+                            imageUrl = getImageUrl(image.name, 'images');
+
+                            fs.exists(imageUrl, function (exists) {
+
+                                expect(exists).equal(true);
+                            });
+
+                            callback();
+                        });
                     }
-
-                    expect(article).to.exist;
-                    expect(article).to.be.instanceOf(Object);
-                    expect(article).to.have.property('subject');
-                    expect(article.subject).equal('Clinic research');
-                    expect(article).to.have.property('content');
-                    expect(article.content).equal('Lorem ipsum dolor si');
-                    expect(article).to.have.property('source');
-                    expect(article.source).equal('Newspaper');
-
-                    done();
-                });
-
+                ], done);
             });
     });
 
@@ -92,6 +146,16 @@ describe('News', function () {
                 expect(article).to.have.property('subject');
                 expect(article).to.have.property('content');
                 expect(article).to.have.property('source');
+                expect(article).to.have.property('image');
+                expect(article.image).to.be.instanceOf(Object);
+                expect(article.image).to.have.property('imageable_id');
+                expect(article.image.imageable_id).equal(articleId);
+                expect(article.image).to.have.property('image_url');
+
+                fs.exists(article.image.image_url, function (exists) {
+
+                    expect(exists).equal(true);
+                });
 
                 done();
 
@@ -145,11 +209,12 @@ describe('News', function () {
         var data = {
             subject: 'Updated research',
             content: 'Lorem ipsum dolor si',
-            source: 'Updated Newspaper'
+            source: 'Updated Newspaper',
+            image: images[TABLES.NEWS][1]
         };
 
         agent
-            .put('/news/' + articleId)
+            .put('/news/' + updatingArticleId)
             .send(data)
             .expect(200)
             .end(function (err, res) {
@@ -161,24 +226,64 @@ describe('News', function () {
 
                 expect(success).equal(RESPONSES.UPDATED_SUCCESS);
 
-                helpers.getOne(TABLES.NEWS, articleId, function (err, article) {
-                    if (err) {
-                        return done(err);
+                async.waterfall([
+                    function (callback) {
+
+                        helpers.getOne(TABLES.NEWS, updatingArticleId, function (err, article) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(article).to.exist;
+                            expect(article).to.be.instanceOf(Object);
+                            expect(article).to.have.property('subject');
+                            expect(article.subject).equal(data.subject);
+                            expect(article).to.have.property('content');
+                            expect(article.content).equal(data.content);
+                            expect(article).to.have.property('source');
+                            expect(article.source).equal(data.source);
+
+                            callback( null, article);
+                        });
+                    },
+                    function (article, callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: article.id, imageable_type: TABLES.NEWS}, function (err, images) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            var image = images[0];
+                            var imageUrl;
+
+                            expect(image).to.exist;
+                            expect(image).to.be.instanceOf(Object);
+                            expect(image).to.have.property('id');
+                            expect(image).to.have.property('name');
+                            expect(image.name).not.equal(updatingArticleImage.name);
+                            expect(image).to.have.property('imageable_id');
+                            expect(image.imageable_id).equal(article.id);
+                            expect(image).to.have.property('imageable_type');
+                            expect(image.imageable_type).equal(TABLES.NEWS);
+                            expect(image).to.have.property('imageable_field');
+                            expect(image.imageable_field).equal('image');
+
+                            imageUrl = getImageUrl(image.name, 'images');
+
+                            fs.exists(imageUrl, function (exists) {
+
+                                expect(exists).equal(true);
+                            });
+
+                            fs.exists(updatingArticleImage.image_url, function (exists) {
+
+                                expect(exists).equal(false);
+                            });
+
+                            callback();
+                        });
                     }
-
-                    expect(article).to.exist;
-                    expect(article).to.be.instanceOf(Object);
-                    expect(article).to.have.property('subject');
-                    expect(article.subject).equal('Updated research');
-                    expect(article).to.have.property('content');
-                    expect(article.content).equal('Lorem ipsum dolor si');
-                    expect(article).to.have.property('source');
-                    expect(article.source).equal('Updated Newspaper');
-
-                    articleId = article.id;
-
-                    done();
-                });
+                ], done);
             });
     });
 
@@ -191,7 +296,39 @@ describe('News', function () {
                     return done(err);
                 }
                 expect(res.body.success).equal(RESPONSES.REMOVE_SUCCESSFULY);
-                done();
+
+                async.waterfall([
+                    function (callback) {
+
+                        helpers.getOne(TABLES.NEWS, articleId, function (err, article) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(article).not.to.exist;
+
+                            callback();
+                        });
+                    },
+                    function (callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: articleId, imageable_type: TABLES.NEWS}, function (err, images) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            //expect(images.length).equal(0);
+
+                            fs.exists(articleImage.image_url, function (exists) {
+
+                                expect(exists).equal(false);
+                            });
+
+                            callback();
+                        });
+                    }
+                ], done);
+
             });
     });
 

@@ -92,5 +92,12 @@ module.exports = function (db) {
         }
     });
 
+    factory.define('image', db.Models[TABLES.IMAGES], {
+        name: 'default_name',
+        imageable_id: 1,
+        imageable_type: 'default_type',
+        imageable_field: 'default_field'
+    });
+
     return factory;
 };

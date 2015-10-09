@@ -1,9 +1,9 @@
-var TABLES = require('../constants/tables');
+var TABLES = require('../../constants/tables');
 var crypto = require('crypto');
 var async = require('async');
 
 
-var beforeModule = function (knex) {
+module.exports = function (knex) {
     var self = this;
 
     this.getOne = function (tableName, id, callback) {
@@ -62,4 +62,3 @@ var beforeModule = function (knex) {
             });
     };
 };
-module.exports = beforeModule;

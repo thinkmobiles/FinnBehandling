@@ -4,10 +4,16 @@ var expect = require("chai").expect;
 var async = require('async');
 var RESPONSES = require('../../constants/responseMessages');
 var Config = require('../config');
-var Helpers = require('../helpers');
-var files = require('./../db/base64Fixtures/files');
+var Helpers = require('../helpers/general');
 var images = require('./../db/base64Fixtures/images');
 var defaultData = require('./../db/defaultData');
+var imageGenerator = require('./../helpers/imageGenerator');
+var fs = require('fs');
+var imageUploaderConfig = {
+    type: 'FileSystem',
+    directory: process.env.LOCAL_IMAGE_STORAGE
+};
+var getImageUrl = require('../../helpers/imageUploader/imageUploader')(imageUploaderConfig).getImageUrl;
 
 var TABLES = require('../../constants/tables');
 
@@ -23,7 +29,9 @@ describe('Hospitals', function () {
     var agent = request.agent(url);
 
     var hospitalId;
-    var response;
+    var updatingHospitalId;
+    var hospitalImage;
+    var updatingHospitalImage;
     var fixtures;
 
     before(function (done) {
@@ -34,9 +42,19 @@ describe('Hospitals', function () {
                 return done(err);
             }
 
-            hospitalId = hospitals[0].id;
+            imageGenerator(hospitals, TABLES.HOSPITALS, 'logo', factory, function (err, images) {
+                if (err) {
+                    return done(err);
+                }
 
-            fixtures = defaultData.setUp(PostGre, done);
+                hospitalImage = images[0].toJSON();
+                updatingHospitalImage = images[1].toJSON();
+
+                hospitalId = hospitalImage.imageable_id;
+                updatingHospitalId = updatingHospitalImage.imageable_id;
+
+                fixtures = defaultData.setUp(PostGre, done);
+            });
         });
     });
 
@@ -52,7 +70,8 @@ describe('Hospitals', function () {
             description: 'Lorem ipsum dolor si',
             phone_number: ['+380660237194'],
             email: ['dummy@mail.com'],
-            web_address: 'www.clinic.com'
+            web_address: 'www.clinic.com',
+            logo: images[TABLES.HOSPITALS][0]
         };
 
         agent
@@ -65,13 +84,72 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response.success).equal(RESPONSES.WAS_CREATED);
                 expect(typeof response.hospital_id).equal('number');
 
-                done();
+
+                async.waterfall([
+                    function (callback) {
+
+                        helpers.getOneJustCreated(TABLES.HOSPITALS, function (err, hospital) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(hospital).to.exist;
+                            expect(hospital).to.be.instanceOf(Object);
+                            expect(hospital).to.have.property('region_id');
+                            expect(hospital.region_id).equal(createClinicData.region_id);
+                            expect(hospital).to.have.property('is_paid');
+                            expect(hospital.is_paid).equal(createClinicData.is_paid);
+                            expect(hospital).to.have.property('type_id');
+                            expect(hospital.type_id).equal(createClinicData.type_id);
+                            expect(hospital).to.have.property('name');
+                            expect(hospital.name).equal(createClinicData.name);
+                            expect(hospital).to.have.property('description');
+                            expect(hospital.description).equal(createClinicData.description);
+                            expect(hospital).to.have.property('phone_number');
+                            expect(hospital.phone_number[0]).equal(createClinicData.phone_number[0]);
+                            expect(hospital).to.have.property('email');
+                            expect(hospital.email[0]).equal(createClinicData.email[0]);
+
+                            callback( null, hospital);
+                        });
+                    },
+                    function (hospital, callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: hospital.id, imageable_type: TABLES.HOSPITALS}, function (err, logos) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            var logo = logos[0];
+                            var imageUrl;
+
+                            expect(logo).to.exist;
+                            expect(logo).to.be.instanceOf(Object);
+                            expect(logo).to.have.property('name');
+                            expect(logo).to.have.property('imageable_id');
+                            expect(logo.imageable_id).equal(hospital.id);
+                            expect(logo).to.have.property('imageable_type');
+                            expect(logo.imageable_type).equal(TABLES.HOSPITALS);
+                            expect(logo).to.have.property('imageable_field');
+                            expect(logo.imageable_field).equal('logo');
+
+                            imageUrl = getImageUrl(logo.name, 'images');
+
+                            fs.exists(imageUrl, function (exists) {
+
+                                expect(exists).equal(true);
+                            });
+
+                            callback();
+                        });
+                    }
+                ], done);
             });
     });
 
@@ -100,7 +178,7 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response.error).equal(RESPONSES.NON_UNIQUE_NAME_ERROR);
@@ -121,11 +199,12 @@ describe('Hospitals', function () {
             description: 'Lorem ipsum dolor si',
             phone_number: ['+380660237194'],
             email: ['dummy@mail.com'],
-            web_address: 'www.clinic.com'
+            web_address: 'www.clinic.com',
+            logo: images[TABLES.HOSPITALS][1]
         };
 
         agent
-            .put('/hospitals/' + hospitalId)
+            .put('/hospitals/' + updatingHospitalId)
             .send(updateClinicData)
             .expect(200)
             .end(function (err, res) {
@@ -134,22 +213,78 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response.success).equal(RESPONSES.UPDATED_SUCCESS);
-                expect(response.hospital_id).equal(hospitalId);
+                expect(response.hospital_id).equal(updatingHospitalId);
 
-                helpers.getOne(TABLES.HOSPITALS, hospitalId, function (err, hospital) {
-                    if (err) {
-                        return done(err);
+                async.waterfall([
+                    function (callback) {
+
+                        helpers.getOne(TABLES.HOSPITALS, updatingHospitalId, function (err, hospital) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(hospital).to.exist;
+                            expect(hospital).to.be.instanceOf(Object);
+                            expect(hospital).to.have.property('region_id');
+                            expect(hospital.region_id).equal(updateClinicData.region_id);
+                            expect(hospital).to.have.property('is_paid');
+                            expect(hospital.is_paid).equal(updateClinicData.is_paid);
+                            expect(hospital).to.have.property('type_id');
+                            expect(hospital.type_id).equal(updateClinicData.type_id);
+                            expect(hospital).to.have.property('name');
+                            expect(hospital.name).equal(updateClinicData.name);
+                            expect(hospital).to.have.property('description');
+                            expect(hospital.description).equal(updateClinicData.description);
+                            expect(hospital).to.have.property('phone_number');
+                            expect(hospital.phone_number[0]).equal(updateClinicData.phone_number[0]);
+                            expect(hospital).to.have.property('email');
+                            expect(hospital.email[0]).equal(updateClinicData.email[0]);
+
+                            callback( null, hospital);
+                        });
+                    },
+                    function (hospital, callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: hospital.id, imageable_type: TABLES.HOSPITALS}, function (err, logos) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            var logo = logos[0];
+                            var imageUrl;
+
+                            expect(logo).to.exist;
+                            expect(logo).to.be.instanceOf(Object);
+                            expect(logo).to.have.property('id');
+                            expect(logo.name).not.equal(updatingHospitalImage.name);
+                            expect(logo).to.have.property('name');
+                            expect(logo).to.have.property('imageable_id');
+                            expect(logo.imageable_id).equal(hospital.id);
+                            expect(logo).to.have.property('imageable_type');
+                            expect(logo.imageable_type).equal(TABLES.HOSPITALS);
+                            expect(logo).to.have.property('imageable_field');
+                            expect(logo.imageable_field).equal('logo');
+
+                            imageUrl = getImageUrl(logo.name, 'images');
+
+                            fs.exists(updatingHospitalImage.image_url, function (exists) {
+
+                                expect(exists).equal(false);
+                            });
+
+                            fs.exists(imageUrl, function (exists) {
+
+                                expect(exists).equal(true);
+                            });
+
+                            callback();
+                        });
                     }
-
-                    expect(hospital).to.exist;
-                    expect(hospital.name).equal(updateClinicData.name);
-
-                    done();
-                });
+                ], done);
             });
     });
 
@@ -165,7 +300,7 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response).to.have.property('id');
@@ -175,6 +310,16 @@ describe('Hospitals', function () {
                 expect(response).to.have.property('address');
                 expect(response).to.have.property('treatments');
                 expect(response).to.have.property('sub_treatments');
+                expect(response).to.have.property('logo');
+                expect(response.logo).to.be.instanceOf(Object);
+                expect(response.logo).to.have.property('imageable_id');
+                expect(response.logo.imageable_id).equal(hospitalId);
+                expect(response.logo).to.have.property('image_url');
+
+                fs.exists(response.logo.image_url, function (exists) {
+
+                    expect(exists).equal(true);
+                });
 
                 done();
             });
@@ -192,7 +337,7 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Array);
 
@@ -232,12 +377,42 @@ describe('Hospitals', function () {
                     return done(err);
                 }
 
-                response = res.body;
+                var response = res.body;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response.success).equal(RESPONSES.REMOVE_SUCCESSFULY);
 
-                done();
+                async.series([
+                    function (callback) {
+
+                        helpers.getOne(TABLES.HOSPITALS, hospitalId, function (err, hospital) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            expect(hospital).not.to.exist;
+
+                            callback();
+                        });
+                    },
+                    function (callback) {
+
+                        helpers.getByParams(TABLES.IMAGES, {imageable_id: hospitalId, imageable_type: TABLES.HOSPITALS}, function (err, logos) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            //expect(logos.length).equal(0);
+
+                            fs.exists(hospitalImage.image_url, function (exists) {
+
+                                expect(exists).equal(false);
+                            });
+
+                            callback();
+                        });
+                    }
+                ], done);
             });
     });
 });

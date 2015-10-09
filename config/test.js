@@ -1,3 +1,4 @@
+process.env.HOST = 'http://localhost:8787/';
 process.env.APP_HOST = 'http://localhost';
 process.env.PORT = 8790;
 process.env.DB_HOST = 'localhost';
@@ -8,6 +9,8 @@ process.env.DB_NAME = "finnbehandling_test";
 process.env.DB_PORT = 5432;
 
 process.env.UPLOADING_TYPE = 'FileSystem';
+
+process.env.LOCAL_IMAGE_STORAGE = 'test';
 
 process.env.REDIS_HOST = 'localhost';
 process.env.REDIS_PORT = 6379;
