@@ -24,7 +24,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitalsCount();
 
-        this.updateHospitals = function () {
+        this.refreshHospitals = function () {
             if (!$scope.$parent.searchResponse) {
                 GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
             }
