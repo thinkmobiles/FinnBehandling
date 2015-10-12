@@ -11,6 +11,10 @@ var Validation = require('../helpers/validation');
 var news = function (PostGre) {
 
     var News = PostGre.Models[TABLES.NEWS];
+
+    var Image = require('./images');
+    var image = new Image(PostGre);
+
     var self = this;
 
     function assert(fn) {
@@ -50,7 +54,12 @@ var news = function (PostGre) {
     function getArticle (newsId, callback){
         News
             .forge({id: newsId})
-            .fetch()
+            .fetch({
+                withRelated: [
+                    'image'
+                ],
+                require: true
+            })
             .asCallback(callback);
     }
 
@@ -60,7 +69,11 @@ var news = function (PostGre) {
                 qb.limit(options.limit);
                 qb.offset(options.offset);
             })
-            .fetchAll()
+            .fetchAll({
+                withRelated: [
+                    'image'
+                ]
+            })
             .asCallback(callback);
     }
 
@@ -103,7 +116,32 @@ var news = function (PostGre) {
             News
                 .forge()
                 .save(validOptions, {require: true})
-                .asCallback(callback);
+                .asCallback(function (err, result) {
+                    var  imageParams;
+
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    if (options.image) {
+
+                        imageParams = {
+                            imageUrl: options.image,
+                            imageable_id: result.id,
+                            imageable_type: TABLES.NEWS,
+                            imageable_field: 'image'
+                        };
+
+                        image.newImage(imageParams, function () {
+
+                            callback(null, result);
+                        });
+
+                    } else {
+
+                        callback(null, result);
+                    }
+                });
         });
     };
 
@@ -128,7 +166,32 @@ var news = function (PostGre) {
             News
                 .where({id: options.id})
                 .save(validOptions, {method: 'update', require: true})
-                .asCallback(callback);
+                .asCallback(function (err, result) {
+                    var  imageParams;
+
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    if (options.image) {
+
+                        imageParams = {
+                            imageUrl: options.image,
+                            imageable_id: result.id,
+                            imageable_type: TABLES.NEWS,
+                            imageable_field: 'image'
+                        };
+
+                        image.updateOrCreateImageByClientProfileId(imageParams, function () {
+
+                            callback(null, result);
+                        });
+
+                    } else {
+
+                        callback(null, result);
+                    }
+                });
         });
     };
 
