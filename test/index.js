@@ -12,22 +12,33 @@ var app = conf.app;
 var PostGre = app.get('PostGre');
 var defaultData = require('./db/defaultData');
 
-    before(function (done) {
-        console.log('>>> before all');
+before(function (done) {
+    console.log('>>> before all');
 
-        async.series([
-            function (callback) {
-                dropDb(PostGre.knex, callback);
-            },
-            function (callback) {
-                defaultData.setUp(PostGre, callback);
-            }
-        ], done);
-    });
+    async.series([
+        function (callback) {
+            dropDb(PostGre.knex, callback);
+        },
+        function (callback) {
+            defaultData.setUp(PostGre, callback);
+        }
+    ], done);
+});
 
 
+describe('Models', function () {
+    require('./models/hospitals');
+    require('./models/hospitalTypesList');
+    require('./models/images');
+    require('./models/news');
+    require('./models/regionsList');
+    require('./models/subTreatmentsList');
+    require('./models/treatmentsList');
+});
 
+describe('Handlers', function () {
     require('./handlers/hospitals');
     require('./handlers/news');
     require('./handlers/staticData');
+});
 

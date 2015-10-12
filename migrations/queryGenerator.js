@@ -76,7 +76,7 @@ module.exports = {
                     'region_id integer NOT NULL, ' +
                     'is_paid boolean NOT NULL, ' +
                     'type_id integer NOT NULL, ' +
-                    'name varchar(80), ' +
+                    'name varchar(80) NOT NULL, ' +
                     'web_address varchar(80), ' +
                     'phone_number text[3], ' +
                     'email text[3], ' +
