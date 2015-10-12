@@ -1,0 +1,15 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix">
+    <h1 class="bold blue">{{articleCtrl.article.subject}}</h1>
+    <br/>
+    <div class="clearfix">
+        <!--<img class="col-md-6" ng-src="{{hospitalCtrl.hospital.image}}"/>-->
+        <img class="col-md-6" src="http://www.saturdayeveningpost.com/wp-content/uploads/satevepost/photo_2009-12_26_biomedical_research-400x300.jpg"/>
+        <div class="col-md-6 dynamic-font-md">
+            {{articleCtrl.article.content}}
+        </div>
+    </div>
+    <br/>
+    <hr/>
+    <h5 class="blue dynamic-font-md">Sist oppdatert: {{articleCtrl.article.created_at}}</h5>
+</div>

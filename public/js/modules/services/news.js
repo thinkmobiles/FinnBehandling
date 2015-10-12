@@ -13,5 +13,25 @@ app.factory('NewsManager', ['$http', function ($http) {
         }, callback);
     };
 
+    this.getArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getNewsCount = function (callback) {
+        $http({
+            url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
     return this;
 }]);

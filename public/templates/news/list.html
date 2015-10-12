@@ -1,0 +1,11 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list">
+
+    <div ng-repeat="article in newsCtrl.news" class="hospital-item">
+        <img src="http://www.saturdayeveningpost.com/wp-content/uploads/satevepost/photo_2009-12_26_biomedical_research-400x300.jpg"/>
+        <h5 class="dynamic-font-md"> <a href="#/nyheter/{{article.id}}">{{article.subject}} </a> </h5>
+        <h5 class="dynamic-font-md"> {{article.created_at | date: "d MMM, y"}} </h5>
+        <h6  class="dynamic-font-sm"> {{article.content}} </h6>
+    </div>
+
+</div>
