@@ -59,8 +59,7 @@ module.exports = {
                         ') WITHOUT OIDS; ',
     STATIC_DATA: 'CREATE TABLE IF NOT EXISTS tb_static_data ( ' +
                         'id serial NOT NULL, ' +
-                        'text varchar(255), ' +
-                        'CONSTRAINT tb_static_data_pkey PRIMARY KEY (id)' +
+                        'text text, ' +
                         ') WITHOUT OIDS; ',
     IMAGES: 'CREATE TABLE tb_images ( ' +
             'id serial NOT NULL, ' +

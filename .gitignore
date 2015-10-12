@@ -31,4 +31,5 @@ node_modules
 doc
 .idea
 public/uploads
+test/uploads
 

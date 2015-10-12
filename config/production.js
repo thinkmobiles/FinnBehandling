@@ -1,3 +1,4 @@
+process.env.HOST = 'http://localhost:8787/';
 process.env.DB_HOST = 'localhost';
 process.env.DB_USER = "postgres";
 process.env.DB_PASS = "postgres";

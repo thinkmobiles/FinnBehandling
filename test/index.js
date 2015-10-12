@@ -11,6 +11,7 @@ var conf = new Config();
 var app = conf.app;
 var PostGre = app.get('PostGre');
 var defaultData = require('./db/defaultData');
+var clearFixtures = require('./db/destroyFixtureFiles');
 
     before(function (done) {
         console.log('>>> before all');
@@ -25,9 +26,13 @@ var defaultData = require('./db/defaultData');
         ], done);
     });
 
-
-
     require('./handlers/hospitals');
     require('./handlers/news');
     require('./handlers/staticData');
+
+after(function (done) {
+    console.log('>>> after all');
+
+    clearFixtures(done);
+});
 

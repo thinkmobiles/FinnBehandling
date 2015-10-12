@@ -24,12 +24,12 @@ var StaticData = function (PostGre) {
          * This __method__ allows get _one static_ entry
          *
          * @example Request example:
-         *         http://192.168.88.250:8787/staticData/:id
+         *         http://192.168.88.250:8787/staticData
          *
          * @example Response example:
          *
          * {
-         *       "id": 3,
+         *       "id": 1,
          *       "text": "Some text"
          * }
          *
@@ -38,7 +38,7 @@ var StaticData = function (PostGre) {
          * @instance
          */
 
-        var staticId = req.params.id;
+        var staticId = 1;
 
         staticDataHelper.getStaticData (staticId, function(err, result){
             if(err){
@@ -59,7 +59,7 @@ var StaticData = function (PostGre) {
          * This __method__ allows update _static_data_entries_
          *
          * @example Request example:
-         *         http://192.168.88.250:8787/staticData/:id
+         *         http://192.168.88.250:8787/staticData
          *
          * @example Response example:
          *
@@ -72,7 +72,7 @@ var StaticData = function (PostGre) {
          * @instance
          */
 
-        var newsId = req.params.id;
+        var newsId = 1;
         var options = req.body;
 
         options.id = newsId;

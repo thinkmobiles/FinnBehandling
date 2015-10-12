@@ -144,7 +144,7 @@ Hospitals = function (PostGre) {
                 hospital_id: result
             });
 
-        })
+        });
     };
 
     this.getAllHospitals = function (req, res, next) {
@@ -217,7 +217,7 @@ Hospitals = function (PostGre) {
             }
 
             res.status(200).send(hospitals);
-        })
+        });
     };
 
     this.getHospitalsCount = function (req, res, next) {
@@ -249,7 +249,7 @@ Hospitals = function (PostGre) {
             }
 
             res.status(200).send({count: count});
-        })
+        });
     };
 
     this.getHospital = function (req, res, next) {
@@ -313,7 +313,7 @@ Hospitals = function (PostGre) {
             }
 
             res.status(200).send(hospital);
-        })
+        });
     };
 
     this.deleteHospital = function (req, res, next) {
@@ -348,7 +348,7 @@ Hospitals = function (PostGre) {
             res.status(200).send({
                 success: RESPONSES.REMOVE_SUCCESSFULY
             });
-        })
+        });
     }
 };
 

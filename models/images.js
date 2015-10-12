@@ -4,7 +4,7 @@ module.exports = function (postGre, ParentModel) {
     var IMAGE_FOLDER = 'images';
     var imageUploaderConfig = {
         type: 'FileSystem',
-        directory: 'public'
+        directory: process.env.LOCAL_IMAGE_STORAGE
     };
     var imageUploader = require('../helpers/imageUploader/imageUploader')(imageUploaderConfig);
 

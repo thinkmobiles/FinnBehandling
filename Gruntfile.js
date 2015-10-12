@@ -44,7 +44,7 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            app: ["./dist/css/app_style.css"]
+            app: ['./public/dist/temp/css/*.css']
         },
 
         concat: {
@@ -150,5 +150,4 @@ module.exports = function (grunt) {
         'watch:app',
         'jsdoc'
     ]);
-
 };

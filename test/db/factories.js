@@ -86,9 +86,17 @@ module.exports = function (db) {
     });
 
     factory.define('static_data', db.Models[TABLES.STATIC_DATA], {
+        id: 1,
         text: function() {
             return faker.lorem.sentence(10, 0);
         }
+    });
+
+    factory.define('image', db.Models[TABLES.IMAGES], {
+        name: 'default_name',
+        imageable_id: 1,
+        imageable_type: 'default_type',
+        imageable_field: 'default_field'
     });
 
     return factory;
