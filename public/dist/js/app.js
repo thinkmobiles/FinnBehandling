@@ -38886,6 +38886,14 @@ app.config(['$routeProvider', function ($routeProvider) {
         controller: 'hospitalController',
         templateUrl: 'templates/behandlingstilbud/view.html',
         controllerAs: 'hospitalCtrl'
+    }).when('/nyheter', {
+        controller: 'newsController',
+        templateUrl: 'templates/news/list.html',
+        controllerAs: 'newsCtrl'
+    }).when('/nyheter/:id', {
+        controller: 'articleController',
+        templateUrl: 'templates/news/view.html',
+        controllerAs: 'articleCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -38895,6 +38903,26 @@ app.config(['$routeProvider', function ($routeProvider) {
 
 }]);
 ;
+app.controller('articleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
+        var self = this;
+        var articleId = $routeParams.id;
+
+        $location.hash('main-menu');
+
+        function getArticle () {
+
+            NewsManager.getArticle(articleId, function(err, article) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.article = article;
+            });
+        }
+
+        getArticle();
+    }]);;
 app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'GeneralHelpers',
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
@@ -38974,6 +39002,44 @@ app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'Ho
 
         getHospital();
     }]);;
+app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
+    function ($scope, NewsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
+        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+
+        function getNewsCount () {
+            NewsManager.getNewsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getNewsCount();
+
+        function getNews () {
+
+            $scope.pending = true;
+
+            NewsManager.getNewsList({limit: resultater, page: $scope.curPage}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+                $scope.$parent.searchResponse = false;
+
+                self.news = news;
+            });
+        }
+
+        getNews();
+    }]);
+;
 app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     function ($scope, $location, GeneralHelpers) {
 
@@ -39268,6 +39334,26 @@ app.factory('NewsManager', ['$http', function ($http) {
             url: '/news',
             method: "GET",
             params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getNewsCount = function (callback) {
+        $http({
+            url: '/news/count',
+            method: "GET"
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

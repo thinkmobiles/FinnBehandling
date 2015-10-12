@@ -12,6 +12,14 @@ app.config(['$routeProvider', function ($routeProvider) {
         controller: 'hospitalController',
         templateUrl: 'templates/behandlingstilbud/view.html',
         controllerAs: 'hospitalCtrl'
+    }).when('/nyheter', {
+        controller: 'newsController',
+        templateUrl: 'templates/news/list.html',
+        controllerAs: 'newsCtrl'
+    }).when('/nyheter/:id', {
+        controller: 'articleController',
+        templateUrl: 'templates/news/view.html',
+        controllerAs: 'articleCtrl'
     }).otherwise({
         redirectTo: '/'
     });
