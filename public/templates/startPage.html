@@ -16,7 +16,7 @@
 
 <div>
     <div ng-repeat="article in startPageCtrl.news" class="start-page-news">
-        <img ng-src="{{article.image}}"/>
+        <img ng-src="{{article.image.image_url}}"/>
         <h5 class="dynamic-font-md"> {{article.subject}} </h5>
         <h5 class="dynamic-font-md"> {{article.created_at | date: "d MMM, y"}} </h5>
         <h6  class="dynamic-font-sm"> {{article.content}} </h6>

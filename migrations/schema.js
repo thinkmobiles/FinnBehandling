@@ -20,7 +20,7 @@ module.exports = function (knex) {
             .then(function () {
                 cb()
             })
-            .catch(cb)
+            .catch(cb);
     }
 
     function addExtentionPostGISTopology(cb) {
@@ -29,7 +29,7 @@ module.exports = function (knex) {
             .then(function () {
                 cb()
             })
-            .catch(cb)
+            .catch(cb);
     }
 
     function createTables(callback) {
@@ -41,14 +41,8 @@ module.exports = function (knex) {
                 .then(function () {
                     cb()
                 })
-                .catch(cb)
-        },function (err) {
-
-            if (err) {
-                callback(err)
-            }
-            callback()
-        })
+                .catch(cb);
+        }, callback);
 
     }
 
@@ -91,7 +85,6 @@ module.exports = function (knex) {
                 }
             })
     }
-
 
 
     function setDefaultOptions () {
