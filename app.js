@@ -11,13 +11,35 @@ var server;
 var config;
 var session = require('express-session');
 var MemoryStore = require('connect-redis')(session);
+var fs = require( 'fs' );
 var knex;
 var PostGre;
 var Models;
 var Migrator;
 var migrator;
 
+app.use( function ( req, res, next ) {
 
+    res.on('finish', function () {
+
+        if (req.files) {
+
+            Object.keys(req.files).forEach( function (file) {
+
+                console.log(req.files[file].path);
+
+                fs.unlink(req.files[file].path, function (err) {
+
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            });
+        }
+    });
+
+    next();
+});
 
 app.engine('html', cons.swig);
 app.set('view engine', 'html');

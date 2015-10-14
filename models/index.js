@@ -10,8 +10,8 @@ var Models = function (PostGre) {
             return this.tableName.replace(/s$/, '')
         }
     }, {
-        fetchMe: function (queryObject, optionsObject) {
-            return this.forge(queryObject).fetch(optionsObject);
+        fetchWhere: function (queryObject, optionsObject) {
+            return this.where(queryObject).fetch(optionsObject);
         }
     });
 

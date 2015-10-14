@@ -12,8 +12,7 @@ var TABLES = require('../constants/tables');
 
 var StaticData = function (PostGre) {
 
-    var StaticDataHelper = require('../helpers/staticData.js');
-    var staticDataHelper = new StaticDataHelper(PostGre);
+    var StaticData = PostGre.Models[TABLES.STATIC_DATA];
 
     this.getStaticData = function (req, res, next){
 
@@ -38,11 +37,12 @@ var StaticData = function (PostGre) {
          * @instance
          */
 
-        var staticId = 1;
+        StaticData
+            .forge({id: 1})
+            .fetch()
+            .asCallback(function(err, result){
 
-        staticDataHelper.getStaticData (staticId, function(err, result){
-            if(err){
-
+            if (err) {
                 return next(err);
             }
 
@@ -72,15 +72,11 @@ var StaticData = function (PostGre) {
          * @instance
          */
 
-        var newsId = 1;
         var options = req.body;
 
-        options.id = newsId;
+        StaticData.updateValid(options, function(err, result){
 
-        staticDataHelper.updateArticle(options, function(err, result){
-
-            if(err){
-
+            if (err) {
                 return next(err);
             }
 
