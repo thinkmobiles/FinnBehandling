@@ -1,5 +1,4 @@
 var RESPONSES = require('../constants/responseMessages');
-var CONSTANTS = require('../constants/constants');
 var TABLES = require('../constants/tables');
 
 //helpers
@@ -12,8 +11,10 @@ var TABLES = require('../constants/tables');
 
 var News = function (PostGre) {
 
-    var NewsHelper = require('../helpers/news.js');
-    var newsHelper = new NewsHelper(PostGre);
+    var News = PostGre.Models[TABLES.NEWS];
+
+    var Image = require('../helpers/images');
+    var image = new Image(PostGre);
 
     this.getArticle = function (req, res, next){
 
@@ -44,14 +45,22 @@ var News = function (PostGre) {
 
        var newsId = req.params.id;
 
-        newsHelper.getNewsByParams (newsId, function(err, news){
-          if(err){
+        News
+            .forge({id: newsId})
+            .fetch({
+                withRelated: [
+                    'image'
+                ],
+                require: true
+            })
+            .asCallback(function(err, news){
 
-              return next(err);
-          }
+                if (err) {
+                    return next(err);
+                }
 
-          res.status(200).send(news);
-      });
+                res.status(200).send(news);
+            });
     };
 
     this.getNews = function (req, res, next) {
@@ -90,24 +99,30 @@ var News = function (PostGre) {
          * @instance
          */
 
-        var options = {};
         var limit = req.query.limit;
         var page = req.query.page;
 
         var limitIsValid = limit && !isNaN(limit) && limit > 0;
         var offsetIsValid = page && !isNaN(page) && page > 1;
 
-        options.limit = limitIsValid ? limit : 25;
-        options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
+        News
+            .query(function (qb) {
+                qb.limit( limitIsValid ? limit : 25 );
+                qb.offset( offsetIsValid ? (page - 1) * options.limit : 0 );
+            })
+            .fetchAll({
+                withRelated: [
+                    'image'
+                ]
+            })
+            .asCallback(function (err, news) {
 
-        newsHelper.getNewsByParams(options, function (err, news) {
-            if (err) {
+                if (err) {
+                    return next(err);
+                }
 
-                return next(err);
-            }
-
-            res.status(200).send(news);
-        });
+                res.status(200).send(news);
+            });
     };
 
     this.getNewsCount = function (req, res, next) {
@@ -131,14 +146,18 @@ var News = function (PostGre) {
          * @instance
          */
 
-        newsHelper.getNewsCount(function (err, count) {
-            if (err) {
+        PostGre.knex(TABLES.NEWS)
+            .count()
+            .asCallback(function (err, queryResult) {
 
-                return next(err);
-            }
+                if (err) {
+                    return next(err);
+                }
 
-            res.status(200).send({count: count});
-        });
+                var count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                res.status(200).send({count: count});
+            });
     };
 
     this.createArticle = function (req, res, next){
@@ -168,17 +187,35 @@ var News = function (PostGre) {
 
         var options = req.body;
 
-        newsHelper.createArticle(options, function(err, news){
+        News.createValid(options, function(err, result){
 
-            if(err){
-
+            if (err) {
                 return next(err);
             }
 
-            res.status(201).send({
-                success: RESPONSES.WAS_CREATED,
-                article: news
-            });
+            if (options.image) {
+
+                var imageParams = {
+                    imageUrl: options.image,
+                    imageable_id: result.id,
+                    imageable_type: TABLES.NEWS,
+                    imageable_field: 'image'
+                };
+
+                image.newImage(imageParams, function () {
+
+                    res.status(201).send({
+                        success: RESPONSES.WAS_CREATED,
+                        article: result
+                    });
+                });
+            } else {
+
+                res.status(201).send({
+                    success: RESPONSES.WAS_CREATED,
+                    article: result
+                });
+            }
         });
     };
 
@@ -213,17 +250,35 @@ var News = function (PostGre) {
 
         options.id = newsId;
 
-        newsHelper.updateArticle(options, function(err, news){
+        News.updateValid(options, function(err, result){
 
-            if(err){
-
+            if (err) {
                 return next(err);
             }
 
-            res.status(200).send({
-                success: RESPONSES.UPDATED_SUCCESS,
-                article: news
-            });
+            if (options.image) {
+
+                var imageParams = {
+                    imageUrl: options.image,
+                    imageable_id: result.id,
+                    imageable_type: TABLES.NEWS,
+                    imageable_field: 'image'
+                };
+
+                image.updateOrCreateImageByClientProfileId(imageParams, function () {
+
+                    res.status(200).send({
+                        success: RESPONSES.UPDATED_SUCCESS,
+                        article: result
+                    });
+                });
+            } else {
+
+                res.status(200).send({
+                    success: RESPONSES.UPDATED_SUCCESS,
+                    article: result
+                });
+            }
         });
     };
 
@@ -251,17 +306,19 @@ var News = function (PostGre) {
 
         var newsId = req.params.id;
 
-        newsHelper.deleteArticle(newsId, function(err, news){
+        News
+            .where({id: newsId})
+            .destroy()
+            .asCallback(function(err, news){
 
-            if(err){
+                if (err) {
+                    return next(err);
+                }
 
-                return next(err);
-            }
-
-            res.status(200).send({
-                success: RESPONSES.REMOVE_SUCCESSFULY
+                res.status(200).send({
+                    success: RESPONSES.REMOVE_SUCCESSFULY
+                });
             });
-        });
     };
 };
 

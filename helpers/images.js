@@ -25,7 +25,7 @@ var Images = function (db) {
         if (!(options.imageUrl && options.imageable_id && options.imageable_type)) {
 
             if (callback && (typeof callback === 'function')) {
-                return callback({error: responseMessages.notEnoughParameters});
+                return callback({error: responseMessages.NOT_ENOUGH_PARAMETERS});
             }
         }
 
@@ -61,7 +61,7 @@ var Images = function (db) {
 
         if (!(options.imageUrl && options.imageable_id && options.imageable_type)) {
             if (callback && (typeof callback === 'function')) {
-                callback({error: responseMessages.notEnoughParameters});
+                callback({error: responseMessages.NOT_ENOUGH_PARAMETERS});
                 return;
             }
         }
@@ -108,7 +108,7 @@ var Images = function (db) {
     this.deleteImage = function (imageId, callback) {
         if (!imageId) {
             if (callback && (typeof callback === 'function')) {
-                callback({error: responseMessages.notEnoughParameters});
+                callback({error: responseMessages.NOT_ENOUGH_PARAMETERS});
             }
             return;
         }
