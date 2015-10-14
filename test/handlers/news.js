@@ -9,11 +9,13 @@ var images = require('./../db/base64Fixtures/images');
 var TABLES = require('../../constants/tables');
 var imageGenerator = require('./../helpers/imageGenerator');
 var fs = require('fs');
-var imageUploaderConfig = {
-    type: 'FileSystem',
-    directory: process.env.LOCAL_IMAGE_STORAGE
-};
-var getImageUrl = require('../../helpers/imageUploader/imageUploader')(imageUploaderConfig).getImageUrl;
+var path = require('path');
+
+
+function getImageUrl(imageName) {
+
+    return path.join(__dirname, '..', 'uploads', 'images', imageName);
+}
 
 describe('News', function () {
     var conf = new Config();
@@ -116,14 +118,14 @@ describe('News', function () {
                             expect(image).to.have.property('imageable_field');
                             expect(image.imageable_field).equal('image');
 
-                            imageUrl = getImageUrl(image.name, 'images');
+                            imageUrl = getImageUrl(image.name);
 
                             fs.exists(imageUrl, function (exists) {
 
                                 expect(exists).equal(true);
-                            });
 
-                            callback();
+                                callback();
+                            });
                         });
                     }
                 ], done);
@@ -140,6 +142,7 @@ describe('News', function () {
                 }
 
                 var article = res.body;
+                var imageUrl;
 
                 expect(article).to.exist;
                 expect(article).to.be.instanceOf(Object);
@@ -152,13 +155,14 @@ describe('News', function () {
                 expect(article.image.imageable_id).equal(articleId);
                 expect(article.image).to.have.property('image_url');
 
-                fs.exists(article.image.image_url, function (exists) {
+                imageUrl = getImageUrl(article.image.name);
+
+                fs.exists(imageUrl, function (exists) {
 
                     expect(exists).equal(true);
+
+                    done();
                 });
-
-                done();
-
             });
     });
 
@@ -268,19 +272,19 @@ describe('News', function () {
                             expect(image).to.have.property('imageable_field');
                             expect(image.imageable_field).equal('image');
 
-                            imageUrl = getImageUrl(image.name, 'images');
+                            imageUrl = getImageUrl(image.name);
 
                             fs.exists(imageUrl, function (exists) {
 
                                 expect(exists).equal(true);
+
+                                fs.exists(updatingArticleImage.image_url, function (exists) {
+
+                                    expect(exists).equal(false);
+
+                                    callback();
+                                });
                             });
-
-                            fs.exists(updatingArticleImage.image_url, function (exists) {
-
-                                expect(exists).equal(false);
-                            });
-
-                            callback();
                         });
                     }
                 ], done);
@@ -319,10 +323,14 @@ describe('News', function () {
 
                             //expect(images.length).equal(0);
 
-                            fs.exists(articleImage.image_url, function (exists) {
+                            /*var imageUrl = getImageUrl(articleImage.name);
 
-                                expect(exists).equal(false);
-                            });
+                             fs.exists(imageUrl, function (exists) {
+
+                                 expect(exists).equal(false);
+
+                                 callback();
+                             });*/
 
                             callback();
                         });

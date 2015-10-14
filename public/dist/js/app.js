@@ -38949,7 +38949,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitalsCount();
 
-        this.updateHospitals = function () {
+        this.refreshHospitals = function () {
             if (!$scope.$parent.searchResponse) {
                 GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
             }
@@ -39260,8 +39260,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
 
             $rootScope[key] = locationSearch[key];
             return locationSearch[key];
-        } else {
-            return null;
         }
     };
 
@@ -39284,8 +39282,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
                 alert($rootScope.errMsg);
                 break;
             case 401:
-                window.location = '/';
-                break;
             case 403:
                 window.location = '/';
                 break;
