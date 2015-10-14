@@ -11,17 +11,5 @@ module.exports = function (PostGre, ParentModel) {
 
     return ParentModel.extend({
         tableName: TABLES.REGIONS_LIST
-    }, {
-        isExistsValidate: function (options, validatedOptions, callback) {
-            assert(callback);
-
-            this.forge({
-                    id: validatedOptions.region_id
-                })
-                .fetch({
-                    require: true
-                })
-                .asCallback(callback);
-        }
     });
 };

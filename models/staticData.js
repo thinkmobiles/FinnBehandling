@@ -33,7 +33,7 @@ module.exports = function (postGre, ParentModel) {
             this.getValidated('update', options, function (err, validOptions) {
 
                 if (err) {
-                    return callback(err)
+                    return callback(err);
                 }
 
                 self.forge({id: 1})

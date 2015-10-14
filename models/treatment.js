@@ -31,7 +31,7 @@ module.exports = function (PostGre, ParentModel) {
                     }, {
                         require: true
                     })
-                    .asCallback(innerCallback)
+                    .asCallback(innerCallback);
             }, callback);
         },
 
@@ -62,7 +62,7 @@ module.exports = function (PostGre, ParentModel) {
                             }, {
                                 require: true
                             })
-                            .asCallback(innerCallback)
+                            .asCallback(innerCallback);
                     }, callback);
                 })
         }

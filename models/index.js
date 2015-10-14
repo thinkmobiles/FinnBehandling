@@ -7,7 +7,7 @@ var Models = function (PostGre) {
 
     var Model = PostGre.Model.extend({
         getName: function () {
-            return this.tableName.replace(/s$/, '')
+            return this.tableName.replace(/s$/, '');
         }
     }, {
         fetchWhere: function (queryObject, optionsObject) {

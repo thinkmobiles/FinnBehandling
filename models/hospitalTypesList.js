@@ -11,17 +11,5 @@ module.exports = function (PostGre, ParentModel) {
 
     return ParentModel.extend({
         tableName: TABLES.HOSPITAL_TYPES_LIST
-    }, {
-        isExistsValidate: function (options, validatedOptions, callback) {
-            assert(callback);
-
-            this.forge({
-                    id: validatedOptions.type_id
-                })
-                .fetch({
-                    require: true
-                })
-                .asCallback(callback);
-        }
     });
 };
