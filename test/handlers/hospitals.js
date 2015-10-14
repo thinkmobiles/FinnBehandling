@@ -9,11 +9,13 @@ var images = require('./../db/base64Fixtures/images');
 var defaultData = require('./../db/defaultData');
 var imageGenerator = require('./../helpers/imageGenerator');
 var fs = require('fs');
-var imageUploaderConfig = {
-    type: 'FileSystem',
-    directory: process.env.LOCAL_IMAGE_STORAGE
-};
-var getImageUrl = require('../../helpers/imageUploader/imageUploader')(imageUploaderConfig).getImageUrl;
+var path = require('path');
+
+
+function getImageUrl(imageName) {
+
+    return path.join(__dirname, '..', 'uploads', 'images', imageName);
+}
 
 var TABLES = require('../../constants/tables');
 
@@ -144,9 +146,9 @@ describe('Hospitals', function () {
                             fs.exists(imageUrl, function (exists) {
 
                                 expect(exists).equal(true);
-                            });
 
-                            callback();
+                                callback();
+                            });
                         });
                     }
                 ], done);
@@ -269,19 +271,19 @@ describe('Hospitals', function () {
                             expect(logo).to.have.property('imageable_field');
                             expect(logo.imageable_field).equal('logo');
 
-                            imageUrl = getImageUrl(logo.name, 'images');
+                            imageUrl = getImageUrl(logo.name);
 
                             fs.exists(updatingHospitalImage.image_url, function (exists) {
 
                                 expect(exists).equal(false);
+
+                                fs.exists(imageUrl, function (exists) {
+
+                                    expect(exists).equal(true);
+
+                                    callback();
+                                });
                             });
-
-                            fs.exists(imageUrl, function (exists) {
-
-                                expect(exists).equal(true);
-                            });
-
-                            callback();
                         });
                     }
                 ], done);
@@ -301,6 +303,7 @@ describe('Hospitals', function () {
                 }
 
                 var response = res.body;
+                var imageUrl;
 
                 expect(response).to.be.instanceOf(Object);
                 expect(response).to.have.property('id');
@@ -316,12 +319,14 @@ describe('Hospitals', function () {
                 expect(response.logo.imageable_id).equal(hospitalId);
                 expect(response.logo).to.have.property('image_url');
 
-                fs.exists(response.logo.image_url, function (exists) {
+                imageUrl = getImageUrl(response.logo.name);
+
+                fs.exists(imageUrl, function (exists) {
 
                     expect(exists).equal(true);
-                });
 
-                done();
+                    done();
+                });
             });
     });
 
@@ -404,10 +409,14 @@ describe('Hospitals', function () {
 
                             //expect(logos.length).equal(0);
 
-                            fs.exists(hospitalImage.image_url, function (exists) {
+                            /*var imageUrl = getImageUrl(hospitalImage.name);
+
+                            fs.exists(imageUrl, function (exists) {
 
                                 expect(exists).equal(false);
-                            });
+
+                                callback();
+                            });*/
 
                             callback();
                         });
