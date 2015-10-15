@@ -10,13 +10,15 @@
 
     <dir-pagination-controls
             on-page-change="behandlingstilbudCtrl.refreshHospitals()"
+            pagination-id="hospitals"
             class="dynamic-font-md"
             ng-show="behandlingstilbudCtrl.hospitals.length">
 
     </dir-pagination-controls>
 
     <div class="hospital-item" ng-class="{'hospital-item-paid': hospital.is_paid, grey: !($index % 2)}"
-         dir-paginate="hospital in behandlingstilbudCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="curPage">
+         dir-paginate="hospital in behandlingstilbudCtrl.hospitals | itemsPerPage: resultater" total-items="totalItems" current-page="hospitalPage"
+         pagination-id="hospitals">
 
         <h4 class="blue bold dynamic-font-lg">{{hospital.name | uppercase}}</h4>
 
@@ -68,6 +70,7 @@
 
     <dir-pagination-controls
             on-page-change="behandlingstilbudCtrl.refreshHospitals()"
+            pagination-id="hospitals"
             class="dynamic-font-md"
             ng-show="behandlingstilbudCtrl.hospitals.length">
 

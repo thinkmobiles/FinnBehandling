@@ -1,15 +1,22 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
-    <h1 class="bold blue">{{articleCtrl.article.subject}}</h1>
-    <br/>
     <div class="clearfix">
-        <!--<img class="col-md-6" ng-src="{{hospitalCtrl.hospital.image}}"/>-->
-        <img class="col-md-6" src="http://www.saturdayeveningpost.com/wp-content/uploads/satevepost/photo_2009-12_26_biomedical_research-400x300.jpg"/>
-        <div class="col-md-6 dynamic-font-md">
+        <div class="col-md-12">
+            <h6 class="dynamic-font-sm pull-right">{{articleCtrl.article.created_at | date: "d MMM, y"}}</h6>
+        </div>
+        <h1 class="col-md-12 bold blue">{{articleCtrl.article.subject}}</h1>
+        <br/>
+        <div class="col-md-12 dynamic-font-md">
+            <img class="col-md-6" ng-src="{{articleCtrl.article.image.image_url}}"/>
             {{articleCtrl.article.content}}
         </div>
+        <div class="col-md-12">
+            <br/>
+            <h5 class="dynamic-font-md bold">Kilder: {{articleCtrl.article.source}}</h5>
+        </div>
+        <div class="col-md-12">
+            <hr/>
+            <a class="blue dynamic-font-md-lg bold pull-right" href="#/news">Lukk</a>
+        </div>
     </div>
-    <br/>
-    <hr/>
-    <h5 class="blue dynamic-font-md">Sist oppdatert: {{articleCtrl.article.created_at}}</h5>
 </div>
