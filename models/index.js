@@ -17,6 +17,7 @@ var Models = function (PostGre) {
 
 
 
+    this[TABLES.USERS] = require('./user')(PostGre, Model);
     this[TABLES.STATIC_DATA] = require('./staticData')(PostGre, Model);
     this[TABLES.IMAGES] = require('./images')(PostGre, Model);
     this[TABLES.NEWS] = require('./news')(PostGre, Model);

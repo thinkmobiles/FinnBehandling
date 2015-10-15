@@ -43,5 +43,5 @@ var logWriter = function () {
         log: erfunc,
         errorHandler: errorHandler
     }
-}
+};
 module.exports = logWriter;

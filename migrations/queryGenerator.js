@@ -37,6 +37,8 @@ module.exports = {
                     'facebook_id varchar(50), ' +
                     'twitter_id varchar(50), ' +
                     'role varchar(15) NOT NULL, ' +
+                    'created_at timestamp without time zone,' +
+                    'updated_at timestamp without time zone,' +
                     'CONSTRAINT tb_users_pkey PRIMARY KEY (id)' +
                     ') WITHOUT OIDS; ',
     NEWS: 'CREATE TABLE IF NOT EXISTS tb_news ( ' +

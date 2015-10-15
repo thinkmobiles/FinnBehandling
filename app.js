@@ -16,6 +16,9 @@ var PostGre;
 var Models;
 var Migrator;
 var migrator;
+var getPassport = require('./helpers/passport');
+var passport;
+
 
 
 
@@ -40,7 +43,7 @@ if (app.get('env') === 'development') {
 }
 
 config = {
-    db: 8,
+    db: process.env.REDIS_DB_KEY,
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT) || 6379
 };
@@ -75,6 +78,11 @@ var Collections = require('./collections/index');
 
 PostGre.Models = new Models(PostGre);
 PostGre.Collections = new Collections(PostGre);
+
+passport = getPassport(PostGre);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.set('PostGre', PostGre);
 
