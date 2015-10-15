@@ -2,7 +2,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
+        $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
 
         this.setCoordinates = function (lat, long) {
@@ -26,7 +26,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         this.refreshHospitals = function () {
             if (!$scope.$parent.searchResponse) {
-                GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
+                GeneralHelpers.saveAsLocalData('hospitalPage', $scope.hospitalPage);
             }
 
             getHospitals();
@@ -40,7 +40,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
             $scope.pending = true;
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
+            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }

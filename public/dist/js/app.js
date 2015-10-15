@@ -38927,7 +38927,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
+        $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
 
         this.setCoordinates = function (lat, long) {
@@ -38951,7 +38951,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         this.refreshHospitals = function () {
             if (!$scope.$parent.searchResponse) {
-                GeneralHelpers.saveAsLocalData('curPage', $scope.curPage);
+                GeneralHelpers.saveAsLocalData('hospitalPage', $scope.hospitalPage);
             }
 
             getHospitals();
@@ -38965,7 +38965,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
             $scope.pending = true;
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
+            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -39006,8 +39006,8 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
     function ($scope, NewsManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
-        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        $scope.newsPage = GeneralHelpers.getLocalData('newsPage') || 1;
+        $scope.resultater = 10;
 
         function getNewsCount () {
             NewsManager.getNewsCount(function(err, result) {
@@ -39021,17 +39021,22 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
 
         getNewsCount();
 
+        this.refreshNews = function () {
+            GeneralHelpers.saveAsLocalData('newsPage', $scope.newsPage);
+
+            getNews();
+        };
+
         function getNews () {
 
             $scope.pending = true;
 
-            NewsManager.getNewsList({limit: resultater, page: $scope.curPage}, function(err, news) {
+            NewsManager.getNewsList({limit: $scope.resultater, page: $scope.newsPage}, function(err, news) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 $scope.pending = false;
-                $scope.$parent.searchResponse = false;
 
                 self.news = news;
             });
@@ -39067,7 +39072,7 @@ app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
     ];
 
     $scope.search = function () {
-        GeneralHelpers.saveAsLocalData('curPage', 1);
+        GeneralHelpers.saveAsLocalData('hospitalPage', 1);
         GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
         GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
         GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);

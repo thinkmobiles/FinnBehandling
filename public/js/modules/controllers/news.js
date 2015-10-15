@@ -2,8 +2,8 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
     function ($scope, NewsManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = GeneralHelpers.getLocalData('curPage') || 1;
-        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        $scope.newsPage = GeneralHelpers.getLocalData('newsPage') || 1;
+        $scope.resultater = 10;
 
         function getNewsCount () {
             NewsManager.getNewsCount(function(err, result) {
@@ -17,17 +17,22 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
 
         getNewsCount();
 
+        this.refreshNews = function () {
+            GeneralHelpers.saveAsLocalData('newsPage', $scope.newsPage);
+
+            getNews();
+        };
+
         function getNews () {
 
             $scope.pending = true;
 
-            NewsManager.getNewsList({limit: resultater, page: $scope.curPage}, function(err, news) {
+            NewsManager.getNewsList({limit: $scope.resultater, page: $scope.newsPage}, function(err, news) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 $scope.pending = false;
-                $scope.$parent.searchResponse = false;
 
                 self.news = news;
             });

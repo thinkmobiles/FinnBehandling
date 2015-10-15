@@ -78,7 +78,7 @@ module.exports = function (db) {
             return faker.lorem.sentence(1, 0);
         },
         content: function() {
-            return faker.lorem.paragraph();
+            return faker.lorem.paragraphs(15);
         },
         source: function() {
             return faker.lorem.sentence(1, 3);

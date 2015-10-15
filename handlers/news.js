@@ -108,7 +108,7 @@ var News = function (PostGre) {
         News
             .query(function (qb) {
                 qb.limit( limitIsValid ? limit : 25 );
-                qb.offset( offsetIsValid ? (page - 1) * options.limit : 0 );
+                qb.offset( offsetIsValid ? (page - 1) * limit : 0 );
             })
             .fetchAll({
                 withRelated: [
