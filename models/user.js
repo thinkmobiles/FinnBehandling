@@ -1,6 +1,6 @@
 var TABLES = require('../constants/tables');
 
-var Validation = require('../helpers/validation');
+var Validation = require('../helpers/validation/main');
 
 function assert(fn) {
 

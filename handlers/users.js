@@ -209,14 +209,13 @@ var Users = function (PostGre) {
         User
             .count()
             .asCallback(function (err, queryResult) {
-                var count;
 
                 if (err) {
 
                     return next(err);
                 }
 
-                count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+                var count = queryResult && queryResult.length ? +queryResult[0].count : 0;
 
                 res.status(200).send({count: count});
             });

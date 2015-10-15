@@ -92,6 +92,12 @@ module.exports = function (db) {
         }
     });
 
+    factory.define('advertisement', db.Models[TABLES.ADVERTISEMENT], {
+        text: function() {
+            return faker.lorem.sentence(10, 0);
+        }
+    });
+
     factory.define('image', db.Models[TABLES.IMAGES], {
         name: 'default_name',
         imageable_id: 1,

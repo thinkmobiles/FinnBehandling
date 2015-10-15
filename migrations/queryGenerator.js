@@ -50,7 +50,7 @@ module.exports = {
                         'updated_at timestamp without time zone,' +
                         'CONSTRAINT tb_news_pkey PRIMARY KEY (id)' +
                         ') WITHOUT OIDS; ',
-    ADVERTISEMENT: 'CREATE TABLE IF NOT EXISTS tb_advertisement ( ' +
+    WEB_RECOMMENDATIONS: 'CREATE TABLE IF NOT EXISTS tb_web_recommendations ( ' +
                         'id serial NOT NULL, ' +
                         'name varchar(40), ' +
                         'link varchar(255), ' +
@@ -61,7 +61,13 @@ module.exports = {
                         ') WITHOUT OIDS; ',
     STATIC_DATA: 'CREATE TABLE IF NOT EXISTS tb_static_data ( ' +
                         'id serial NOT NULL, ' +
+                        'text text ' +
+                        ') WITHOUT OIDS; ',
+    ADVERTISEMENT: 'CREATE TABLE IF NOT EXISTS tb_advertisement ( ' +
+                        'id serial NOT NULL, ' +
                         'text text, ' +
+                        'created_at timestamp without time zone,' +
+                        'updated_at timestamp without time zone' +
                         ') WITHOUT OIDS; ',
     IMAGES: 'CREATE TABLE tb_images ( ' +
             'id serial NOT NULL, ' +
