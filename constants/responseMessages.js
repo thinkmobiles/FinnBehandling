@@ -32,7 +32,7 @@ module.exports = {
     SUCCESSFUL_LOGIN: 'Login successful',
     SUCCESSFUL_LOGOUT: 'Logout successful',
     WRONG_CURRENT_PASS: 'The Current Password is incorrect. Please enter the valid one',
-    PASSWORD_TO_SHORT: 'Password should be at least 6 characters long',
+    PASSWORD_TOO_SHORT: 'Password should be at least 6 characters long',
     PASSWORD_NOT_EQUAL: 'Password is not equal',
     INCORRECT_LOGIN_PASS: 'Your log in details are incorrect, please try again',
 

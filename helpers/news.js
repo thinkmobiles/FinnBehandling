@@ -94,7 +94,7 @@ var news = function (PostGre) {
 
                 callback(null, clientsCount);
             });
-    }
+    };
 
     this.checkCreateNewsOptions = new Validation.Check({
         subject: ['required', 'isString'],

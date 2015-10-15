@@ -20,6 +20,28 @@ var Users = function (PostGre) {
 
     this.signIn = function (req, res,next) {
 
+        /**
+         * __Type__ `POST`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _users login_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/users/signIn
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "success": "Login successful"
+         *      }
+         *
+         * @param {string} email - users email (optional)
+         * @param {string} password - users password (optional)
+         *
+         * @method signIn
+         * @instance
+         */
+
         passport.authenticate('local',
             function (err, user, info) {
 
@@ -33,9 +55,8 @@ var Users = function (PostGre) {
                         if (err) {
                             return next(err);
                         }
-                        res.redirect('/');
-                    }
-                );
+                        res.status(200).send({success: RESPONSES.SUCCESSFUL_LOGIN});
+                    });
             })(req, res, next);
     };
 
@@ -142,20 +163,17 @@ var Users = function (PostGre) {
          * @instance
          */
 
-        var options = {};
+
         var limit = req.query.limit;
         var page = req.query.page;
 
         var limitIsValid = limit && !isNaN(limit) && limit > 0;
         var offsetIsValid = page && !isNaN(page) && page > 1;
 
-        options.limit = limitIsValid ? limit : 25;
-        options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
-
         User
             .query(function (qb) {
-                qb.limit(options.limit);
-                qb.offset(options.offset);
+                qb.limit(limitIsValid ? limit : 25);
+                qb.offset(offsetIsValid ? (page - 1) * limit : 0);
             })
             .fetchAll()
             .asCallback(function(err, users){
@@ -167,16 +185,16 @@ var Users = function (PostGre) {
             });
     };
 
-    /*this.getNewsCount = function (req, res, next) {
+    this.getUsersCount = function (req, res, next) {
 
-        /!**
+        /**
          * __Type__ `GET`
          * __Content-Type__ `application/json`
          *
-         * This __method__ allows get _news count_
+         * This __method__ allows get _users count_
          *
          * @example Request example:
-         *         http://192.168.88.250:8787/news/count
+         *         http://192.168.88.250:8787/users/count
          *
          * @example Response example:
          *
@@ -184,20 +202,26 @@ var Users = function (PostGre) {
          *          "count": 3
          *      }
          *
-         * @method getNewsCount
+         * @method getUsersCount
          * @instance
-         *!/
+         */
 
-        newsHelper.getNewsCount(function (err, count) {
-            if (err) {
+        User
+            .count()
+            .asCallback(function (err, queryResult) {
+                var count;
 
-                return next(err);
-            }
+                if (err) {
 
-            res.status(200).send({count: count});
-        });
+                    return next(err);
+                }
+
+                count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                res.status(200).send({count: count});
+            });
     };
-*/
+
 
     this.userSignUp = function (req, res, next) {
 
@@ -235,7 +259,7 @@ var Users = function (PostGre) {
         var error;
 
         if (password.length < 6) {
-            error = new Error(RESPONSES.PASSWORD_TO_SHORT);
+            error = new Error(RESPONSES.PASSWORD_TOO_SHORT);
             error.status = 400;
 
             return next(error);
@@ -281,6 +305,33 @@ var Users = function (PostGre) {
                 });
             });
         });
+    };
+
+    this.signOut = function (req, res) {
+
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _users logout_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/users/signOut
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "success": "Logout successful"
+         *      }
+         *
+         * @method signOut
+         * @instance
+         */
+
+        req.logout();
+
+        res.status(200).send({success: RESPONSES.SUCCESSFUL_LOGOUT});
+
     };
 
     this.updateUser = function (req, res, next){

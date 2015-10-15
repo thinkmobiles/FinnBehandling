@@ -6,7 +6,7 @@ var TABLES = require('../constants/tables');
 
 /**
  * @description  News management module
- * @module news
+ * @module staticData
  *
  */
 

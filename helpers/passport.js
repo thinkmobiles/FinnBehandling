@@ -10,10 +10,13 @@ module.exports = function (PostGre) {
     var User = PostGre.Models[TABLES.USERS];
     var error;
 
-    passport.use(new LocalStrategy(
-        function(username, password, done) {
+    passport.use(new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password'
+    },
+        function(email, password, done) {
 
-            User.findByEmail(username, function (err, user) {
+            User.findByEmail(email, function (err, user) {
                 if (err) {
 
                     return done(err);
