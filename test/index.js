@@ -41,6 +41,7 @@ describe('Handlers', function () {
     require('./handlers/hospitals');
     require('./handlers/news');
     require('./handlers/staticData');
+    require('./handlers/advertisement');
 });
 
 after(function (done) {

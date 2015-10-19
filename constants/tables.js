@@ -9,5 +9,6 @@ module.exports = {
     TREATMENTS_LIST: 'tb_treatments_dic',
     USERS: 'tb_users',
     NEWS: 'tb_news',
-    STATIC_DATA: 'tb_static_data'
+    STATIC_DATA: 'tb_static_data',
+    ADVERTISEMENT: 'tb_advertisement'
 };
