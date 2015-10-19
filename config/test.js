@@ -14,4 +14,5 @@ process.env.LOCAL_IMAGE_STORAGE = 'test';
 
 process.env.REDIS_HOST = 'localhost';
 process.env.REDIS_PORT = 6379;
+process.env.REDIS_DB_KEY = 8;
 

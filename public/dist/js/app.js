@@ -38347,10 +38347,10 @@ angular.module('ngAnimate', [])
         function dirPaginationCompileFn(tElement, tAttrs){
 
             var expression = tAttrs.dirPaginate;
-            // regex taken directly from https://github.com/angular/angular.js/blob/master/src/ng/directive/ngRepeat.js#L211
-            var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
+            // regex taken directly from https://github.com/angular/angular.js/blob/v1.4.x/src/ng/directive/ngRepeat.js#L339
+            var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
 
-            var filterPattern = /\|\s*itemsPerPage\s*:[^|\)]*/;
+            var filterPattern = /\|\s*itemsPerPage\s*:\s*(.*\(\s*\w*\)|([^\)]*?(?=as))|[^\)]*)/;
             if (match[2].match(filterPattern) === null) {
                 throw 'pagination directive: the \'itemsPerPage\' filter must be set.';
             }
@@ -38737,7 +38737,7 @@ angular.module('ngAnimate', [])
             }
             var end;
             var start;
-            if (collection instanceof Array) {
+            if (angular.isObject(collection)) {
                 itemsPerPage = parseInt(itemsPerPage) || 9999999999;
                 if (paginationService.isAsyncMode(paginationId)) {
                     start = 0;
@@ -38747,11 +38747,41 @@ angular.module('ngAnimate', [])
                 end = start + itemsPerPage;
                 paginationService.setItemsPerPage(paginationId, itemsPerPage);
 
-                return collection.slice(start, end);
+                if (collection instanceof Array) {
+                    // the array just needs to be sliced
+                    return collection.slice(start, end);
+                } else {
+                    // in the case of an object, we need to get an array of keys, slice that, then map back to
+                    // the original object.
+                    var slicedObject = {};
+                    angular.forEach(keys(collection).slice(start, end), function(key) {
+                        slicedObject[key] = collection[key];
+                    });
+                    return slicedObject;
+                }
             } else {
                 return collection;
             }
         };
+    }
+
+    /**
+     * Shim for the Object.keys() method which does not exist in IE < 9
+     * @param obj
+     * @returns {Array}
+     */
+    function keys(obj) {
+        if (!Object.keys) {
+            var objKeys = [];
+            for (var i in obj) {
+                if (obj.hasOwnProperty(i)) {
+                    objKeys.push(i);
+                }
+            }
+            return objKeys;
+        } else {
+            return Object.keys(obj);
+        }
     }
 
     /**
@@ -39045,43 +39075,57 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         getNews();
     }]);
 ;
-app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
-    function ($scope, $location, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, GeneralHelpers) {
 
-    $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-    $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
-    $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
+        $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
+        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
+        $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
-    $scope.fylkes = [
-        'Alle',
-        'Østfold',
-        'Akershus',
-        'Oslo',
-        'Hedmark',
-        'Oppland',
-        'Buskerud'
-    ];
+        $scope.fylkes = [
+            'Alle',
+            'Østfold',
+            'Akershus',
+            'Oslo',
+            'Hedmark',
+            'Oppland',
+            'Buskerud'
+        ];
 
-    $scope.behandlings = [
-        'Alle',
-        'ear',
-        'nose',
-        'mouth treatment',
-        'plastic surgery',
-        'bone problems'
-    ];
+        $scope.behandlings = [
+            'Alle',
+            'ear',
+            'nose',
+            'mouth treatment',
+            'plastic surgery',
+            'bone problems'
+        ];
 
-    $scope.search = function () {
-        GeneralHelpers.saveAsLocalData('hospitalPage', 1);
-        GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
-        GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
-        GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
-        GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+        $scope.search = function () {
+            GeneralHelpers.saveAsLocalData('hospitalPage', 1);
+            GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
+            GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
+            GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
 
-        $scope.$parent.searchResponse = true;
+            $scope.$parent.searchResponse = true;
 
-        $location.path('behandlingstilbud');
-    };
+            $location.path('behandlingstilbud');
+        };
+
+        $scope.signIn = function () {
+
+            if ($scope.signInForm.$valid) {
+                UserManager.signIn($scope.loginParams, function (err) {
+                    if (err) {
+                        $scope.$parent.isAuthenticated = false;
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.$parent.isAuthenticated = true;
+                });
+            }
+        };
 }]);;
 app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
     function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
@@ -39383,6 +39427,23 @@ app.factory('StaticDataManager', ['$http', function ($http) {
         $http({
             url: '/staticData',
             method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('UserManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.signIn = function (data, callback) {
+        $http({
+            url: '/user/signIn',
+            method: "POST",
+            data: data
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
