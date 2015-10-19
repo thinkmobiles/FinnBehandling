@@ -7,17 +7,20 @@ var Models = function (PostGre) {
 
     var Model = PostGre.Model.extend({
         getName: function () {
-            return this.tableName.replace(/s$/, '')
+            return this.tableName.replace(/s$/, '');
         }
     }, {
-        fetchMe: function (queryObject, optionsObject) {
-            return this.forge(queryObject).fetch(optionsObject);
+        fetchWhere: function (queryObject, optionsObject) {
+            return this.where(queryObject).fetch(optionsObject);
         }
     });
 
 
 
-
+    this[TABLES.USERS] = require('./user')(PostGre, Model);
+    this[TABLES.ADVERTISEMENT] = require('./advertisement')(PostGre, Model);
+    this[TABLES.STATIC_DATA] = require('./staticData')(PostGre, Model);
+    this[TABLES.IMAGES] = require('./images')(PostGre, Model);
     this[TABLES.NEWS] = require('./news')(PostGre, Model);
     this[TABLES.HOSPITALS] = require('./hospital')(PostGre, Model);
     this[TABLES.HOSPITAL_TYPES_LIST] = require('./hospitalTypesList')(PostGre, Model);
@@ -26,7 +29,6 @@ var Models = function (PostGre) {
     this[TABLES.TREATMENTS_LIST] = require('./treatmentsList')(PostGre, Model);
     this[TABLES.SUB_TREATMENTS] = require('./subTreatment')(PostGre, Model);
     this[TABLES.SUB_TREATMENTS_LIST] = require('./subTreatmentsList')(PostGre, Model);
-    //this[TABLES.HOSPITAL_TEXTS] = require('./hospitalText')(PostGre, Model);
 
 };
 module.exports = Models;

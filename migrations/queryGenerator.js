@@ -37,6 +37,8 @@ module.exports = {
                     'facebook_id varchar(50), ' +
                     'twitter_id varchar(50), ' +
                     'role varchar(15) NOT NULL, ' +
+                    'created_at timestamp without time zone,' +
+                    'updated_at timestamp without time zone,' +
                     'CONSTRAINT tb_users_pkey PRIMARY KEY (id)' +
                     ') WITHOUT OIDS; ',
     NEWS: 'CREATE TABLE IF NOT EXISTS tb_news ( ' +
@@ -47,6 +49,25 @@ module.exports = {
                         'created_at timestamp without time zone,' +
                         'updated_at timestamp without time zone,' +
                         'CONSTRAINT tb_news_pkey PRIMARY KEY (id)' +
+                        ') WITHOUT OIDS; ',
+    WEB_RECOMMENDATIONS: 'CREATE TABLE IF NOT EXISTS tb_web_recommendations ( ' +
+                        'id serial NOT NULL, ' +
+                        'name varchar(40), ' +
+                        'link varchar(255), ' +
+                        'private boolean DEFAULT false, ' +
+                        'created_at timestamp without time zone,' +
+                        'updated_at timestamp without time zone,' +
+                        'CONSTRAINT tb_advertisement_pkey PRIMARY KEY (id)' +
+                        ') WITHOUT OIDS; ',
+    STATIC_DATA: 'CREATE TABLE IF NOT EXISTS tb_static_data ( ' +
+                        'id serial NOT NULL, ' +
+                        'text text ' +
+                        ') WITHOUT OIDS; ',
+    ADVERTISEMENT: 'CREATE TABLE IF NOT EXISTS tb_advertisement ( ' +
+                        'id serial NOT NULL, ' +
+                        'text text, ' +
+                        'created_at timestamp without time zone,' +
+                        'updated_at timestamp without time zone' +
                         ') WITHOUT OIDS; ',
     IMAGES: 'CREATE TABLE tb_images ( ' +
             'id serial NOT NULL, ' +
@@ -62,7 +83,7 @@ module.exports = {
                     'region_id integer NOT NULL, ' +
                     'is_paid boolean NOT NULL, ' +
                     'type_id integer NOT NULL, ' +
-                    'name varchar(80), ' +
+                    'name varchar(80) NOT NULL, ' +
                     'web_address varchar(80), ' +
                     'phone_number text[3], ' +
                     'email text[3], ' +

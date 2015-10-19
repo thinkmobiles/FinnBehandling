@@ -19,8 +19,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
 
             $rootScope[key] = locationSearch[key];
             return locationSearch[key];
-        } else {
-            return null;
         }
     };
 
@@ -43,8 +41,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
                 alert($rootScope.errMsg);
                 break;
             case 401:
-                window.location = '/';
-                break;
             case 403:
                 window.location = '/';
                 break;

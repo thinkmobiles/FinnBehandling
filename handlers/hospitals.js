@@ -4,8 +4,6 @@ var TABLES = require('../constants/tables');
 var async = require('../node_modules/async');
 var _ = require('../node_modules/underscore');
 
-var HospitalHelper = require('../helpers/hospitals');
-
 var Hospitals;
 
 /**
@@ -15,7 +13,14 @@ var Hospitals;
  */
 
 Hospitals = function (PostGre) {
-    var hospitalHelper = new HospitalHelper(PostGre);
+
+    var self = this;
+    var Hospital = PostGre.Models[TABLES.HOSPITALS];
+    var HospitalTreatment = PostGre.Models[TABLES.TREATMENTS];
+    var HospitalSubTreatment = PostGre.Models[TABLES.SUB_TREATMENTS];
+
+    var Image = require('../helpers/images');
+    var image = new Image(PostGre);
 
     this.createHospital = function (req, res, next) {
         /**
@@ -60,24 +65,51 @@ Hospitals = function (PostGre) {
          */
         var options = req.body;
 
-        hospitalHelper.createHospitalByOptions(options, {checkFunctions: [
-            'checkHospitalType',
-            'checkHospitalRegion',
-            'checkHospitalTreatment',
-            'checkHospitalSubTreatment',
-            'checkUniqueHospitalName'
-
-        ]}, function (err, result) {
+        Hospital.createValid(options, function (err, hospital) {
 
             if (err) {
                 return next(err);
             }
 
-            res.status(201).send({
-                success: RESPONSES.WAS_CREATED,
-                hospital_id: result
-            });
+            var hospitalId = hospital.id;
+            var functionsToExecute = [
+                function (callback) {
+                    HospitalTreatment.create(options.treatment_ids, hospitalId, callback);
+                },
+                function (callback) {
+                    HospitalSubTreatment.create(options.sub_treatments, hospitalId, callback);
+                }
+            ];
 
+            if (options.logo) {
+                var  imageParams = {
+                    imageUrl: options.logo,
+                    imageable_id: hospitalId,
+                    imageable_type: TABLES.HOSPITALS,
+                    imageable_field: 'logo'
+                };
+
+                functionsToExecute.push(
+                    function (callback) {
+                        image.newImage(imageParams, callback);
+                    }
+                );
+            }
+
+            async.parallel(functionsToExecute, function (err) {
+
+                if (err) {
+
+                    Hospital.delete(hospitalId, function () {
+                        return next(err);
+                    });
+                }
+
+                res.status(201).send({
+                    success: RESPONSES.WAS_CREATED,
+                    hospital_id: hospitalId
+                });
+            });
         });
     };
 
@@ -123,28 +155,51 @@ Hospitals = function (PostGre) {
          * @instance
          */
         var options = req.body;
-        options.hospital_id = req.params.id;
+        options.id = req.params.id;
 
-        hospitalHelper.updateHospitalByOptions(options, {checkFunctions: [
-            'checkExistingHospital',
-            'checkHospitalType',
-            'checkHospitalRegion',
-            'checkHospitalTreatment',
-            'checkHospitalSubTreatment',
-            'checkUniqueHospitalName'
-
-        ]}, function (err, result) {
+        Hospital.updateValid(options, function (err, hospital) {
 
             if (err) {
                 return next(err);
             }
 
-            res.status(200).send({
-                success: RESPONSES.UPDATED_SUCCESS,
-                hospital_id: result
-            });
+            var hospitalId = hospital.id;
+            var functionsToExecute = [
+                function (callback) {
+                    HospitalTreatment.update(options.treatment_ids, hospitalId, callback);
+                },
+                function (callback) {
+                    HospitalSubTreatment.update(options.sub_treatments, hospitalId, callback);
+                }
+            ];
 
-        })
+            if (options.logo) {
+                var  imageParams = {
+                    imageUrl: options.logo,
+                    imageable_id: hospitalId,
+                    imageable_type: TABLES.HOSPITALS,
+                    imageable_field: 'logo'
+                };
+
+                functionsToExecute.push(
+                    function (callback) {
+                        image.updateOrCreateImageByClientProfileId(imageParams, callback);
+                    }
+                );
+            }
+
+            async.parallel(functionsToExecute, function (err) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send({
+                    success: RESPONSES.UPDATED_SUCCESS,
+                    hospital_id: hospitalId
+                });
+            });
+        });
     };
 
     this.getAllHospitals = function (req, res, next) {
@@ -210,14 +265,14 @@ Hospitals = function (PostGre) {
         options.limit = limitIsValid ? limit : 25;
         options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
 
-        hospitalHelper.getHospitalByOptions(options, function (err, hospitals) {
+        Hospital.getAll(options, function (err, hospitals) {
 
             if (err) {
                 return next(err);
             }
 
             res.status(200).send(hospitals);
-        })
+        });
     };
 
     this.getHospitalsCount = function (req, res, next) {
@@ -242,14 +297,19 @@ Hospitals = function (PostGre) {
          * @instance
          */
 
-        hospitalHelper.getHospitalsCount(function (err, count) {
+        PostGre.knex(TABLES.HOSPITALS)
+            .count()
+            .asCallback(function (err, queryResult) {
+                var  count;
 
-            if (err) {
-                return next(err);
-            }
+                if (err) {
+                    return next(err);
+                }
 
-            res.status(200).send({count: count});
-        })
+                count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                res.status(200).send({count: count});
+            });
     };
 
     this.getHospital = function (req, res, next) {
@@ -306,14 +366,14 @@ Hospitals = function (PostGre) {
          */
         var hospitalId = req.params.id;
 
-        hospitalHelper.getHospitalByOptions(hospitalId, function (err, hospital) {
+        Hospital.getOne(hospitalId, function (err, hospital) {
 
             if (err) {
                 return next(err);
             }
 
             res.status(200).send(hospital);
-        })
+        });
     };
 
     this.deleteHospital = function (req, res, next) {
@@ -339,7 +399,7 @@ Hospitals = function (PostGre) {
          */
         var hospitalId = parseInt(req.params.id);
 
-        hospitalHelper.deleteHospital(hospitalId, function (err) {
+        Hospital.delete(hospitalId, function (err) {
 
             if (err) {
                 return next(err);
@@ -348,7 +408,7 @@ Hospitals = function (PostGre) {
             res.status(200).send({
                 success: RESPONSES.REMOVE_SUCCESSFULY
             });
-        })
+        });
     }
 };
 

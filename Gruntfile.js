@@ -44,7 +44,7 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            app: ["./dist/css/app_style.css"]
+            app: ['./public/dist/temp/css/*.css']
         },
 
         concat: {
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
                     'public/js/libs/angular-animate/angular-animate.js',
                     'public/js/libs/angular-strap/dist/angular-strap.js',
                     'public/js/libs/angular-strap/dist/angular-strap.tpl.js',
-                    'public/js/libs/nonBower/pagination/dirPagination.js',
+                    'public/js/libs/angularUtils-pagination/dirPagination.js',
                     'public/js/modules/config.js',
                     'public/js/modules/app.js',
                     'public/js/modules/routes.js',
@@ -150,5 +150,4 @@ module.exports = function (grunt) {
         'watch:app',
         'jsdoc'
     ]);
-
 };

@@ -38347,10 +38347,10 @@ angular.module('ngAnimate', [])
         function dirPaginationCompileFn(tElement, tAttrs){
 
             var expression = tAttrs.dirPaginate;
-            // regex taken directly from https://github.com/angular/angular.js/blob/master/src/ng/directive/ngRepeat.js#L211
-            var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
+            // regex taken directly from https://github.com/angular/angular.js/blob/v1.4.x/src/ng/directive/ngRepeat.js#L339
+            var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
 
-            var filterPattern = /\|\s*itemsPerPage\s*:[^|\)]*/;
+            var filterPattern = /\|\s*itemsPerPage\s*:\s*(.*\(\s*\w*\)|([^\)]*?(?=as))|[^\)]*)/;
             if (match[2].match(filterPattern) === null) {
                 throw 'pagination directive: the \'itemsPerPage\' filter must be set.';
             }
@@ -38737,7 +38737,7 @@ angular.module('ngAnimate', [])
             }
             var end;
             var start;
-            if (collection instanceof Array) {
+            if (angular.isObject(collection)) {
                 itemsPerPage = parseInt(itemsPerPage) || 9999999999;
                 if (paginationService.isAsyncMode(paginationId)) {
                     start = 0;
@@ -38747,11 +38747,41 @@ angular.module('ngAnimate', [])
                 end = start + itemsPerPage;
                 paginationService.setItemsPerPage(paginationId, itemsPerPage);
 
-                return collection.slice(start, end);
+                if (collection instanceof Array) {
+                    // the array just needs to be sliced
+                    return collection.slice(start, end);
+                } else {
+                    // in the case of an object, we need to get an array of keys, slice that, then map back to
+                    // the original object.
+                    var slicedObject = {};
+                    angular.forEach(keys(collection).slice(start, end), function(key) {
+                        slicedObject[key] = collection[key];
+                    });
+                    return slicedObject;
+                }
             } else {
                 return collection;
             }
         };
+    }
+
+    /**
+     * Shim for the Object.keys() method which does not exist in IE < 9
+     * @param obj
+     * @returns {Array}
+     */
+    function keys(obj) {
+        if (!Object.keys) {
+            var objKeys = [];
+            for (var i in obj) {
+                if (obj.hasOwnProperty(i)) {
+                    objKeys.push(i);
+                }
+            }
+            return objKeys;
+        } else {
+            return Object.keys(obj);
+        }
     }
 
     /**
@@ -38878,14 +38908,22 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
-    }).when('/sentere', {
-        controller: 'sentereController',
-        templateUrl: 'templates/sentere/list.html',
-        controllerAs: 'sentereCtrl'
-    }).when('/sentere/:id', {
+    }).when('/behandlingstilbud', {
+        controller: 'behandlingstilbudController',
+        templateUrl: 'templates/behandlingstilbud/list.html',
+        controllerAs: 'behandlingstilbudCtrl'
+    }).when('/behandlingstilbud/:id', {
         controller: 'hospitalController',
-        templateUrl: 'templates/sentere/view.html',
+        templateUrl: 'templates/behandlingstilbud/view.html',
         controllerAs: 'hospitalCtrl'
+    }).when('/nyheter', {
+        controller: 'newsController',
+        templateUrl: 'templates/news/list.html',
+        controllerAs: 'newsCtrl'
+    }).when('/nyheter/:id', {
+        controller: 'articleController',
+        templateUrl: 'templates/news/view.html',
+        controllerAs: 'articleCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -38895,31 +38933,31 @@ app.config(['$routeProvider', function ($routeProvider) {
 
 }]);
 ;
-app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
+app.controller('articleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
         var self = this;
-        var hospitalId = $routeParams.id;
+        var articleId = $routeParams.id;
 
         $location.hash('main-menu');
 
-        function getHospital () {
+        function getArticle () {
 
-            HospitalManager.getHospital(hospitalId, function(err, hospital) {
+            NewsManager.getArticle(articleId, function(err, article) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                self.hospital = hospital;
+                self.article = article;
             });
         }
 
-        getHospital();
+        getArticle();
     }]);;
-app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelpers',
+app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'GeneralHelpers',
     function ($scope, HospitalManager, GeneralHelpers) {
         var self = this;
 
-        $scope.curPage = 1;
+        $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
         $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
 
         this.setCoordinates = function (lat, long) {
@@ -38941,100 +38979,187 @@ app.controller('sentereController', ['$scope', 'HospitalManager', 'GeneralHelper
 
         getHospitalsCount();
 
-        this.getHospitals = function () {
+        this.refreshHospitals = function () {
+            if (!$scope.$parent.searchResponse) {
+                GeneralHelpers.saveAsLocalData('hospitalPage', $scope.hospitalPage);
+            }
+
+            getHospitals();
+        };
+
+        function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var tekstsok = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.curPage}, function(err, hospitals) {
+            $scope.pending = true;
+
+            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
+                $scope.pending = false;
+
+                if ($scope.$parent) {
+                    $scope.$parent.searchResponse = false;
+                }
+
                 self.hospitals = hospitals;
             });
+        }
+
+        getHospitals();
+}]);;
+app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
+        var self = this;
+        var hospitalId = $routeParams.id;
+
+        $location.hash('main-menu');
+
+        function getHospital () {
+
+            HospitalManager.getHospital(hospitalId, function(err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        getHospital();
+    }]);;
+app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
+    function ($scope, NewsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.newsPage = GeneralHelpers.getLocalData('newsPage') || 1;
+        $scope.resultater = 10;
+
+        function getNewsCount () {
+            NewsManager.getNewsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getNewsCount();
+
+        this.refreshNews = function () {
+            GeneralHelpers.saveAsLocalData('newsPage', $scope.newsPage);
+
+            getNews();
         };
 
-        this.getHospitals();
+        function getNews () {
+
+            $scope.pending = true;
+
+            NewsManager.getNewsList({limit: $scope.resultater, page: $scope.newsPage}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                self.news = news;
+            });
+        }
+
+        getNews();
+    }]);
+;
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, GeneralHelpers) {
+
+        $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
+        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
+        $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
+
+        $scope.fylkes = [
+            'Alle',
+            'Østfold',
+            'Akershus',
+            'Oslo',
+            'Hedmark',
+            'Oppland',
+            'Buskerud'
+        ];
+
+        $scope.behandlings = [
+            'Alle',
+            'ear',
+            'nose',
+            'mouth treatment',
+            'plastic surgery',
+            'bone problems'
+        ];
+
+        $scope.search = function () {
+            GeneralHelpers.saveAsLocalData('hospitalPage', 1);
+            GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
+            GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
+            GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
+            $scope.$parent.searchResponse = true;
+
+            $location.path('behandlingstilbud');
+        };
+
+        $scope.signIn = function () {
+
+            if ($scope.signInForm.$valid) {
+                UserManager.signIn($scope.loginParams, function (err) {
+                    if (err) {
+                        $scope.$parent.isAuthenticated = false;
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.$parent.isAuthenticated = true;
+                });
+            }
+        };
 }]);;
-app.controller('sideBarController', ['$scope', '$location', 'GeneralHelpers',
-    function ($scope, $location, GeneralHelpers) {
+app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
+    function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
 
-    $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-    $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
-    $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
+        var self = this;
 
-    $scope.fylkes = [
-        'Alle',
-        'Østfold',
-        'Akershus',
-        'Oslo',
-        'Hedmark',
-        'Oppland',
-        'Buskerud'
-    ];
+        function getStaticData () {
 
-    $scope.behandlings = [
-        'Alle',
-        'ear',
-        'nose',
-        'mouth treatment',
-        'plastic surgery',
-        'bone problems'
-    ];
+            StaticDataManager.getStaticData(function(err, staticData) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
 
-    $scope.search = function () {
-        GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
-        GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
-        GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
-        GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+                self.staticData = staticData ? staticData.text : '';
+            });
+        }
 
-        $location.path('sentere');
-    };
-}]);;
-app.controller('startPageController', ['$scope', function ($scope) {
-    var self = this;
+        function getNews () {
 
-    this.news = [{
-        image: 'http://www.saturdayeveningpost.com/wp-content/uploads/satevepost/photo_2009-12_26_biomedical_research-400x300.jpg',
-        title: 'Doctor',
-        date: new Date(),
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend nisi lectus, ut maximus mauris ' +
-        'condimentum eget. Nulla facilisi. Mauris vel ante aliquet, feugiat nulla eu, mollis libero. Fusce tristique ' +
-        'tellus at urna porttitor hendrerit. Maecenas vel facilisis sem. Vivamus eu pretium ipsum, sed blandit sapien. ' +
-        'Quisque finibus aliquet nulla, id venenatis erat elementum ac. Quisque fringilla nulla lorem, eget suscipit ' +
-        'massa porttitor non. Donec tempus mi velit, non venenatis erat condimentum sit amet. Nunc vehicula nulla nec ' +
-        'massa vestibulum ornare. Pellentesque a metus et ligula mattis faucibus. Mauris ultricies nisl sit amet nunc ' +
-        'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
-        ' Suspendisse potenti.'
-    },
-    {
-        image: 'http://cdn1.medicalnewstoday.com/content/images/articles/284/284381/pills.jpg',
-        title: 'Pills',
-        date: new Date(),
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend nisi lectus, ut maximus mauris ' +
-        'condimentum eget. Nulla facilisi. Mauris vel ante aliquet, feugiat nulla eu, mollis libero. Fusce tristique ' +
-        'tellus at urna porttitor hendrerit. Maecenas vel facilisis sem. Vivamus eu pretium ipsum, sed blandit sapien. ' +
-        'Quisque finibus aliquet nulla, id venenatis erat elementum ac. Quisque fringilla nulla lorem, eget suscipit ' +
-        'massa porttitor non. Donec tempus mi velit, non venenatis erat condimentum sit amet. Nunc vehicula nulla nec ' +
-        'massa vestibulum ornare. Pellentesque a metus et ligula mattis faucibus. Mauris ultricies nisl sit amet nunc ' +
-        'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
-        ' Suspendisse potenti.'
-    },
-    {
-        image: 'http://a.abcnews.com/images/Health/GTY_cat_scan_jef_141203_16x9_992.jpg',
-        title: 'MRT',
-        date: new Date(),
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend nisi lectus, ut maximus mauris ' +
-        'condimentum eget. Nulla facilisi. Mauris vel ante aliquet, feugiat nulla eu, mollis libero. Fusce tristique ' +
-        'tellus at urna porttitor hendrerit. Maecenas vel facilisis sem. Vivamus eu pretium ipsum, sed blandit sapien. ' +
-        'Quisque finibus aliquet nulla, id venenatis erat elementum ac. Quisque fringilla nulla lorem, eget suscipit ' +
-        'massa porttitor non. Donec tempus mi velit, non venenatis erat condimentum sit amet. Nunc vehicula nulla nec ' +
-        'massa vestibulum ornare. Pellentesque a metus et ligula mattis faucibus. Mauris ultricies nisl sit amet nunc ' +
-        'bibendum mollis. Proin nec fringilla mi. Nullam bibendum felis ac ex aliquet, ac tincidunt orci tempor.' +
-        ' Suspendisse potenti.'
-    }];
+            var params = {
+                limit: 3
+            };
+
+            NewsManager.getNewsList(params, function(err, hospitals) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.news = hospitals;
+            });
+        }
+
+        getStaticData();
+        getNews();
 }]);;
 app.directive('gmap', function () {
     return {
@@ -39184,8 +39309,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
 
             $rootScope[key] = locationSearch[key];
             return locationSearch[key];
-        } else {
-            return null;
         }
     };
 
@@ -39208,8 +39331,6 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
                 alert($rootScope.errMsg);
                 break;
             case 401:
-                window.location = '/';
-                break;
             case 403:
                 window.location = '/';
                 break;
@@ -39253,6 +39374,76 @@ app.factory('HospitalManager', ['$http', function ($http) {
         $http({
             url: '/hospitals/count',
             method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('NewsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getNewsList = function (params, callback) {
+        $http({
+            url: '/news',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getNewsCount = function (callback) {
+        $http({
+            url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('StaticDataManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getStaticData = function (callback) {
+        $http({
+            url: '/staticData',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('UserManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.signIn = function (data, callback) {
+        $http({
+            url: '/user/signIn',
+            method: "POST",
+            data: data
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

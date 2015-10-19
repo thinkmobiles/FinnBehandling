@@ -39,7 +39,9 @@ module.exports = function (db) {
 
     factory.define('hospital', db.Models[TABLES.HOSPITALS], {
         region_id: factory.assoc('region', 'id'),
-        is_paid: !!Math.round(Math.random()),
+        is_paid: function () {
+            return !!Math.round(Math.random());
+        },
         type_id: factory.assoc('hospital_type', 'id'),
         name: function() {
             return faker.company.companyName(0);
@@ -76,11 +78,31 @@ module.exports = function (db) {
             return faker.lorem.sentence(1, 0);
         },
         content: function() {
-            return faker.lorem.paragraph();
+            return faker.lorem.paragraphs(15);
         },
         source: function() {
             return faker.lorem.sentence(1, 3);
         }
+    });
+
+    factory.define('static_data', db.Models[TABLES.STATIC_DATA], {
+        id: 1,
+        text: function() {
+            return faker.lorem.sentence(10, 0);
+        }
+    });
+
+    factory.define('advertisement', db.Models[TABLES.ADVERTISEMENT], {
+        text: function() {
+            return faker.lorem.sentence(10, 0);
+        }
+    });
+
+    factory.define('image', db.Models[TABLES.IMAGES], {
+        name: 'default_name',
+        imageable_id: 1,
+        imageable_type: 'default_type',
+        imageable_field: 'default_field'
     });
 
     return factory;

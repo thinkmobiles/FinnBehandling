@@ -2,7 +2,7 @@ var express = require('express');
 var http = require('http');
 
 //TODO change NODE_ENV for production server
-process.env.NODE_ENV = 'development';
+process.env.NODE_ENV = 'test';
 
     //development only
     if (process.env.NODE_ENV === 'production') {
@@ -31,7 +31,7 @@ Knex.knex = Knex.initialize({
         user: process.env.DB_USER,
         password: process.env.DB_PASS,
         port: process.env.DB_PORT,
-        database: /*process.env.DB_NAME*/ 'finnbehandling_test'
+        database: process.env.DB_NAME
     }
 });
 
