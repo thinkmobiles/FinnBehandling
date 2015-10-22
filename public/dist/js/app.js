@@ -38908,6 +38908,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/kontakt', {
+        controller: 'contactController',
+        templateUrl: 'templates/contact.html',
+        controllerAs: 'contactCtrl',
+        reloadOnSearch: false
     }).when('/behandlingstilbud', {
         controller: 'behandlingstilbudController',
         templateUrl: 'templates/behandlingstilbud/list.html',
@@ -39012,6 +39017,27 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitals();
 }]);;
+app.controller('contactController', ['$scope', 'UserManager', 'GeneralHelpers',
+    function ($scope, UserManager, GeneralHelpers) {
+
+        var self = this;
+
+        this.sendEmail = function () {
+
+            if ($scope.sendEmailForm.$valid) {
+
+                UserManager.sendEmail(self.email, function(err, response) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    } else {
+                        alert('success');
+                        $scope.sendEmailForm.$submitted = false;
+                        self.email = {};
+                    }
+                });
+            }
+        };
+    }]);;
 app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
         var self = this;
@@ -39442,6 +39468,17 @@ app.factory('UserManager', ['$http', function ($http) {
     this.signIn = function (data, callback) {
         $http({
             url: '/user/signIn',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.sendEmail = function (data, callback) {
+        $http({
+            url: '/user/sendEmail',
             method: "POST",
             data: data
         }).then(function (response) {

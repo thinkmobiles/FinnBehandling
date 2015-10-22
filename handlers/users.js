@@ -1,6 +1,8 @@
 var RESPONSES = require('../constants/responseMessages');
 var CONSTANTS = require('../constants/constants');
 var TABLES = require('../constants/tables');
+var Mailer = require('../helpers/mailer');
+var mailer = new Mailer();
 
 //helpers
 
@@ -331,6 +333,48 @@ var Users = function (PostGre) {
 
         res.status(200).send({success: RESPONSES.SUCCESSFUL_LOGOUT});
 
+    };
+
+    this.sendEmail = function (req, res, next) {
+
+        /**
+         * __Type__ `POST`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _users send email_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/users/sendEmail
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "success": "Email have successfully sent"
+         *      }
+         *
+         * @param {string} name - sender's name
+         * @param {string} email - sender's email
+         * @param {string} topic - email topic
+         * @param {string} notification - email body
+         *
+         * @method sendEmail
+         * @instance
+         */
+
+        var options = req.body;
+
+        mailer.sendEmail({
+            name: options.name,
+            email: options.email,
+            notification: options.notification,
+            topic: options.topic
+        }, function (err) {
+            if (err) {
+                next(err);
+            }
+
+            res.status(200).send({success: RESPONSES.EMAIL_SENT});
+        });
     };
 
     this.updateUser = function (req, res, next){
