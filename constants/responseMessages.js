@@ -34,6 +34,7 @@ module.exports = {
     WRONG_CURRENT_PASS: 'The Current Password is incorrect. Please enter the valid one',
     PASSWORD_TOO_SHORT: 'Password should be at least 6 characters long',
     PASSWORD_NOT_EQUAL: 'Password is not equal',
+    EMAIL_NOT_EQUAL: 'eMAIL is not equal',
     INCORRECT_LOGIN_PASS: 'Your log in details are incorrect, please try again',
 
     USER_USED_FIELDS: {

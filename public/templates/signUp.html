@@ -1,0 +1,152 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix">
+    <h1>Registrer ny bruker</h1>
+    <hr/>
+    <form
+            role="form"
+            class="one-block"
+            name="signUpForm"
+            ng-submit="signUpCtrl.signUp()"
+            novalidate>
+        <div class="form-group clearfix">
+
+            <div class="col-md-6">
+                <label for="name" class="pull-right side-label-holder dynamic-font-md">Navn:</label>
+            </div>
+
+            <div class="col-md-6">
+                <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="pull-left form-control side-input"
+                        required
+                        ng-model="signUpCtrl.registerParams.name"/>
+            </div>
+            <div class="col-md-12  text-center">
+                <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && signUpForm.name.$invalid">
+                    <p ng-show="signUpForm.name.$error.required">Feltet skal utfylles</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+
+            <div class="col-md-6">
+                <label for="email" class="pull-right side-label-holder dynamic-font-md">E-post:</label>
+            </div>
+
+            <div class="col-md-6">
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="pull-left form-control side-input"
+                        ng-pattern="emailPattern"
+                        required
+                        ng-model="signUpCtrl.registerParams.email"
+                        ng-model-options="{allowInvalid: true}"/>
+            </div>
+            <div class="col-md-12  text-center">
+                <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && signUpForm.email.$invalid">
+                    <p ng-show="signUpForm.email.$error.required">Feltet skal utfylles</p>
+                    <p ng-show="signUpForm.email.$error.pattern">Ugyldig e-post adresse</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+
+            <div class="col-md-6">
+                <label for="repeatEmail" class="pull-right side-label-holder dynamic-font-md">Gjenta e-post:</label>
+            </div>
+
+            <div class="col-md-6">
+                <input
+                        type="email"
+                        id="repeatEmail"
+                        name="repeatEmail"
+                        class="pull-left form-control side-input"
+                        ng-pattern="emailPattern"
+                        required
+                        compare-to-validator="signUpCtrl.registerParams.email"
+                        ng-model="signUpCtrl.registerParams.emailConfirm"/>
+            </div>
+            <div class="col-md-12  text-center">
+                <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && signUpForm.repeatEmail.$invalid">
+                    <p ng-show="signUpForm.repeatEmail.$error.required">Feltet skal utfylles</p>
+                    <p ng-show="signUpForm.repeatEmail.$error.pattern">Ugyldig e-post adresse</p>
+                    <p ng-show="signUpForm.repeatEmail.$error.confirmation">E-post adressene er ikke like</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+
+            <div class="col-md-6">
+                <label for="password" class="pull-right side-label-holder dynamic-font-md">Passord:</label>
+            </div>
+
+            <div class="col-md-6">
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="pull-left form-control side-input"
+                        required
+                        minlength="6"
+                        ng-model="signUpCtrl.registerParams.password"
+                        ng-model-options="{allowInvalid: true}"/>
+            </div>
+            <div class="col-md-12  text-center">
+                <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && signUpForm.password.$invalid">
+                    <p ng-show="signUpForm.password.$error.required">Feltet skal utfylles</p>
+                    <p ng-show="signUpForm.password.$error.minlength">Minimum seks tegn</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+
+            <div class="col-md-6">
+                <label for="repeatPassword" class="pull-right dynamic-font-md">Gjenta passord:</label>
+            </div>
+            <div class="col-md-6">
+                <input
+                        type="password"
+                        id="repeatPassword"
+                        name="repeatPassword"
+                        class="pull-left form-control side-input"
+                        required
+                        compare-to-validator="signUpCtrl.registerParams.password"
+                        ng-model="signUpCtrl.registerParams.passwordConfirm"/>
+            </div>
+            <div class="col-md-12  text-center">
+                <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && signUpForm.repeatPassword.$invalid">
+                    <p ng-show="signUpForm.repeatPassword.$error.required">Feltet skal utfylles</p>
+                    <p ng-show="signUpForm.repeatPassword.$error.confirmation">Passordene er ikke like</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group clearfix text-center">
+            <a class="h4 blue bold" href="/pdf/betingelser_for_bruk_av_nettsted.pdf" target="_blank">Vilkår og betingelser (pdf)</a>
+        </div>
+
+        <div class="form-group clearfix text-center">
+            <div style="width: 300px !important; margin: auto">
+                <input type="checkbox" ng-model="acceptRules"/>
+                <span>Jeg har lest og godtar vilkår og betingelser for bruk av dette nettstedet</span>
+            </div>
+            <div  style="color:red; margin: auto" ng-show="signUpForm.$submitted && !acceptRules">
+                <p>Du må godkjenne vilkår og betingelser</p>
+            </div>
+        </div>
+        <hr/>
+
+        <div class="form-group clearfix">
+            <button type="submit" class="btn btn-primary">Registrer</button>
+            <a class="btn btn-default" href="#/">Avbryt</a>
+        </div>
+
+    </form>
+</div>

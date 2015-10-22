@@ -254,7 +254,9 @@ var Users = function (PostGre) {
 
         var options = req.body;
         var password = options.password;
-        var passConfirm = options.pass_confirm;
+        var email = options.email;
+        var passConfirm = options.passwordConfirm;
+        var emailConfirm = options.emailConfirm;
         var error;
 
         if (password.length < 6) {
@@ -265,12 +267,22 @@ var Users = function (PostGre) {
         }
 
         if (password !== passConfirm) {
+            error = new Error(RESPONSES.EMAIL_NOT_EQUAL);
+            error.status = 400;
+
+            return next(error);
+        }
+
+        if (email !== emailConfirm) {
             error = new Error(RESPONSES.PASSWORD_NOT_EQUAL);
             error.status = 400;
 
             return next(error);
         }
 
+        options.first_name = options.name;
+        options.last_name = options.name;
+        options.role = 'user';
         options.password = cryptoPass.getEncryptedPass(password);
 
         User.findByEmail(options.email, function(err, user){
@@ -442,6 +454,50 @@ var Users = function (PostGre) {
                     success: RESPONSES.REMOVE_SUCCESSFULY
                 });
             });
+    };
+
+
+
+    this.isAuthorizedUser = function (req, res, next) {
+
+
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows check _is user authorized_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/user/isAuthorized?name=true
+         *
+         * @example Response example:
+         *
+         * {
+         *       "success": "Authorized",
+         *       "name": "Tomas"
+         * }
+         *
+         * @param {number} id - id of user
+         * @method isAuthorizedUser
+         * @instance
+         */
+
+        var withName = req.query.name;
+        var result;
+
+        if (req.session && req.session.passport && req.session.passport.user) {
+            result = {success: RESPONSES.AUTHORIZED};
+
+            if (withName && req.session.user && req.session.user.first_name) {
+                result.name = req.session.user.first_name;
+            }
+
+            res.status(200).send(result);
+        } else {
+            var err = new Error(RESPONSES.UNAUTHORIZED);
+            err.status = 401;
+            next(err);
+        }
     };
 };
 

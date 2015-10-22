@@ -13,7 +13,7 @@ module.exports = function (postGre, ParentModel) {
 
     return ParentModel.extend({
         idAttribute: 'id',
-        hasTimestamps: true,
+        //hasTimestamps: true,
         tableName: TABLES.USERS
     },
         {

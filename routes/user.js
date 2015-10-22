@@ -7,6 +7,8 @@ module.exports = function (PostGre) {
 
     userRouter.route('/').get(userHandler.getUsers);
 
+    userRouter.route('/isAuthorized').get(userHandler.isAuthorizedUser);
+
     userRouter.route('/signUp').post(userHandler.userSignUp);
 
     userRouter.route('/signIn').post(userHandler.signIn);

@@ -4,6 +4,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/signUp', {
+        controller: 'signUpController',
+        templateUrl: 'templates/signUp.html',
+        controllerAs: 'signUpCtrl',
+        reloadOnSearch: false
     }).when('/behandlingstilbud', {
         controller: 'behandlingstilbudController',
         templateUrl: 'templates/behandlingstilbud/list.html',
@@ -24,7 +29,10 @@ app.config(['$routeProvider', function ($routeProvider) {
         redirectTo: '/'
     });
 
-}]).run(['$rootScope', function ($rootScope) {
+}]).run(['$rootScope', 'UserManager', function ($rootScope, UserManager) {
 
+    UserManager.isAuthorized(function (err) {
+        $rootScope.logedIn = !err;
+    });
 
 }]);

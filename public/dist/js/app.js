@@ -38908,6 +38908,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/signUp', {
+        controller: 'signUpController',
+        templateUrl: 'templates/signUp.html',
+        controllerAs: 'signUpCtrl',
+        reloadOnSearch: false
     }).when('/behandlingstilbud', {
         controller: 'behandlingstilbudController',
         templateUrl: 'templates/behandlingstilbud/list.html',
@@ -38928,11 +38933,21 @@ app.config(['$routeProvider', function ($routeProvider) {
         redirectTo: '/'
     });
 
-}]).run(['$rootScope', function ($rootScope) {
+}]).run(['$rootScope', 'UserManager', function ($rootScope, UserManager) {
 
+    UserManager.isAuthorized(function (err) {
+        $rootScope.logedIn = !err;
+    });
 
 }]);
 ;
+app.constant('PATTERNS', {
+    EMAIL: /^(([^<"'>()[\]\\.,;:\s@\" ]+(\.[^><>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    PHONE: /^\+[1-9]\d{4,14}$/,
+    NAME: /^[a-zA-Z]{3,30}$/,
+    URL: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/,
+    DATE: /^([0-9]{4}\/[0-9]{2}\/[0-9]{2})$/
+});;
 app.controller('articleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
         var self = this;
@@ -39127,6 +39142,27 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Gene
             }
         };
 }]);;
+app.controller('signUpController', ['$scope', 'UserManager', 'GeneralHelpers', 'PATTERNS',
+    function ($scope, UserManager, GeneralHelpers, PATTERNS) {
+
+        var self = this;
+
+        $scope.emailPattern = PATTERNS.EMAIL;
+
+        this.signUp = function () {
+
+            if ($scope.signUpForm.$valid && $scope.acceptRules) {
+                UserManager.signIn(self.registerParams, function (err) {
+                    if (err) {
+                        $scope.$parent.isAuthenticated = false;
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.$parent.isAuthenticated = true;
+                });
+            }
+        };
+    }]);;
 app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
     function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
 
@@ -39288,6 +39324,23 @@ app.directive('gmap', function () {
         }
     }
 });;
+app.directive('compareToValidator', function () {
+
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, ele, attrs, ctrl) {
+            scope.$watch(attrs.compareToValidator, function () {
+                ctrl.$validate();
+            });
+            ctrl.$validators.confirmation = function (modelValue, viewValue) {
+                var value = modelValue || viewValue;
+                var other = scope.$eval(attrs.compareToValidator);
+                return !value || !other || value == other;
+            };
+        }
+    }
+});;
 app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
     "use strict";
     var self = this;
@@ -39444,6 +39497,27 @@ app.factory('UserManager', ['$http', function ($http) {
             url: '/user/signIn',
             method: "POST",
             data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.signIn = function (data, callback) {
+        $http({
+            url: '/user/signUp',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.isAuthorized = function (callback) {
+        $http({
+            url: '/user/isAuthorized',
+            method: "GET"
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

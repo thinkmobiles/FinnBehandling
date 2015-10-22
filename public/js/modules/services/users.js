@@ -13,5 +13,26 @@ app.factory('UserManager', ['$http', function ($http) {
         }, callback);
     };
 
+    this.signIn = function (data, callback) {
+        $http({
+            url: '/user/signUp',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.isAuthorized = function (callback) {
+        $http({
+            url: '/user/isAuthorized',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
     return this;
 }]);
