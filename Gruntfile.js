@@ -11,17 +11,20 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     grunt.initConfig({
         watch: {
             app: {
                 files: [
                     'Gruntfile.js',
-                    'public/js/modules/**/*.js'
+                    'public/js/modules/**/*.js',
+                    'public/css/*.css',
+                    'public/less/**/*.less',
+                    'public/less/*.less'
                 ],
                 tasks: [
                     'less:app',
-                    'clean:app',
                     'concat_css:app',
                     'jshint:app',
                     'concat:app'
@@ -31,6 +34,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         jshint: {
             app: [
                 'Gruntfile.js',
@@ -40,8 +44,9 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            app: ["./dist/css/app_style.css"]
+            app: ['./public/dist/temp/css/*.css']
         },
+
         concat: {
             options: {
                 separator: ';\n'
@@ -54,6 +59,7 @@ module.exports = function (grunt) {
                     'public/js/libs/angular-animate/angular-animate.js',
                     'public/js/libs/angular-strap/dist/angular-strap.js',
                     'public/js/libs/angular-strap/dist/angular-strap.tpl.js',
+                    'public/js/libs/angularUtils-pagination/dirPagination.js',
                     'public/js/modules/config.js',
                     'public/js/modules/app.js',
                     'public/js/modules/routes.js',
@@ -62,6 +68,7 @@ module.exports = function (grunt) {
                 dest: 'public/dist/js/app.js'
             }
         },
+
         uglify: {
             app: {
                 files: {
@@ -72,6 +79,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         less: {
             app: {
                 options: {
@@ -84,6 +92,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+
         concat_css: {
             app: {
                 src: [
@@ -93,6 +102,7 @@ module.exports = function (grunt) {
                 dest: "./public/dist/css/style.css"
             }
         },
+
         cssmin: {
             app: {
                 files: [{
@@ -103,15 +113,29 @@ module.exports = function (grunt) {
                     ext: '.min.css'
                 }]
             }
+        },
+
+        jsdoc : {
+            dist : {
+                src: ['handlers/**/*.js'],
+                options: {
+                    destination: 'doc',
+                    template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
+                    configure : "jsdoc.json"
+                }
+            }
         }
     });
+
+    grunt.registerTask('default', ['jsdoc']);
 
     grunt.registerTask('dev', [
         'jshint:app',
         'less:app',
         'concat:app',
         'concat_css:app',
-        'watch:app'
+        'watch:app',
+        'jsdoc'
     ]);
 
 
@@ -123,7 +147,7 @@ module.exports = function (grunt) {
         'clean:app',
         'concat_css:app',
         'cssmin:app',
-        'watch:app'
+        'watch:app',
+        'jsdoc'
     ]);
-
 };
