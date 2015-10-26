@@ -11,6 +11,8 @@ module.exports = function (PostGre) {
 
     userRouter.route('/signIn').post(userHandler.signIn);
 
+    userRouter.route('/sendEmail').post(userHandler.sendEmail);
+
     userRouter.route('/signOut').get(userHandler.signOut);
 
     userRouter.route('/count').get(userHandler.getUsersCount);
