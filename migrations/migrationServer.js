@@ -4,23 +4,25 @@ var http = require('http');
 //TODO change NODE_ENV for production server
 process.env.NODE_ENV = 'test';
 
-    //development only
-    if (process.env.NODE_ENV === 'production') {
-        console.log('-----Server start success in Production version--------');
-        require('../config/production');
+//development only
+if (process.env.NODE_ENV === 'production') {
+    console.log('-----Server start success in Production version--------');
+    require('../config/production');
 
-    } else if (process.env.NODE_ENV === 'test') {
-        console.log('-----Server start success in Test version--------');
-        require('../config/test');
-    } else {
-        console.log('-----Server start success in Development version--------');
-        require('../config/development');
-    }
+} else if (process.env.NODE_ENV === 'test') {
+    console.log('-----Server start success in Test version--------');
+    require('../config/test');
+} else {
+    console.log('-----Server start success in Development version--------');
+    require('../config/development');
+}
 
 var Knex = require('knex');
 var pg = require('pg');
 var Promise = require('bluebird');
 var crypto = require("crypto");
+var setRegions = require("./regions");
+var setFylkes = require("./fylkes");
 //var CONSTANTS = require('../constants/constants');
 
 Knex.knex = Knex.initialize({
@@ -83,6 +85,9 @@ app.get('/', function (req, res) {
     html += '<a href="/databases/create">Create Tables</a><br/>';
     html += '<a href="/databases/drop">Drop Tables</a><br/>';
     html += '<a href="/databases/default">Set default data</a><br/>';
+    html += '<h6>==========</h6>';
+    html += '<a href="/databases/regions">Set regions data</a><br/>';
+    html += '<a href="/databases/fylkes">Set fylkes for regions</a><br/>';
     //html += '<a href="/databases/default">Set Defult Date</a><br/>';
     //html += '<a href="/add_admin">Add admin</a><br/>';
     //html+='<a href="/seed/default">Seed Default</a><br/>';
@@ -105,6 +110,28 @@ app.get('/databases/drop', function (req, res) {
 app.get('/databases/default', function (req, res) {
     schema.setDefaultData();
     res.send('<b>Defaults data filled successfully</b>');
+});
+
+app.get('/databases/regions', function (req, res) {
+    setRegions(knex, function (err, result) {
+        if (err) {
+            return console.error(err);
+        }
+
+        console.log(result);
+    });
+    res.send('<b>Regions Created Successfully</b>');
+});
+
+app.get('/databases/fylkes', function (req, res) {
+    setFylkes(knex, function (err, result) {
+        if (err) {
+            return console.error(err);
+        }
+
+        console.log(result);
+    });
+    res.send('<b>Fylkes was Successfully set</b>');
 });
 
 /*app.get('/add_admin', function (req, res) {
