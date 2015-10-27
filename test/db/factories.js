@@ -16,7 +16,8 @@ module.exports = function (db) {
     factory.define('sub_treatment', db.Models[TABLES.SUB_TREATMENTS_LIST], {
         name: function() {
             return faker.lorem.sentence(1, 0);
-        }
+        },
+        treatment_id: factory.assoc('treatment', 'id')
     });
 
     factory.define('region', db.Models[TABLES.REGIONS_LIST], {

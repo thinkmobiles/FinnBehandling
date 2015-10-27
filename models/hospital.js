@@ -133,18 +133,28 @@ module.exports = function (postGre, ParentModel) {
 
             this.query(function(qb){
                     qb.select(
-                        postGre.knex.raw('TO_CHAR( ' + TABLES.HOSPITALS + '.created_at, \'D. Mon YYYY\') AS created_at '),
+                        postGre.knex.raw('TO_CHAR( :hospital: .created_at, \'D. Mon YYYY\') AS created_at ',
+                            {
+                                hospital: TABLES.HOSPITALS
+                            }
+                        ),
 
                         postGre.knex.raw(
                             '(SELECT JSON_AGG(treatments_result) ' +
                             '   FROM ( ' +
                             '       SELECT treatment.name ' +
-                            '           FROM ' + TABLES.TREATMENTS_LIST + ' treatment ' +
-                            '           LEFT JOIN ' + TABLES.TREATMENTS + ' hospital_treatment ' +
+                            '           FROM :treatments_list: treatment ' +
+                            '           LEFT JOIN :treatments: hospital_treatment ' +
                             '               ON treatment.id = hospital_treatment.treatment_id ' +
-                            '           WHERE hospital_treatment.hospital_id = ' + TABLES.HOSPITALS + '.id ' +
+                            '           WHERE hospital_treatment.hospital_id = :hospital: .id ' +
                             '       ) treatments_result ' +
-                            ') AS treatments '
+                            ') AS treatments ',
+
+                            {
+                                treatments_list: TABLES.TREATMENTS_LIST,
+                                treatments: TABLES.TREATMENTS,
+                                hospital: TABLES.HOSPITALS
+                            }
                         ),
 
                         postGre.knex.raw(

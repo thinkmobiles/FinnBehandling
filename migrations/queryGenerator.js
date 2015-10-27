@@ -21,7 +21,9 @@ module.exports = {
     SUB_TREATMENTS_DIC: 'CREATE TABLE IF NOT EXISTS tb_sub_treatments_dic ( ' +
                         'id serial NOT NULL, ' +
                         'name varchar(30) NOT NULL, ' +
+                        'treatment_id integer NOT NULL, ' +
                         'CONSTRAINT tb_sub_treatments_dic_pkey PRIMARY KEY (id)' +
+                        'CONSTRAINT tb_sub_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_treatments_dic (id) MATCH SIMPLE ' +
                         ') WITHOUT OIDS;',
 
     //OTHER TABLES
@@ -98,7 +100,7 @@ module.exports = {
                     'CONSTRAINT tb_hospitals_type_id_foreign FOREIGN KEY (type_id) REFERENCES tb_hospital_types_dic (id) MATCH SIMPLE ' +
                     'ON UPDATE CASCADE ON DELETE CASCADE ' +
                     ') WITHOUT OIDS; ',
-    HOSPITAL_TREATMENTS: 'CREATE TABLE tb_hospital_treatments ( ' +
+    /*HOSPITAL_TREATMENTS: 'CREATE TABLE tb_hospital_treatments ( ' +
                                 'id serial NOT NULL, ' +
                                 'hospital_id integer NOT NULL, ' +
                                 'treatment_id integer NOT NULL, ' +
@@ -107,7 +109,7 @@ module.exports = {
                                 'ON UPDATE CASCADE ON DELETE CASCADE, ' +
                                 'CONSTRAINT tb_hospital_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_treatments_dic (id) MATCH SIMPLE ' +
                                 'ON UPDATE CASCADE ON DELETE CASCADE ' +
-                                ') WITHOUT OIDS;',
+                                ') WITHOUT OIDS;',*/
     HOSPITAL_SUB_TREATMENTS: 'CREATE TABLE tb_hospital_sub_treatments ( ' +
                                 'id serial NOT NULL, ' +
                                 'hospital_id integer NOT NULL, ' +
