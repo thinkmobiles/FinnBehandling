@@ -35,6 +35,7 @@ module.exports = {
     PASSWORD_TOO_SHORT: 'Password should be at least 6 characters long',
     PASSWORD_NOT_EQUAL: 'Password is not equal',
     INCORRECT_LOGIN_PASS: 'Your log in details are incorrect, please try again',
+    UPDATED_REGIONS_DB_SUCCESS: 'Regions DB Was Successfully Updated',
 
     USER_USED_FIELDS: {
         EMAIL: 'Email is already used',
