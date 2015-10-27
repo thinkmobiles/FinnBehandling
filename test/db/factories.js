@@ -20,15 +20,20 @@ module.exports = function (db) {
     });
 
     factory.define('region', db.Models[TABLES.REGIONS_LIST], {
-        zip_code: function() {
-            return faker.address.zipCode();
+        postnummer: function () {
+            return '' + randomFrom(9) + randomFrom(9) + randomFrom(9) + randomFrom(9);
         },
-        kommune_name: function() {
+        kommunenummer: function () {
+            return '' + randomFrom(9) + randomFrom(9) + randomFrom(9) + randomFrom(9);
+        },
+        poststed: function() {
+            return faker.address.city();
+        },
+        kommunenavn: function() {
             return faker.address.county();
         },
-        fylke_name: function() {
-            return faker.address.country();
-        }
+        kategori: 'P',
+        fylke: 'Oslo'
     });
 
     factory.define('hospital_type', db.Models[TABLES.HOSPITAL_TYPES_LIST], {
@@ -38,13 +43,15 @@ module.exports = function (db) {
     });
 
     factory.define('hospital', db.Models[TABLES.HOSPITALS], {
-        region_id: factory.assoc('region', 'id'),
         is_paid: function () {
             return !!Math.round(Math.random());
         },
         type_id: factory.assoc('hospital_type', 'id'),
         name: function() {
             return faker.company.companyName(0);
+        },
+        postcode: function () {
+            return '' + randomFrom(9) + randomFrom(9) + randomFrom(9) + randomFrom(9);
         },
         web_address: 'shouldntbethere.com',
         phone_number: function () {
@@ -127,3 +134,8 @@ module.exports = function (db) {
 
     return factory;
 };
+
+function randomFrom (number) {
+
+    return Math.floor((Math.random() * number));
+}

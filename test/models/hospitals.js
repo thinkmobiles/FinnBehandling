@@ -37,11 +37,11 @@ describe('Hospitals', function () {
         });
     });
 
-    it('should not save without region', function (done) {
-        factory.create('hospital', {region_id: null}, function (err) {
+    it('should not save without postcode', function (done) {
+        factory.create('hospital', {postcode: null}, function (err) {
 
             expect(err).to.exist;
-            expect(err.column).equal('region_id');
+            expect(err.column).equal('postcode');
             expect(err.message).to.contain('violates not-null constraint');
 
             done();

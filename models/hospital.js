@@ -37,10 +37,10 @@ module.exports = function (postGre, ParentModel) {
         }
     }, {
         create: {
-            region_id: ['required', 'isInt'],
             is_paid: ['required', 'isBoolean'],
             type_id: ['required', 'isInt'],
             name: ['required', 'isString'],
+            postcode: ['required', 'isString'],
             description: ['isString'],
             address: ['isString'],
             phone_number: ['isArray'],
@@ -51,10 +51,10 @@ module.exports = function (postGre, ParentModel) {
 
         update: {
             id: ['required', 'isInt'],
-            region_id: ['required', 'isInt'],
             is_paid: ['required', 'isBoolean'],
             type_id: ['required', 'isInt'],
             name: ['required', 'isString'],
+            postcode: ['required', 'isString'],
             description: ['isString'],
             address: ['isString'],
             phone_number: ['isArray'],
@@ -79,7 +79,6 @@ module.exports = function (postGre, ParentModel) {
             var settings =  {
                 checkFunctions: [
                     'checkHospitalType',
-                    'checkHospitalRegion',
                     'checkHospitalTreatment',
                     'checkHospitalSubTreatment',
                     'checkUniqueHospitalName'
@@ -108,7 +107,6 @@ module.exports = function (postGre, ParentModel) {
                 checkFunctions: [
                     'checkExistingHospital',
                     'checkHospitalType',
-                    'checkHospitalRegion',
                     'checkHospitalTreatment',
                     'checkHospitalSubTreatment',
                     'checkUniqueHospitalName'
@@ -164,6 +162,7 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.name',
                         TABLES.HOSPITALS + '.address',
                         TABLES.HOSPITALS + '.phone_number',
+                        TABLES.HOSPITALS + '.postcode',
                         TABLES.HOSPITALS + '.email',
                         TABLES.HOSPITALS + '.description'
                     );
@@ -196,6 +195,7 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.name',
                         TABLES.HOSPITALS + '.address',
                         TABLES.HOSPITALS + '.phone_number',
+                        TABLES.HOSPITALS + '.postcode',
                         TABLES.HOSPITALS + '.email',
                         TABLES.HOSPITALS + '.description'
                     );
@@ -227,7 +227,6 @@ module.exports = function (postGre, ParentModel) {
 
         return new Validation.Check(options, {
             checkHospitalType: validationFunctions.checkHospitalType,
-            checkHospitalRegion: validationFunctions.checkHospitalRegion,
             checkHospitalTreatment: validationFunctions.checkHospitalTreatment,
             checkHospitalSubTreatment: validationFunctions.checkHospitalSubTreatment,
             checkUniqueHospitalName: validationFunctions.checkUniqueHospitalName,

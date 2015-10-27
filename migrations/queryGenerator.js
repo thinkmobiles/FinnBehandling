@@ -3,9 +3,12 @@ module.exports = {
 
     REGIONS_DIC: 'CREATE TABLE IF NOT EXISTS tb_regions_dic ( ' +
                     'id serial NOT NULL, ' +
-                    'zip_code varchar(35), ' +
-                    'kommune_name varchar(50), ' +
-                    'fylke_name varchar(50), ' +
+                    'postnummer varchar(35), ' +
+                    'poststed varchar(50), ' +
+                    'kommunenummer varchar(50), ' +
+                    'kommunenavn varchar(50), ' +
+                    'kategori varchar(50), ' +
+                    'fylke varchar(50), ' +
                     'CONSTRAINT tb_regions_dic_pkey PRIMARY KEY (id)' +
                     ') WITHOUT OIDS; ',
     HOSPITAL_TYPES_DIC: 'CREATE TABLE IF NOT EXISTS tb_hospital_types_dic ( ' +
@@ -79,7 +82,6 @@ module.exports = {
 
     HOSPITAL: 'CREATE TABLE IF NOT EXISTS tb_hospitals ( ' +
                     'id serial NOT NULL, ' +
-                    'region_id integer NOT NULL, ' +
                     'is_paid boolean NOT NULL, ' +
                     'type_id integer NOT NULL, ' +
                     'name varchar(80) NOT NULL, ' +
@@ -87,6 +89,7 @@ module.exports = {
                     'phone_number text[3], ' +
                     'email text[3], ' +
                     'position point, ' +
+                    'postcode varchar(4) NOT NULL, ' +
                     'description text, ' +
                     'address varchar(40), ' +
                     'updated_at timestamp without time zone,' +

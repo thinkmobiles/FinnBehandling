@@ -312,6 +312,53 @@ Hospitals = function (PostGre) {
             });
     };
 
+    this.getConflicts = function (req, res, next) {
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _get list of hospitals where postcode not in regions DB_
+         *
+         * @example Request example:
+         *         http://localhost:8787/hospitals/conflicts
+         *
+         *
+         * @example Response example:
+         *     [
+         *        {
+         *            "id": 3,
+         *            "name": "rfrfr",
+         *            "web_address": "www.clinic.com",
+         *            "phone_number": "+380660237194",
+         *            "type": "type1",
+         *            "adress": {
+         *                "zip_code": "111",
+         *                "kommune_name": "kom1",
+         *                "fylke_name": "ful1"
+         *            }
+         *        }
+         *    ]
+         * @method getConflicts
+         * @instance
+         */
+
+        Hospital
+            .query(function (qb) {
+                qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+                qb.whereNull('postnummer');
+            })
+            .fetchAll({
+                columns: [TABLES.HOSPITALS + '.id', 'name']
+            })
+            .asCallback(function (err, hospitals) {
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send(hospitals);
+            });
+    };
+
     this.getHospital = function (req, res, next) {
         /**
          * __Type__ `GET`
