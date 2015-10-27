@@ -16,6 +16,7 @@ module.exports = function (app, PostGre) {
     var staticDataRouter = require('./staticData')(PostGre);
     var userRouter = require('./user')(PostGre);
     var advertisementRouter = require('./advertisement')(PostGre);
+    var treatmentRouter = require('./treatment')(PostGre);
 
 
 
@@ -38,6 +39,8 @@ module.exports = function (app, PostGre) {
     app.use('/staticData', staticDataRouter);
 
     app.use('/advertisement', advertisementRouter);
+
+    app.use('/treatment', treatmentRouter);
 
     app.post('/authenticate', function (req, res, next) {
         var cid = req.body.cid;

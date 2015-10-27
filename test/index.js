@@ -44,6 +44,7 @@ describe('Handlers', function () {
     require('./handlers/advertisement');
     require('./handlers/users');
     require('./handlers/regions');
+    require('./handlers/treatments');
 });
 
 after(function (done) {
