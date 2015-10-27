@@ -34,7 +34,6 @@ module.exports.setUp = function (db, callback) {
         var createStack = [];
         var fixturesObj = {
             hospital_type: [],
-            region: [],
             treatment: [],
             sub_treatment: []
         };

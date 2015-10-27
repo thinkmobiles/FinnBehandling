@@ -63,7 +63,7 @@ describe('Hospitals', function () {
     it('should create a new hospital', function (done) {
 
         var createClinicData = {
-            region_id: fixtures.region[0],
+            postcode: '0010',
             is_paid: false,
             type_id: fixtures.hospital_type[0],
             name: 'Clinic test1',
@@ -103,8 +103,6 @@ describe('Hospitals', function () {
 
                             expect(hospital).to.exist;
                             expect(hospital).to.be.instanceOf(Object);
-                            expect(hospital).to.have.property('region_id');
-                            expect(hospital.region_id).equal(createClinicData.region_id);
                             expect(hospital).to.have.property('is_paid');
                             expect(hospital.is_paid).equal(createClinicData.is_paid);
                             expect(hospital).to.have.property('type_id');
@@ -158,7 +156,7 @@ describe('Hospitals', function () {
     it('should fail to create a new hospital with existing name', function (done) {
 
         var createClinicData = {
-            region_id: fixtures.region[0],
+            postcode: '0010',
             is_paid: false,
             type_id: fixtures.hospital_type[0],
             name: 'Clinic test1',
@@ -192,7 +190,7 @@ describe('Hospitals', function () {
     it('should update hospital', function (done) {
 
         var updateClinicData = {
-            region_id: fixtures.region[1],
+            postcode: '0021',
             is_paid: false,
             type_id: fixtures.hospital_type[1],
             name: 'Clinic test2',
@@ -231,8 +229,6 @@ describe('Hospitals', function () {
 
                             expect(hospital).to.exist;
                             expect(hospital).to.be.instanceOf(Object);
-                            expect(hospital).to.have.property('region_id');
-                            expect(hospital.region_id).equal(updateClinicData.region_id);
                             expect(hospital).to.have.property('is_paid');
                             expect(hospital.is_paid).equal(updateClinicData.is_paid);
                             expect(hospital).to.have.property('type_id');
@@ -334,6 +330,26 @@ describe('Hospitals', function () {
 
         agent
             .get('/hospitals')
+            .send()
+            .expect(200)
+            .end(function (err, res) {
+
+                if (err) {
+                    return done(err);
+                }
+
+                var response = res.body;
+
+                expect(response).to.be.instanceOf(Array);
+
+                done();
+            });
+    });
+
+    it('should get conflict hospitals', function (done) {
+
+        agent
+            .get('/hospitals/conflicts')
             .send()
             .expect(200)
             .end(function (err, res) {
