@@ -36,6 +36,7 @@ module.exports = {
     PASSWORD_NOT_EQUAL: 'Password is not equal',
     INCORRECT_LOGIN_PASS: 'Your log in details are incorrect, please try again',
     EMAIL_SENT: 'Email have successfully sent',
+    UPDATED_REGIONS_DB_SUCCESS: 'Regions DB Was Successfully Updated',
 
     USER_USED_FIELDS: {
         EMAIL: 'Email is already used',
