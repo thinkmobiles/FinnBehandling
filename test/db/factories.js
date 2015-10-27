@@ -105,5 +105,25 @@ module.exports = function (db) {
         imageable_field: 'default_field'
     });
 
+    factory.define('user', db.Models[TABLES.USERS], {
+        name: function () {
+            return faker.name.firstName() +' '+ faker.name.lastName();
+        },
+        email: function () {
+            return faker.internet.email()
+        },
+        password: '12356789',
+        google_id: function () {
+            return faker.random.number()
+        },
+        facebook_id: function () {
+            return faker.random.number()
+        },
+        twitter_id: function () {
+            return faker.random.number()
+        },
+        role: 'admin'
+    });
+
     return factory;
 };

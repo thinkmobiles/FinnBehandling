@@ -42,6 +42,7 @@ describe('Handlers', function () {
     require('./handlers/news');
     require('./handlers/staticData');
     require('./handlers/advertisement');
+    require('./handlers/users');
 });
 
 after(function (done) {

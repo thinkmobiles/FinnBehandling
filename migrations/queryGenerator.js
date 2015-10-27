@@ -28,8 +28,7 @@ module.exports = {
 
     USERS: 'CREATE TABLE IF NOT EXISTS tb_users ( ' +
                     'id serial NOT NULL, ' +
-                    'first_name varchar(25) NOT NULL, ' +
-                    'last_name varchar(25) NOT NULL, ' +
+                    'name varchar(50) NOT NULL, ' +
                     'uuid uuid DEFAULT uuid_generate_v4(), ' +
                     'email varchar(35), ' +
                     'password varchar(255) NOT NULL, ' +
