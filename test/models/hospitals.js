@@ -59,17 +59,6 @@ describe('Hospitals', function () {
         });
     });
 
-    it('should not save without type', function (done) {
-        factory.create('hospital', {type_id: null}, function (err) {
-
-            expect(err).to.exist;
-            expect(err.column).equal('type_id');
-            expect(err.message).to.contain('violates not-null constraint');
-
-            done();
-        });
-    });
-
     it('should not save address with over 40 characters', function (done) {
         var longString = '12345678901234567890123456789012345678901';
 

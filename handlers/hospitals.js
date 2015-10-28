@@ -74,9 +74,6 @@ Hospitals = function (PostGre) {
             var hospitalId = hospital.id;
             var functionsToExecute = [
                 function (callback) {
-                    HospitalTreatment.create(options.treatment_ids, hospitalId, callback);
-                },
-                function (callback) {
                     HospitalSubTreatment.create(options.sub_treatments, hospitalId, callback);
                 }
             ];
@@ -165,9 +162,6 @@ Hospitals = function (PostGre) {
 
             var hospitalId = hospital.id;
             var functionsToExecute = [
-                function (callback) {
-                    HospitalTreatment.update(options.treatment_ids, hospitalId, callback);
-                },
                 function (callback) {
                     HospitalSubTreatment.update(options.sub_treatments, hospitalId, callback);
                 }

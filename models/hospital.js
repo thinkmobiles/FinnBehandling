@@ -38,7 +38,6 @@ module.exports = function (postGre, ParentModel) {
     }, {
         create: {
             is_paid: ['required', 'isBoolean'],
-            type_id: ['required', 'isInt'],
             name: ['required', 'isString'],
             postcode: ['required', 'isString'],
             description: ['isString'],
@@ -52,7 +51,6 @@ module.exports = function (postGre, ParentModel) {
         update: {
             id: ['required', 'isInt'],
             is_paid: ['required', 'isBoolean'],
-            type_id: ['required', 'isInt'],
             name: ['required', 'isString'],
             postcode: ['required', 'isString'],
             description: ['isString'],
@@ -78,8 +76,6 @@ module.exports = function (postGre, ParentModel) {
 
             var settings =  {
                 checkFunctions: [
-                    'checkHospitalType',
-                    'checkHospitalTreatment',
                     'checkHospitalSubTreatment',
                     'checkUniqueHospitalName'
                 ]
@@ -106,8 +102,6 @@ module.exports = function (postGre, ParentModel) {
             var settings =  {
                 checkFunctions: [
                     'checkExistingHospital',
-                    'checkHospitalType',
-                    'checkHospitalTreatment',
                     'checkHospitalSubTreatment',
                     'checkUniqueHospitalName'
                 ]
@@ -138,24 +132,6 @@ module.exports = function (postGre, ParentModel) {
                         ),
 
                         postGre.knex.raw(
-                            '(SELECT JSON_AGG(treatments_result) ' +
-                            '   FROM ( ' +
-                            '       SELECT treatment.name ' +
-                            '           FROM :treatments_list: treatment ' +
-                            '           LEFT JOIN :treatments: hospital_treatment ' +
-                            '               ON treatment.id = hospital_treatment.treatment_id ' +
-                            '           WHERE hospital_treatment.hospital_id = :hospital: .id ' +
-                            '       ) treatments_result ' +
-                            ') AS treatments ',
-
-                            {
-                                treatments_list: TABLES.TREATMENTS_LIST,
-                                treatments: TABLES.TREATMENTS,
-                                hospital: TABLES.HOSPITALS
-                            }
-                        ),
-
-                        postGre.knex.raw(
                             '(SELECT JSON_AGG(sub_treatments_result) ' +
                             '   FROM ( ' +
                             '       SELECT sub_treatment.name ' +
@@ -177,7 +153,6 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.description'
                     );
 
-                    qb.leftJoin(TABLES.HOSPITAL_TYPES_LIST, TABLES.HOSPITAL_TYPES_LIST + '.id', TABLES.HOSPITALS + '.type_id');
                     qb.where(TABLES.HOSPITALS + '.id', id);
                 })
                 .fetch({
@@ -210,7 +185,6 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.description'
                     );
 
-                    qb.leftJoin(TABLES.HOSPITAL_TYPES_LIST, TABLES.HOSPITAL_TYPES_LIST + '.id', TABLES.HOSPITALS + '.type_id');
                     qb.orderBy(TABLES.HOSPITALS + '.created_at', 'DESC');
                     qb.limit(options.limit);
                     qb.offset(options.offset);
@@ -236,8 +210,6 @@ module.exports = function (postGre, ParentModel) {
     function validation (options) {
 
         return new Validation.Check(options, {
-            checkHospitalType: validationFunctions.checkHospitalType,
-            checkHospitalTreatment: validationFunctions.checkHospitalTreatment,
             checkHospitalSubTreatment: validationFunctions.checkHospitalSubTreatment,
             checkUniqueHospitalName: validationFunctions.checkUniqueHospitalName,
             checkExistingHospital: validationFunctions.checkExistingHospital

@@ -11,52 +11,6 @@ function assert(fn) {
 module.exports = function (postGre) {
 
     return {
-        checkHospitalType: function (options, validatedOptions, callback) {
-            assert(callback);
-
-            postGre.Models[TABLES.HOSPITAL_TYPES_LIST].forge({
-                id: validatedOptions.type_id
-            })
-                .fetch({
-                    require: true
-                })
-                .asCallback(callback);
-        },
-        checkHospitalRegion: function (options, validatedOptions, callback) {
-            assert(callback);
-
-            postGre.Models[TABLES.REGIONS_LIST].forge({
-                id: validatedOptions.region_id
-            })
-                .fetch({
-                    require: true
-                })
-                .asCallback(callback);
-        },
-        checkHospitalTreatment: function (options, validatedOptions, callback) {
-
-            assert(callback);
-
-            postGre.Models[TABLES.TREATMENTS_LIST].query(function (qb) {
-                qb.whereIn('id', options.treatment_ids)
-            })
-                .fetchAll({
-                    require: true
-                })
-                .asCallback(function (err, treatment) {
-                    var treatmentError;
-
-                    if (err || treatment.models.length !== options.treatment_ids.length) {
-                        treatmentError = err || new Error(RESPONSES.CLINIC_TREATMENT_ERROR);
-                        treatmentError.status = 400;
-
-                        return callback(treatmentError);
-                    }
-
-                    callback();
-
-                });
-        },
         checkHospitalSubTreatment: function (options, validatedOptions, callback) {
 
             assert(callback);
@@ -84,7 +38,7 @@ module.exports = function (postGre) {
 
             assert(callback);
 
-            postGre.Models[TABLES.HOSPITALS].forge({
+            postGre.Models[TABLES.HOSPITALS].where({
                 name: validatedOptions.name
             })
                 .fetch()

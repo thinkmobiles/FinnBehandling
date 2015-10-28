@@ -12,7 +12,7 @@ var PostGre = app.get('PostGre');
 
 var factory = require('../db/factories')(PostGre);
 
-describe('Sub Treatments', function () {
+describe('Treatments', function () {
 
     it('should not save without name', function (done) {
         factory.create('treatment', {name: null}, function (err) {

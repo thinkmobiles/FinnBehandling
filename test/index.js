@@ -29,7 +29,6 @@ before(function (done) {
 
 describe('Models', function () {
     require('./models/hospitals');
-    require('./models/hospitalTypesList');
     require('./models/images');
     require('./models/news');
     require('./models/regionsList');

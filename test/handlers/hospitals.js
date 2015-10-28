@@ -65,9 +65,7 @@ describe('Hospitals', function () {
         var createClinicData = {
             postcode: '0010',
             is_paid: false,
-            type_id: fixtures.hospital_type[0],
             name: 'Clinic test1',
-            treatment_ids: fixtures.treatment,
             sub_treatments: fixtures.sub_treatment,
             description: 'Lorem ipsum dolor si',
             phone_number: ['+380660237194'],
@@ -105,8 +103,6 @@ describe('Hospitals', function () {
                             expect(hospital).to.be.instanceOf(Object);
                             expect(hospital).to.have.property('is_paid');
                             expect(hospital.is_paid).equal(createClinicData.is_paid);
-                            expect(hospital).to.have.property('type_id');
-                            expect(hospital.type_id).equal(createClinicData.type_id);
                             expect(hospital).to.have.property('name');
                             expect(hospital.name).equal(createClinicData.name);
                             expect(hospital).to.have.property('description');
@@ -158,9 +154,7 @@ describe('Hospitals', function () {
         var createClinicData = {
             postcode: '0010',
             is_paid: false,
-            type_id: fixtures.hospital_type[0],
             name: 'Clinic test1',
-            treatment_ids: [fixtures.treatment[0], fixtures.treatment[1]],
             sub_treatments: [fixtures.sub_treatment[0], fixtures.sub_treatment[1]],
             description: 'Lorem ipsum dolor si',
             phone_number: ['+380660237194'],
@@ -192,9 +186,7 @@ describe('Hospitals', function () {
         var updateClinicData = {
             postcode: '0021',
             is_paid: false,
-            type_id: fixtures.hospital_type[1],
             name: 'Clinic test2',
-            treatment_ids: [fixtures.treatment[2], fixtures.treatment[3]],
             sub_treatments: [fixtures.sub_treatment[2], fixtures.sub_treatment[3]],
             description: 'Lorem ipsum dolor si',
             phone_number: ['+380660237194'],
@@ -231,8 +223,6 @@ describe('Hospitals', function () {
                             expect(hospital).to.be.instanceOf(Object);
                             expect(hospital).to.have.property('is_paid');
                             expect(hospital.is_paid).equal(updateClinicData.is_paid);
-                            expect(hospital).to.have.property('type_id');
-                            expect(hospital.type_id).equal(updateClinicData.type_id);
                             expect(hospital).to.have.property('name');
                             expect(hospital.name).equal(updateClinicData.name);
                             expect(hospital).to.have.property('description');
@@ -307,7 +297,6 @@ describe('Hospitals', function () {
                 expect(response).to.have.property('name');
                 expect(response).to.have.property('phone_number');
                 expect(response).to.have.property('address');
-                expect(response).to.have.property('treatments');
                 expect(response).to.have.property('sub_treatments');
                 expect(response).to.have.property('logo');
                 expect(response.logo).to.be.instanceOf(Object);

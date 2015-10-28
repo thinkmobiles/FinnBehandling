@@ -37,17 +37,10 @@ module.exports = function (db) {
         fylke: 'Oslo'
     });
 
-    factory.define('hospital_type', db.Models[TABLES.HOSPITAL_TYPES_LIST], {
-        name: function() {
-            return faker.lorem.sentence(1, 0);
-        }
-    });
-
     factory.define('hospital', db.Models[TABLES.HOSPITALS], {
         is_paid: function () {
             return !!Math.round(Math.random());
         },
-        type_id: factory.assoc('hospital_type', 'id'),
         name: function() {
             return faker.company.companyName(0);
         },
