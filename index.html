@@ -69,7 +69,7 @@
                                         class="pull-right form-control side-input"
                                         ng-model="chosenFylke"
                                         ng-change="search()"
-                                        ng-options="fylke for fylke in fylkes">
+                                        ng-options="fylke.fylke as fylke.fylke for fylke in fylkes">
                                 </select>
                             </div>
                         </div>

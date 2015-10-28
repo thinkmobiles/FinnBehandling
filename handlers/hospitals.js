@@ -264,6 +264,8 @@ Hospitals = function (PostGre) {
 
         options.limit = limitIsValid ? limit : 25;
         options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
+        options.fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
+        options.textSearch = req.query.textSearch ? req.query.textSearch : null;
 
         Hospital.getAll(options, function (err, hospitals) {
 
@@ -297,16 +299,36 @@ Hospitals = function (PostGre) {
          * @instance
          */
 
-        PostGre.knex(TABLES.HOSPITALS)
-            .count()
-            .asCallback(function (err, queryResult) {
+        var fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
+        var textSearch = req.query.textSearch ? req.query.textSearch : null;
+
+        Hospital
+            .query(function (qb) {
+                if (fylke) {
+                    qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+                    qb.where(TABLES.REGIONS_LIST + '.fylke', fylke);
+                }
+
+                if (textSearch) {
+                    qb.where(PostGre.knex.raw(
+                        '(LOWER(' + TABLES.HOSPITALS + '.name) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.description) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.address) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.postcode) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.web_address) LIKE LOWER(\'%' + textSearch + '%\'))'
+                    ));
+                }
+                qb.count();
+            })
+            .fetch()
+            .asCallback(function (err, result) {
                 var  count;
 
                 if (err) {
                     return next(err);
                 }
 
-                count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+                count = result ? result.get('count') : 0;
 
                 res.status(200).send({count: count});
             });
