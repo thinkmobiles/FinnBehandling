@@ -3,7 +3,6 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
-        $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
         RegionManager.getFylkes(function (err, fylkes) {
             if (err) {
@@ -27,12 +26,22 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             'bone problems'
         ];
 
+        $scope.underkategori = [
+            'Alle',
+            'ear',
+            'nose',
+            'mouth treatment',
+            'plastic surgery',
+            'bone problems'
+        ];
+
         $scope.search = function () {
             GeneralHelpers.saveAsLocalData('hospitalPage', 1);
             GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
             GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('underkategori', $scope.underkategori);
             GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
-            GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
 
             $scope.$parent.searchResponse = true;
 

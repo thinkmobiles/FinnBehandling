@@ -91,9 +91,21 @@
                                 </select>
                             </div>
 
+                            <div class="form-group clearfix margin-top">
+
+                                <label for="underkategori" class="pull-left side-label-holder dynamic-font-md">Underkategori:</label>
+
+                                <select
+                                        id="underkategori"
+                                        class="pull-right form-control side-input"
+                                        ng-model="chosenUnderkategori"
+                                        ng-options="underkategori for underkategori in underkategori">
+                                </select>
+                            </div>
+
                             <div class="form-group clearfix  margin-top">
 
-                                <label for="tekstsøk" class="pull-left side-label-holder dynamic-font-md">Tekstsøk:</label>
+                                <label for="tekstsøk" class="pull-left side-label-holder dynamic-font-md">Fritekst:</label>
 
                                 <input
                                         type="text"
@@ -101,21 +113,6 @@
                                         placeholder="Skriv ord..."
                                         class="pull-right form-control side-input"
                                         ng-model="tekstsok"/>
-                            </div>
-
-                            <div class="form-group clearfix margin-top">
-
-                                <label for="resultater" class="pull-left side-label-holder dynamic-font-md">Resultater:</label>
-
-                                <select
-                                        id="resultater"
-                                        class="pull-right form-control side-input-sm"
-                                        ng-change="search()"
-                                        ng-model="resultater">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                </select>
                             </div>
 
                             <div class="form-group clearfix margin-top">
