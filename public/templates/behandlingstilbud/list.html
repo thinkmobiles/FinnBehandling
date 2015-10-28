@@ -8,6 +8,10 @@
         <h3>Loading...</h3>
     </div>
 
+    <div ng-show="noHospitalsFound">
+        <h2 class="bold" style="text-align: center">Ingen treff</h2>
+    </div>
+
     <dir-pagination-controls
             on-page-change="behandlingstilbudCtrl.refreshHospitals()"
             pagination-id="hospitals"

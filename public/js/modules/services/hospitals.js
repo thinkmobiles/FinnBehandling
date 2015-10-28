@@ -23,10 +23,11 @@ app.factory('HospitalManager', ['$http', function ($http) {
         }, callback);
     };
 
-    this.getHospitalsCount = function (callback) {
+    this.getHospitalsCount = function (params, callback) {
         $http({
             url: '/hospitals/count',
-            method: "GET"
+            method: "GET",
+            params: params
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

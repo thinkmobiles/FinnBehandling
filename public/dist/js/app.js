@@ -38973,12 +38973,21 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         };
 
         function getHospitalsCount () {
-            HospitalManager.getHospitalsCount(function(err, result) {
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+
+            var searchData = {
+                fylke: fylke,
+                textSearch: textSearch
+            };
+
+            HospitalManager.getHospitalsCount(searchData, function(err, result) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 $scope.totalItems = result.count;
+                $scope.noHospitalsFound = result.count === '0';
             });
         }
 
@@ -38995,12 +39004,19 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
-            var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
+
+            var searchData = {
+                limit: resultater,
+                page: $scope.hospitalPage,
+                fylke: fylke,
+                textSearch: textSearch
+            };
 
             $scope.pending = true;
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
+            HospitalManager.getHospitalsList(searchData, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -39101,22 +39117,25 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         getNews();
     }]);
 ;
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, GeneralHelpers) {
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
         $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
-        $scope.fylkes = [
-            'Alle',
-            'Østfold',
-            'Akershus',
-            'Oslo',
-            'Hedmark',
-            'Oppland',
-            'Buskerud'
-        ];
+        RegionManager.getFylkes(function (err, fylkes) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (fylkes && fylkes.length) {
+                fylkes.unshift({
+                    fylke: 'Alle'
+                });
+            }
+
+            $scope.fylkes = fylkes;
+        });
 
         $scope.behandlings = [
             'Alle',
@@ -39396,10 +39415,11 @@ app.factory('HospitalManager', ['$http', function ($http) {
         }, callback);
     };
 
-    this.getHospitalsCount = function (callback) {
+    this.getHospitalsCount = function (params, callback) {
         $http({
             url: '/hospitals/count',
-            method: "GET"
+            method: "GET",
+            params: params
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
@@ -39436,6 +39456,22 @@ app.factory('NewsManager', ['$http', function ($http) {
     this.getNewsCount = function (callback) {
         $http({
             url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('RegionManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getFylkes = function (callback) {
+        $http({
+            url: '/regions/fylkes',
             method: "GET"
         }).then(function (response) {
             if (callback)
