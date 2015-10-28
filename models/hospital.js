@@ -185,6 +185,20 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.description'
                     );
 
+                    if (options.fylke) {
+                        qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+                        qb.where(TABLES.REGIONS_LIST + '.fylke', options.fylke);
+                    }
+
+                    if (options.textSearch) {
+                        qb.where(postGre.knex.raw(
+                            '(LOWER(' + TABLES.HOSPITALS + '.name) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
+                            'LOWER(' + TABLES.HOSPITALS + '.description) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
+                            'LOWER(' + TABLES.HOSPITALS + '.address) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
+                            'LOWER(' + TABLES.HOSPITALS + '.postcode) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
+                            'LOWER(' + TABLES.HOSPITALS + '.web_address) LIKE LOWER(\'%' + options.textSearch + '%\'))'
+                        ));
+                    }
                     qb.orderBy(TABLES.HOSPITALS + '.created_at', 'DESC');
                     qb.limit(options.limit);
                     qb.offset(options.offset);

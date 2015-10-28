@@ -1,19 +1,22 @@
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, GeneralHelpers) {
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
         $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
-        $scope.fylkes = [
-            'Alle',
-            'Østfold',
-            'Akershus',
-            'Oslo',
-            'Hedmark',
-            'Oppland',
-            'Buskerud'
-        ];
+        RegionManager.getFylkes(function (err, fylkes) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (fylkes && fylkes.length) {
+                fylkes.unshift({
+                    fylke: 'Alle'
+                });
+            }
+
+            $scope.fylkes = fylkes;
+        });
 
         $scope.behandlings = [
             'Alle',

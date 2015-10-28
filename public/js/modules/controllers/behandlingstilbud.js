@@ -13,12 +13,21 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         };
 
         function getHospitalsCount () {
-            HospitalManager.getHospitalsCount(function(err, result) {
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+
+            var searchData = {
+                fylke: fylke,
+                textSearch: textSearch
+            };
+
+            HospitalManager.getHospitalsCount(searchData, function(err, result) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 $scope.totalItems = result.count;
+                $scope.noHospitalsFound = result.count === '0';
             });
         }
 
@@ -35,12 +44,19 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
-            var tekstsok = GeneralHelpers.getLocalData('tekstsok');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
             var resultater = GeneralHelpers.getLocalData('resultater');
+
+            var searchData = {
+                limit: resultater,
+                page: $scope.hospitalPage,
+                fylke: fylke,
+                textSearch: textSearch
+            };
 
             $scope.pending = true;
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
+            HospitalManager.getHospitalsList(searchData, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
