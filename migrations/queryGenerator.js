@@ -25,7 +25,7 @@ module.exports = {
                         'id serial NOT NULL, ' +
                         'name varchar(30) NOT NULL, ' +
                         'treatment_id integer NOT NULL, ' +
-                        'CONSTRAINT tb_sub_treatments_dic_pkey PRIMARY KEY (id)' +
+                        'CONSTRAINT tb_sub_treatments_dic_pkey PRIMARY KEY (id),' +
                         'CONSTRAINT tb_sub_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_treatments_dic (id) MATCH SIMPLE ' +
                         ') WITHOUT OIDS;',
 
@@ -97,8 +97,6 @@ module.exports = {
                     'updated_at timestamp without time zone,' +
                     'created_at timestamp without time zone,' +
                     'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
-                    'CONSTRAINT tb_hospitals_region_id_foreign FOREIGN KEY (region_id) REFERENCES tb_regions_dic (id) MATCH SIMPLE ' +
-                    'ON UPDATE CASCADE ON DELETE CASCADE, ' +
                     'CONSTRAINT tb_hospitals_type_id_foreign FOREIGN KEY (type_id) REFERENCES tb_hospital_types_dic (id) MATCH SIMPLE ' +
                     'ON UPDATE CASCADE ON DELETE CASCADE ' +
                     ') WITHOUT OIDS; ',
