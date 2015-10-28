@@ -130,7 +130,7 @@ var Treatments = function (PostGre) {
         var treatmentId = req.params.id;
 
         SubTreatment
-            .forge({treatment_id: treatmentId})
+            .where({treatment_id: treatmentId})
             .fetchAll()
             .asCallback(function (err, subtreatments) {
 
