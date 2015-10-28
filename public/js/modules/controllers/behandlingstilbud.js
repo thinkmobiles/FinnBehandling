@@ -3,7 +3,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         var self = this;
 
         $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
-        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        $scope.resultater = 10;
 
         this.setCoordinates = function (lat, long) {
             $scope.$parent.coordinates = {
@@ -45,10 +45,9 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var textSearch = GeneralHelpers.getLocalData('tekstsok');
-            var resultater = GeneralHelpers.getLocalData('resultater');
 
             var searchData = {
-                limit: resultater,
+                limit: $scope.resultater,
                 page: $scope.hospitalPage,
                 fylke: fylke,
                 textSearch: textSearch

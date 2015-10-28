@@ -38963,7 +38963,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         var self = this;
 
         $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
-        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        $scope.resultater = 10;
 
         this.setCoordinates = function (lat, long) {
             $scope.$parent.coordinates = {
@@ -39005,10 +39005,9 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
             var behandling = GeneralHelpers.getLocalData('behandling');
             var fylke = GeneralHelpers.getLocalData('fylke');
             var textSearch = GeneralHelpers.getLocalData('tekstsok');
-            var resultater = GeneralHelpers.getLocalData('resultater');
 
             var searchData = {
-                limit: resultater,
+                limit: $scope.resultater,
                 page: $scope.hospitalPage,
                 fylke: fylke,
                 textSearch: textSearch
@@ -39122,7 +39121,6 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
-        $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
 
         RegionManager.getFylkes(function (err, fylkes) {
             if (err) {
@@ -39146,12 +39144,22 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             'bone problems'
         ];
 
+        $scope.underkategori = [
+            'Alle',
+            'ear',
+            'nose',
+            'mouth treatment',
+            'plastic surgery',
+            'bone problems'
+        ];
+
         $scope.search = function () {
             GeneralHelpers.saveAsLocalData('hospitalPage', 1);
             GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
             GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('underkategori', $scope.underkategori);
             GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
-            GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
 
             $scope.$parent.searchResponse = true;
 
