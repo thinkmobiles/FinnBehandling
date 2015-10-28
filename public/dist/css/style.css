@@ -8655,5 +8655,9 @@ footer {
     background: #009ec8;
     height: 300px;
 }
+.error {
+    color: red;
+    font-size: 12px;
+}
 
 

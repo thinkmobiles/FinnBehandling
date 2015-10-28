@@ -17,16 +17,19 @@ module.exports = function (app, PostGre) {
     var userRouter = require('./user')(PostGre);
     var advertisementRouter = require('./advertisement')(PostGre);
     var treatmentRouter = require('./treatment')(PostGre);
+    var adminRouter = require('./admin')(PostGre);
 
 
 
     var session = new Session(PostGre);
 
     app.get('/', function (req, res, next) {
-        res.sendfile('index.html');
+        res.sendfile('views/index.html');
     });
 
     app.get('/isAuth', session.isAuthorizedUser);
+
+    app.use('/admin/', adminRouter);
 
     app.use('/user', userRouter);
 
