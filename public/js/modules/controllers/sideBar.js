@@ -1,8 +1,11 @@
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, RegionManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
+        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || null;
+        $scope.chosenUnderkategori =  GeneralHelpers.getLocalData('underkategori') || null;
+
+        setUnderkategoriEmpty();
 
         RegionManager.getFylkes(function (err, fylkes) {
             if (err) {
@@ -17,29 +20,50 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             $scope.fylkes = fylkes;
         });
 
-        $scope.behandlings = [
-            'Alle',
-            'ear',
-            'nose',
-            'mouth treatment',
-            'plastic surgery',
-            'bone problems'
-        ];
+        TreatmentManager.getTreaments(function (err, treaments) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (treaments && treaments.length) {
+                treaments.unshift({
+                    id: null,
+                    name: 'Alle'
+                });
+            }
 
-        $scope.underkategori = [
-            'Alle',
-            'ear',
-            'nose',
-            'mouth treatment',
-            'plastic surgery',
-            'bone problems'
-        ];
+            $scope.behandlings = treaments;
+        });
+
+        $scope.getUnderkategoris = function () {
+
+            if ($scope.chosenBehandling) {
+                TreatmentManager.getSubTreatments($scope.chosenBehandling, function (err, subTreaments) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+                    if (subTreaments && subTreaments.length) {
+                        subTreaments.unshift({
+                            id: null,
+                            name: 'Alle'
+                        });
+
+                        $scope.underkategoris = subTreaments;
+
+                    } else{
+                        setUnderkategoriEmpty();
+                    }
+                });
+            } else {
+
+                setUnderkategoriEmpty();
+            }
+        };
 
         $scope.search = function () {
             GeneralHelpers.saveAsLocalData('hospitalPage', 1);
             GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
             GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
-            GeneralHelpers.saveAsLocalData('underkategori', $scope.underkategori);
+            GeneralHelpers.saveAsLocalData('underkategori', $scope.chosenUnderkategori);
             GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
 
 
@@ -61,4 +85,14 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
                 });
             }
         };
+
+        function setUnderkategoriEmpty (){
+
+            $scope.underkategoris = [
+                {
+                    id: null,
+                    name: 'Alle'
+                }
+            ];
+        }
 }]);

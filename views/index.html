@@ -87,7 +87,8 @@
                                         id="behandling"
                                         class="pull-right form-control side-input"
                                         ng-model="chosenBehandling"
-                                        ng-options="behandling for behandling in behandlings">
+                                        ng-options="behandling.id as behandling.name for behandling in behandlings"
+                                        ng-change="getUnderkategoris()">
                                 </select>
                             </div>
 
@@ -99,7 +100,7 @@
                                         id="underkategori"
                                         class="pull-right form-control side-input"
                                         ng-model="chosenUnderkategori"
-                                        ng-options="underkategori for underkategori in underkategori">
+                                        ng-options="underkategori.id as underkategori.name for underkategori in underkategoris">
                                 </select>
                             </div>
 
