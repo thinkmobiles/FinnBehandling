@@ -44,10 +44,12 @@
             <div class="col-md-3">
 
                 <span class="contact-data">{{hospital.address}}</span> <br/>
+                <span class="contact-data">{{hospital.city}}</span> <br/>
                 <span class="contact-data">{{hospital.phone_number[0]}}</span>
 
                 <div ng-show="hospital.is_paid">
                     <a class="btn btn-default margin-top" href="#/behandlingstilbud/{{hospital.id}}">Se hele profilen</a><br/>
+                    <a class="btn btn-default margin-top" ng-click="behandlingstilbudCtrl.redirect(hospital.web_address)">Gå til nettside</a><br/>
                     <a
                             class="btn btn-default margin-top"
                             ng-click="behandlingstilbudCtrl.setCoordinates(hospital.latitude, hospital.longitude)"

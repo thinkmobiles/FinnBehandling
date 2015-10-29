@@ -131,6 +131,8 @@ module.exports = function (postGre, ParentModel) {
                             }
                         ),
 
+                        postGre.knex.raw('(' + TABLES.REGIONS_LIST + '.postnummer || \' \' || initcap('+ TABLES.REGIONS_LIST + '.poststed)) AS city'),
+
                         postGre.knex.raw(
                             '(SELECT JSON_AGG(sub_treatments_result) ' +
                             '   FROM ( ' +
@@ -147,11 +149,14 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.is_paid',
                         TABLES.HOSPITALS + '.name',
                         TABLES.HOSPITALS + '.address',
+                        TABLES.HOSPITALS + '.web_address',
                         TABLES.HOSPITALS + '.phone_number',
                         TABLES.HOSPITALS + '.postcode',
                         TABLES.HOSPITALS + '.email',
                         TABLES.HOSPITALS + '.description'
                     );
+
+                    qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
 
                     qb.where(TABLES.HOSPITALS + '.id', id);
                 })
@@ -172,6 +177,8 @@ module.exports = function (postGre, ParentModel) {
                     qb.select(
                         postGre.knex.raw('TO_CHAR( ' + TABLES.HOSPITALS + '.created_at, \'D. Mon YYYY\') AS created_at '),
 
+                        postGre.knex.raw('(' + TABLES.REGIONS_LIST + '.postnummer || \' \' || initcap('+ TABLES.REGIONS_LIST + '.poststed)) AS city'),
+
                         postGre.knex.raw('ST_X(' + TABLES.HOSPITALS + '.position::geometry) AS latitude '),
                         postGre.knex.raw('ST_Y(' + TABLES.HOSPITALS + '.position::geometry) AS longitude '),
 
@@ -179,27 +186,35 @@ module.exports = function (postGre, ParentModel) {
                         TABLES.HOSPITALS + '.is_paid',
                         TABLES.HOSPITALS + '.name',
                         TABLES.HOSPITALS + '.address',
+                        TABLES.HOSPITALS + '.web_address',
                         TABLES.HOSPITALS + '.phone_number',
                         TABLES.HOSPITALS + '.postcode',
                         TABLES.HOSPITALS + '.email',
                         TABLES.HOSPITALS + '.description'
                     );
 
+                    qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+
+                    qb.whereNotNull(TABLES.REGIONS_LIST + '.postnummer');
+
                     if (options.fylke) {
-                        qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
                         qb.where(TABLES.REGIONS_LIST + '.fylke', options.fylke);
                     }
 
                     if (options.subTreatment) {
+
                         qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
                         qb.where(TABLES.SUB_TREATMENTS + '.sub_treatment_id', options.subTreatment);
+
                     } else if (options.treatment) {
+
                         qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
                         qb.leftJoin(TABLES.SUB_TREATMENTS_LIST, TABLES.SUB_TREATMENTS_LIST + '.id', TABLES.SUB_TREATMENTS + '.sub_treatment_id');
                         qb.where(TABLES.SUB_TREATMENTS_LIST + '.treatment_id', options.treatment);
                     }
 
                     if (options.textSearch) {
+
                         qb.where(postGre.knex.raw(
                             '(LOWER(' + TABLES.HOSPITALS + '.name) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
                             'LOWER(' + TABLES.HOSPITALS + '.description) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
@@ -208,6 +223,7 @@ module.exports = function (postGre, ParentModel) {
                             'LOWER(' + TABLES.HOSPITALS + '.web_address) LIKE LOWER(\'%' + options.textSearch + '%\'))'
                         ));
                     }
+
                     qb.orderBy(TABLES.HOSPITALS + '.created_at', 'DESC');
                     qb.limit(options.limit);
                     qb.offset(options.offset);
