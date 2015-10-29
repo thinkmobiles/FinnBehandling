@@ -59,6 +59,8 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             }
         };
 
+        $scope.getUnderkategoris();
+
         $scope.search = function () {
             GeneralHelpers.saveAsLocalData('hospitalPage', 1);
             GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);

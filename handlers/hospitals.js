@@ -260,6 +260,8 @@ Hospitals = function (PostGre) {
         options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
         options.fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
         options.textSearch = req.query.textSearch ? req.query.textSearch : null;
+        options.subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
+        options.treatment = req.query.treatment ? req.query.treatment : null;
 
         Hospital.getAll(options, function (err, hospitals) {
 
@@ -295,6 +297,8 @@ Hospitals = function (PostGre) {
 
         var fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
         var textSearch = req.query.textSearch ? req.query.textSearch : null;
+        var subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
+        var treatment = req.query.treatment ? req.query.treatment : null;
 
         Hospital
             .query(function (qb) {
@@ -312,6 +316,16 @@ Hospitals = function (PostGre) {
                         'LOWER(' + TABLES.HOSPITALS + '.web_address) LIKE LOWER(\'%' + textSearch + '%\'))'
                     ));
                 }
+
+                if (subTreatment) {
+                    qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                    qb.where(TABLES.SUB_TREATMENTS + '.sub_treatment_id', subTreatment);
+                } else if (treatment) {
+                    qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                    qb.leftJoin(TABLES.SUB_TREATMENTS_LIST, TABLES.SUB_TREATMENTS_LIST + '.id', TABLES.SUB_TREATMENTS + '.sub_treatment_id');
+                    qb.where(TABLES.SUB_TREATMENTS_LIST + '.treatment_id', treatment);
+                }
+
                 qb.count();
             })
             .fetch()

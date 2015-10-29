@@ -190,6 +190,15 @@ module.exports = function (postGre, ParentModel) {
                         qb.where(TABLES.REGIONS_LIST + '.fylke', options.fylke);
                     }
 
+                    if (options.subTreatment) {
+                        qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                        qb.where(TABLES.SUB_TREATMENTS + '.sub_treatment_id', options.subTreatment);
+                    } else if (options.treatment) {
+                        qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                        qb.leftJoin(TABLES.SUB_TREATMENTS_LIST, TABLES.SUB_TREATMENTS_LIST + '.id', TABLES.SUB_TREATMENTS + '.sub_treatment_id');
+                        qb.where(TABLES.SUB_TREATMENTS_LIST + '.treatment_id', options.treatment);
+                    }
+
                     if (options.textSearch) {
                         qb.where(postGre.knex.raw(
                             '(LOWER(' + TABLES.HOSPITALS + '.name) LIKE LOWER(\'%' + options.textSearch + '%\') OR ' +
