@@ -80,7 +80,6 @@ module.exports = {
     HOSPITAL: 'CREATE TABLE IF NOT EXISTS tb_hospitals ( ' +
                     'id serial NOT NULL, ' +
                     'is_paid boolean NOT NULL, ' +
-                    'type_id integer NOT NULL, ' +
                     'name varchar(80) NOT NULL, ' +
                     'web_address varchar(80), ' +
                     'phone_number text[3], ' +
@@ -89,11 +88,9 @@ module.exports = {
                     'postcode varchar(4) NOT NULL, ' +
                     'description text, ' +
                     'address varchar(40), ' +
-                    'updated_at timestamp without time zone,' +
-                    'created_at timestamp without time zone,' +
-                    'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
-                    'CONSTRAINT tb_hospitals_type_id_foreign FOREIGN KEY (type_id) REFERENCES tb_hospital_types_dic (id) MATCH SIMPLE ' +
-                    'ON UPDATE CASCADE ON DELETE CASCADE ' +
+                    'updated_at timestamp without time zone, ' +
+                    'created_at timestamp without time zone, ' +
+                    'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id) ' +
                     ') WITHOUT OIDS; ',
     HOSPITAL_SUB_TREATMENTS: 'CREATE TABLE tb_hospital_sub_treatments ( ' +
                                 'id serial NOT NULL, ' +
