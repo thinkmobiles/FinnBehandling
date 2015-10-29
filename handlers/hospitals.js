@@ -260,6 +260,8 @@ Hospitals = function (PostGre) {
         options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
         options.fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
         options.textSearch = req.query.textSearch ? req.query.textSearch : null;
+        options.subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
+        options.treatment = req.query.treatment ? req.query.treatment : null;
 
         Hospital.getAll(options, function (err, hospitals) {
 
