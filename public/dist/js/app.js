@@ -38972,6 +38972,14 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
             };
         };
 
+        this.redirect = function (address) {
+            if (address.indexOf('http') === -1) {
+                address = 'http://' + address;
+            }
+
+            window.location.href = address;
+        };
+
         function getHospitalsCount () {
             var fylke = GeneralHelpers.getLocalData('fylke');
             var textSearch = GeneralHelpers.getLocalData('tekstsok');
@@ -39127,10 +39135,8 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
     function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || null;
-        $scope.chosenUnderkategori =  GeneralHelpers.getLocalData('underkategori') || null;
-
-        setUnderkategoriEmpty();
+        $scope.chosenBehandling =  +GeneralHelpers.getLocalData('behandling') || null;
+        $scope.chosenUnderkategori =  +GeneralHelpers.getLocalData('underkategori') || null;
 
         RegionManager.getFylkes(function (err, fylkes) {
             if (err) {

@@ -12,6 +12,14 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
             };
         };
 
+        this.redirect = function (address) {
+            if (address.indexOf('http') === -1) {
+                address = 'http://' + address;
+            }
+
+            window.location.href = address;
+        };
+
         function getHospitalsCount () {
             var fylke = GeneralHelpers.getLocalData('fylke');
             var textSearch = GeneralHelpers.getLocalData('tekstsok');
