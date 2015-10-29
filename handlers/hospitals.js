@@ -317,10 +317,17 @@ Hospitals = function (PostGre) {
                     ));
                 }
 
+                qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+
+                qb.whereNotNull(TABLES.REGIONS_LIST + '.postnummer');
+
                 if (subTreatment) {
+
                     qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
                     qb.where(TABLES.SUB_TREATMENTS + '.sub_treatment_id', subTreatment);
+
                 } else if (treatment) {
+
                     qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
                     qb.leftJoin(TABLES.SUB_TREATMENTS_LIST, TABLES.SUB_TREATMENTS_LIST + '.id', TABLES.SUB_TREATMENTS + '.sub_treatment_id');
                     qb.where(TABLES.SUB_TREATMENTS_LIST + '.treatment_id', treatment);
