@@ -32,6 +32,24 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 }
+            },
+            admin: {
+                files: [
+                    'Gruntfile.js',
+                    'public/js/admin/**/*.js',
+                    'public/css/*.css',
+                    'public/less/**/*.less',
+                    'public/less/*.less'
+                ],
+                tasks: [
+                    'less:app',
+                    'concat_css:app',
+                    'jshint:admin',
+                    'concat:admin'
+                ],
+                options: {
+                    spawn: false
+                }
             }
         },
 
@@ -39,7 +57,12 @@ module.exports = function (grunt) {
             app: [
                 'Gruntfile.js',
                 'public/js/modules/controllers/*.js',
-                'public/js/app/services/*.js'
+                'public/js/modules/services/*.js'
+            ],
+            admin: [
+                'Gruntfile.js',
+                'public/js/admin/controllers/*.js',
+                'public/js/admin/services/*.js'
             ]
         },
 
@@ -66,6 +89,22 @@ module.exports = function (grunt) {
                     'public/js/modules/**/*.js'
                 ],
                 dest: 'public/dist/js/app.js'
+            },
+            admin: {
+                src: [
+                    'public/js/libs/angular/angular.js',
+                    'public/js/libs/angular-resource/angular-resource.js',
+                    'public/js/libs/angular-route/angular-route.js',
+                    'public/js/libs/angular-animate/angular-animate.js',
+                    'public/js/libs/angular-strap/dist/angular-strap.js',
+                    'public/js/libs/angular-strap/dist/angular-strap.tpl.js',
+                    'public/js/libs/angularUtils-pagination/dirPagination.js',
+                    'public/js/admin/config.js',
+                    'public/js/admin/app.js',
+                    'public/js/admin/routes.js',
+                    'public/js/admin/**/*.js'
+                ],
+                dest: 'public/dist/js/admin.js'
             }
         },
 
@@ -73,6 +112,14 @@ module.exports = function (grunt) {
             app: {
                 files: {
                     'public/dist/app.min.js': ['public/dist/js/app.js']
+                },
+                options: {
+                    mangle: false
+                }
+            },
+            admin: {
+                files: {
+                    'public/dist/app.min.js': ['public/dist/js/admin.js']
                 },
                 options: {
                     mangle: false
@@ -134,10 +181,8 @@ module.exports = function (grunt) {
         'less:app',
         'concat:app',
         'concat_css:app',
-        'watch:app',
-        'jsdoc'
+        'watch:app'
     ]);
-
 
     grunt.registerTask('prod', [
         'jshint:app',
@@ -147,7 +192,26 @@ module.exports = function (grunt) {
         'clean:app',
         'concat_css:app',
         'cssmin:app',
-        'watch:app',
-        'jsdoc'
+        'watch:app'
+    ]);
+
+    grunt.registerTask('admin_dev', [
+        'jshint:admin',
+        'less:app',
+        'concat:admin',
+        'concat_css:app',
+        'clean:app',
+        'watch:admin'
+    ]);
+
+    grunt.registerTask('admin_prod', [
+        'jshint:admin',
+        'less:admin',
+        'concat:admin',
+        'uglify:admin',
+        'clean:app',
+        'concat_css:app',
+        'cssmin:app',
+        'watch:admin'
     ]);
 };
