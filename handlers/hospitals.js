@@ -303,7 +303,6 @@ Hospitals = function (PostGre) {
         Hospital
             .query(function (qb) {
                 if (fylke) {
-                    qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
                     qb.where(TABLES.REGIONS_LIST + '.fylke', fylke);
                 }
 
