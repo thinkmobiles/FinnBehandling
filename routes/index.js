@@ -9,7 +9,6 @@ module.exports = function (app, PostGre) {
     var CONSTANTS = require('../constants/constants');
     var RESPONSES = require('../constants/responseMessages');
 
-
     var newsRouter = require('./news')(PostGre);
     var regionsRouter = require('./regions')(PostGre);
     var hospitalsRouter = require('./hospitals')(PostGre);
@@ -18,6 +17,7 @@ module.exports = function (app, PostGre) {
     var advertisementRouter = require('./advertisement')(PostGre);
     var treatmentRouter = require('./treatment')(PostGre);
     var adminRouter = require('./admin')(PostGre);
+    var webRecommendationsRouter = require('./webRecommendations')(PostGre);
 
 
 
@@ -36,6 +36,8 @@ module.exports = function (app, PostGre) {
     app.use('/hospitals', hospitalsRouter);
 
     app.use('/news', newsRouter);
+
+    app.use('/webRecommendations', webRecommendationsRouter);
 
     app.use('/regions', regionsRouter);
 

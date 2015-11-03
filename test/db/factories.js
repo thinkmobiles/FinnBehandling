@@ -86,6 +86,15 @@ module.exports = function (db) {
         }
     });
 
+    factory.define('webRecommendation_article', db.Models[TABLES.WEB_RECOMMENDATIONS], {
+        name: function() {
+            return faker.lorem.sentence(1, 0);
+        },
+        link: function() {
+            return faker.internet.url('www.example.com');
+        }
+    });
+
     factory.define('static_data', db.Models[TABLES.STATIC_DATA], {
         id: 1,
         text: function() {
