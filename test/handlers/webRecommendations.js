@@ -66,7 +66,7 @@ describe('WebRecommendations', function () {
     it('should create a new recommendation', function (done) {
         var data = {
             name: 'Clinic research',
-            link: 'Lorem ipsum dolor si'
+            link: 'www.example.com'
         };
 
         agent
@@ -129,7 +129,7 @@ describe('WebRecommendations', function () {
     it('should update recommendation', function (done) {
         var data = {
             name: 'Updated research',
-            link: 'Lorem ipsum dolor si'
+            link: 'www.example.com'
         };
 
         agent
@@ -192,6 +192,26 @@ describe('WebRecommendations', function () {
                     }
                 ], done);
 
+            });
+    });
+
+    it('should get recommendations count', function (done) {
+        agent
+            .get('/webRecommendations/count')
+            .expect(200)
+            .end(function (err, res) {
+                if (err) {
+                    return done(err);
+                }
+
+                var result = res.body;
+
+                expect(result).to.be.not.empty;
+                expect(result).to.be.instanceOf(Object);
+                expect(result.count).to.be.not.empty;
+                expect(result.count).least(4);
+
+                done();
             });
     });
 

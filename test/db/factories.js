@@ -91,7 +91,7 @@ module.exports = function (db) {
             return faker.lorem.sentence(1, 0);
         },
         link: function() {
-            return faker.lorem.sentence(1, 3);
+            return faker.internet.url('www.example.com');
         }
     });
 

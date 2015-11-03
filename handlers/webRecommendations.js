@@ -30,14 +30,14 @@ var WebRecommendations = function (PostGre) {
          *   {
          *      "id": 4,
          *      "name": "Clinic research2",
-         *      "link": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *      "link": "www.example.test",
          *      "created_at": "2015-09-29T13:39:44.644Z",
          *      "updated_at": "2015-09-29T13:39:44.644Z"
          *  },
          *  {
          *     "id": 3,
          *     "name": "Clinic research updated",
-         *     "link": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *     "link": "www.example.test",
          *     "created_at": "2015-09-29T13:39:39.870Z",
          *     "updated_at": "2015-09-29T13:48:39.981Z"
          *  }
@@ -85,7 +85,7 @@ var WebRecommendations = function (PostGre) {
          *
          * {
          *     "name": "Clinic research",
-         *     "link": "Lorem ipsum dolor si"
+         *     "link": "www.example.test"
          * }
          * @param {string} name - name of new recommendation
          * @param {string} link - link of new recommendation
@@ -124,7 +124,7 @@ var WebRecommendations = function (PostGre) {
          * {
          *       "id": 3,
          *       "name": "Clinic research updated",
-         *       "link": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *       "link": "www.example.test",
          *       "created_at": "2015-09-29T13:39:39.870Z",
          *       "updated_at": "2015-09-29T13:48:39.981Z"
          * }
@@ -166,7 +166,7 @@ var WebRecommendations = function (PostGre) {
          *
          * {
          *     "name": "Clinic research",
-         *     "link": "Lorem ipsum dolor si"
+         *     "link": "www.example.test"
          * }
          * @param {number} id - id of recommendation
          * @param {string} name - name of recommendation (optional)
@@ -231,6 +231,42 @@ var WebRecommendations = function (PostGre) {
                 });
             });
     };
+
+    this.getRecommendationsCount = function (req, res, next) {
+
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get _recommendations count_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/webRecommendations/count
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "count": 3
+         *      }
+         *
+         * @method getRecommendationsCount
+         * @instance
+         */
+
+        PostGre.knex(TABLES.WEB_RECOMMENDATIONS)
+            .count()
+            .asCallback(function (err, queryResult) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                var count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+
+                res.status(200).send({count: count});
+            });
+    };
+
 };
 
 module.exports = WebRecommendations;

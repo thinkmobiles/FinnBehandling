@@ -9,7 +9,7 @@ module.exports = function (PostGre) {
     webRecommendationsRouter.route('/').get(webRecommendationsHandler.getWebRecommendations);
     webRecommendationsRouter.route('/').post(webRecommendationsHandler.createRecommendation);
 
-    //webRecommendationsRouter.route('/count').get(webRecommendationsHandler.getNewsCount);
+    webRecommendationsRouter.route('/count').get(webRecommendationsHandler.getRecommendationsCount);
 
     webRecommendationsRouter.route('/:id').get(webRecommendationsHandler.getRecommendation);
     webRecommendationsRouter.route('/:id').put(webRecommendationsHandler.updateRecommendation);
