@@ -38908,6 +38908,14 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/admin.html',
         controllerAs: 'blank',
         reloadOnSearch: false
+    }).when('/nyheter', {
+        controller: 'newsController',
+        templateUrl: 'templates/news/admin/list.html',
+        controllerAs: 'newsCtrl'
+    }).when('/nyheter/:id', {
+        controller: 'updateArticleController',
+        templateUrl: 'templates/news/admin/edit.html',
+        controllerAs: 'updateArticleCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -38919,4 +38927,230 @@ app.config(['$routeProvider', function ($routeProvider) {
 app.controller('blank', ['$scope',
     function ($scope) {
 
+    }]);;
+app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
+        var self = this;
+        var articleId = $routeParams.id;
+
+        function getArticle () {
+
+            NewsManager.getArticle(articleId, function(err, article) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.article = article;
+            });
+        }
+
+        getArticle();
+
+        this.updateArticle = function () {
+
+            NewsManager.updateArticle(articleId, self.article, function(err, article) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Article successfully updated');
+
+                $location.path('nyheter');
+            });
+        };
     }]);
+;
+app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
+    function ($scope, NewsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.newsPage = GeneralHelpers.getLocalData('newsPage') || 1;
+        $scope.resultater = 10;
+
+        function getNewsCount () {
+            NewsManager.getNewsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getNewsCount();
+
+        this.refreshNews = function () {
+            GeneralHelpers.saveAsLocalData('newsPage', $scope.newsPage);
+
+            getNews();
+        };
+
+        function getNews () {
+
+            $scope.pending = true;
+
+            NewsManager.getNewsList({limit: $scope.resultater, page: $scope.newsPage}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                self.news = news;
+            });
+        }
+
+        getNews();
+
+        this.deleteArticle = function (articleId) {
+
+            NewsManager.removeArticle(articleId, function(err) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Deleted successfully');
+
+                getNews();
+
+                getNewsCount();
+            });
+        };
+    }]);
+;
+app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
+    "use strict";
+    var self = this;
+
+    this.saveAsLocalData = function (key, value) {
+        $location.search(key, value).replace();
+        $rootScope[key] = value;
+    };
+
+    this.getLocalData = function (key) {
+        var locationSearch = $location.search();
+
+        if ($rootScope[key]) {
+
+            $location.search(key, $rootScope[key]).replace();
+            return $rootScope[key];
+
+        } else if (locationSearch[key]) {
+
+            $rootScope[key] = locationSearch[key];
+            return locationSearch[key];
+        }
+    };
+
+    this.showErrorMessage = function (err) {
+        switch (err.status) {
+            case 400:
+                if (err.message) {
+                    $rootScope.errMsg = err.message;
+                } else {
+                    $rootScope.errMsg = 'Bad Request. The request was invalid or cannot be otherwise served.';
+                }
+                alert($rootScope.errMsg);
+                break;
+            case 404:
+                $rootScope.errMsg = 'Page not found ';
+                alert($rootScope.errMsg);
+                break;
+            case 500:
+                $rootScope.errMsg = 'Something is broken. Please contact to site administrator.';
+                alert($rootScope.errMsg);
+                break;
+            case 401:
+            case 403:
+                window.location = '/';
+                break;
+            case 413:
+                $rootScope.errMsg = 'File is too big.';
+                alert($rootScope.errMsg);
+                break;
+            default:
+                console.log(err);
+        }
+    };
+
+    return this;
+}]);;
+app.factory('NewsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getNewsList = function (params, callback) {
+        $http({
+            url: '/news',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getNewsCount = function (callback) {
+        $http({
+            url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createArticle = function (data, callback) {
+        $http({
+            url: '/news',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.updateArticle = function (id, data, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "PUT",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.removeArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "DELETE"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    return this;
+}]);

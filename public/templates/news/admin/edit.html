@@ -1,0 +1,61 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix" style="padding: 32px">
+    <h1 class="blue bold">Update article</h1>
+    <br/>
+
+    <form
+            role="form"
+            class="one-block"
+            name="updateArticleForm"
+            ng-submit="updateArticleCtrl.updateArticle()"
+            novalidate>
+
+        <div class="form-group">
+
+            <input
+                    type="text"
+                    name="subject"
+                    placeholder="Subject"
+                    class="form-control side-input dynamic-font-md"
+                    required
+                    ng-model="updateArticleCtrl.article.subject"/>
+            <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.subject.$invalid">
+                <p ng-show="updateArticleForm.subject.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <input
+                    type="text"
+                    name="source"
+                    placeholder="Source"
+                    class="form-control side-input dynamic-font-md"
+                    required
+                    ng-model="updateArticleCtrl.article.source"/>
+            <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.source.$invalid">
+                <p ng-show="updateArticleForm.source.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <textarea
+                    name="content"
+                    required
+                    placeholder="Content"
+                    class="form-control dynamic-font-md"
+                    ng-model="updateArticleCtrl.article.content">
+
+            </textarea>
+            <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.content.$invalid">
+                <p ng-show="updateArticleForm.content.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Update</button>
+        </div>
+    </form>
+    <br/>
+</div>
