@@ -1,5 +1,6 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
+    <a class="btn btn-primary" href="#/nyheter/new"> Legg Til Ny </a>
     <div ng-show="newsCtrl.news.length">
         <span class="dynamic-font-md">Viser resultater: {{newsCtrl.news.length}} av {{totalItems}}</span>
     </div>
@@ -30,7 +31,7 @@
                 <h5  class="dynamic-font-md blue"> Klide: {{article.source}} </h5>
             </div>
             <div class="col-md-8 clearfix">
-                <h5 style="margin-top: 0;" class="dynamic-font-md"> {{article.content | limitTo: 800}} {{article.content.length > 800 ? '...' : ''}} </h5>
+                <h5 style="margin-top: 0;" class="dynamic-font-md"  ng-bind-html="article.content"> </h5>
                 <a class="pull-left blue dynamic-font-md-lg bold" href="#/nyheter/{{article.id}}">Edit</a>
                 <a class="pull-right blue dynamic-font-md-lg bold" ng-click="newsCtrl.deleteArticle(article.id)">Delete</a>
             </div>

@@ -11,6 +11,7 @@ app.controller('updateArticleController', ['$scope', '$routeParams', '$location'
                 }
 
                 self.article = article;
+                self.oldImage = article.image;
             });
         }
 
@@ -27,5 +28,36 @@ app.controller('updateArticleController', ['$scope', '$routeParams', '$location'
 
                 $location.path('nyheter');
             });
+        };
+
+        this.removeImage = function (name) {
+            self.article[name] = null;
+            self[name] = null;
+            $('#' + name).val(null);
+            $( '#' + name + '-slider').slider('disable');
+        };
+
+        this.cropResult = function (croppedImageBase64, type) {
+            self.article[type] = croppedImageBase64;
+        };
+
+        this.checkImageType = function (name) {
+            var imageContent = self[name];
+
+            /*if (!imageContent) {
+                return;
+            }
+
+            Client.checkFileType(imageContent, function (err, response) {
+                if (err) {
+                    self.removeImage(name);
+                    return ErrMsg.show({message: err.data.error, status: err.status});
+                }
+
+                if (!response.validImage) {
+                    self.removeImage(name);
+                    return alert ('File is not image');
+                }
+            });*/
         };
     }]);

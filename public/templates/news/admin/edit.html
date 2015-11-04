@@ -12,10 +12,13 @@
 
         <div class="form-group">
 
+            <label for="subject" class="side-label-holder dynamic-font-md">Title:</label>
+
             <input
                     type="text"
                     name="subject"
                     placeholder="Subject"
+                    id="subject"
                     class="form-control side-input dynamic-font-md"
                     required
                     ng-model="updateArticleCtrl.article.subject"/>
@@ -26,10 +29,13 @@
 
         <div class="form-group">
 
+            <label for="source" class="side-label-holder dynamic-font-md">Source:</label>
+
             <input
                     type="text"
                     name="source"
                     placeholder="Source"
+                    id="source"
                     class="form-control side-input dynamic-font-md"
                     required
                     ng-model="updateArticleCtrl.article.source"/>
@@ -38,16 +44,42 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="image-container" ng-class="{'slim': !updateArticleCtrl.image}">
+            <div class="clients-photo" >
+                <div ng-show='updateArticleCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
+                    <a ng-click="updateArticleCtrl.removeImage('image')"  class="remove-image">X</a>
+                    <img ng-src="{{updateArticleCtrl.image}}">
+                </div>
+                <input
+                        id="image"
+                        type="file"
+                        name="image"
+                        ng-model="updateArticleCtrl.image"
+                        accept="image/jpeg,image/png,image/gif"
+                        fileread
+                        crop-result="updateArticleCtrl.cropResult"
+                        ng-change="updateArticleCtrl.checkImageType('image')"
+                        >
+            </div>
+            <div class="slider-block">
+                <div id="image-slider"></div>
+            </div>
+        </div>
 
-            <textarea
-                    name="content"
+        <div ng-show='!updateArticleCtrl.image && updateArticleCtrl.oldImage && updateArticleCtrl.oldImage.image_url'>
+            <img style="max-height: 445px" ng-src="{{updateArticleCtrl.oldImage.image_url}}">
+        </div>
+
+        <br/>
+
+        <div class="form-group clearfix">
+
+            <div
+                    text-angular
                     required
-                    placeholder="Content"
-                    class="form-control dynamic-font-md"
                     ng-model="updateArticleCtrl.article.content">
 
-            </textarea>
+            </div>
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.content.$invalid">
                 <p ng-show="updateArticleForm.content.$error.required">Feltet skal utfylles</p>
             </div>
