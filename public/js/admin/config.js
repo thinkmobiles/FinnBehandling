@@ -9,7 +9,8 @@ var AppConfig = (function() {
         'ngRoute',
         'ngAnimate',
         'mgcrea.ngStrap',
-        'angularUtils.directives.dirPagination'
+        'angularUtils.directives.dirPagination',
+        'textAngular'
     ];
 
     // Add a new vertical module

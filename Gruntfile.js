@@ -92,13 +92,30 @@ module.exports = function (grunt) {
             },
             admin: {
                 src: [
+                    'public/js/libs/exif.js',
+                    'public/js/libs/binaryajax/src/binaryajax.js',
+                    'public/js/libs/hammerjs/hammer.js',
+
+                    'public/js/libs/jquery/dist/jquery.js',
+                    'public/js/libs/jquery.mousewheel/jquery.mousewheel.js',
+                    'public/js/libs/jquery-ui/jquery-ui.js',
+
                     'public/js/libs/angular/angular.js',
                     'public/js/libs/angular-resource/angular-resource.js',
                     'public/js/libs/angular-route/angular-route.js',
                     'public/js/libs/angular-animate/angular-animate.js',
+
                     'public/js/libs/angular-strap/dist/angular-strap.js',
                     'public/js/libs/angular-strap/dist/angular-strap.tpl.js',
+
                     'public/js/libs/angularUtils-pagination/dirPagination.js',
+
+                    'public/js/libs/textAngular/dist/textAngular-rangy.min.js',
+                    'public/js/libs/textAngular/dist/textAngular-sanitize.js',
+                    'public/js/libs/textAngular/dist/textAngular.js',
+                    'public/js/libs/textAngular/dist/textAngularSetup.js',
+                    'public/js/libs/jquery.cropbox.js',
+
                     'public/js/admin/config.js',
                     'public/js/admin/app.js',
                     'public/js/admin/routes.js',
@@ -147,6 +164,14 @@ module.exports = function (grunt) {
                     "public/dist/temp/css/*.css"
                 ],
                 dest: "./public/dist/css/style.css"
+            },
+            admin: {
+                src: [
+                    "public/css/*.css",
+                    "public/dist/temp/css/*.css",
+                    "public/js/libs/textAngular/dist/textAngular.css"
+                ],
+                dest: "./public/dist/css/admin_style.css"
             }
         },
 
@@ -199,7 +224,7 @@ module.exports = function (grunt) {
         'jshint:admin',
         'less:app',
         'concat:admin',
-        'concat_css:app',
+        'concat_css:admin',
         'clean:app',
         'watch:admin'
     ]);
@@ -210,7 +235,7 @@ module.exports = function (grunt) {
         'concat:admin',
         'uglify:admin',
         'clean:app',
-        'concat_css:app',
+        'concat_css:admin',
         'cssmin:app',
         'watch:admin'
     ]);
