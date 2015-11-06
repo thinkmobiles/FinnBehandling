@@ -73070,6 +73070,14 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/startside', {
+        controller: 'startSideController',
+        templateUrl: 'templates/startSide/admin/startSide.html',
+        controllerAs: 'startSideCtrl'
+    }).when('/startside/edit', {
+        controller: 'updateStartSideController',
+        templateUrl: 'templates/startSide/admin/edit.html',
+        controllerAs: 'updateStartSideCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -73252,6 +73260,59 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         };
     }]);
 ;
+app.controller('updateStartSideController', ['$scope', '$routeParams', '$location', 'StartSideManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, StartSideManager, GeneralHelpers) {
+        var self = this;
+
+        function getStartSide () {
+
+            StartSideManager.getStartSide(function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.startSide = startSide;
+            });
+        }
+
+        getStartSide ();
+
+        this.updateStartSide = function () {
+
+            StartSideManager.updateStartSide(self.startSide, function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+                console.log(self.startSide);
+
+                alert('StartSide successfully updated');
+
+                $location.path('startside');
+            });
+        };
+    }]);;
+app.controller('startSideController', ['$scope', 'StartSideManager', 'GeneralHelpers',
+    function($scope, StartSideManager, GeneralHelpers){
+        var self = this;
+
+
+        function getStartSide () {
+
+            $scope.pending = true;
+
+            StartSideManager.getStartSide(function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                self.startSide = startSide;
+            });
+        }
+
+        getStartSide();
+    }]);;
 app.directive('fileread', ['$timeout', function ($timeout) {
     return {
         restrict: "A",
@@ -73568,6 +73629,36 @@ app.factory('NewsManager', ['$http', function ($http) {
         $http({
             url: '/news/' + id,
             method: "DELETE"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    return this;
+}]);;
+app.factory('StartSideManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getStartSide = function (callback) {
+        $http({
+            url: '/staticData',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateStartSide = function (data, callback) {
+        $http({
+            url: '/staticData',
+            method: "PUT",
+            data: data
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

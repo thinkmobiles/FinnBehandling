@@ -74,16 +74,16 @@
 
         <div class="form-group clearfix">
 
-            <div
-                    text-angular
-                    required
-                    ng-model="updateArticleCtrl.article.content">
+        <div
+                text-angular
+                required
+                ng-model="updateArticleCtrl.article.content">
 
-            </div>
-            <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.content.$invalid">
-                <p ng-show="updateArticleForm.content.$error.required">Feltet skal utfylles</p>
-            </div>
         </div>
+        <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.content.$invalid">
+            <p ng-show="updateArticleForm.content.$error.required">Feltet skal utfylles</p>
+        </div>
+</div>
 
         <div class="form-group">
             <button class="pull-right btn btn-default btn-lg dynamic-font-md">Update</button>
