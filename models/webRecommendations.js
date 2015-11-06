@@ -18,14 +18,14 @@ module.exports = function (postGre, ParentModel) {
         create: {
             name: ['required', 'isString'],
             link: ['required', 'isString'],
-            private: ['required', 'isBoolean']
+            private: ['isBoolean']
         },
 
         update: {
             id: ['required', 'isInt'],
             name: ['required', 'isString'],
             link: ['required', 'isString'],
-            private: ['required', 'isBoolean']
+            private: ['isBoolean']
         },
 
         getValidated: function (validatePurpose, options, callback) {
