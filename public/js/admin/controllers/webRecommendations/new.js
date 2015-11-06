@@ -9,9 +9,9 @@ app.controller('newWebRecommendationController', ['$scope', '$routeParams', '$lo
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                alert('Article successfully created');
+                alert('WebRecommendation successfully created');
 
-                $location.path('webrecommendations');
+                $location.path('webRecommendations');
             });
         };
 

@@ -23,9 +23,9 @@ app.controller('updateWebRecommendationController', ['$scope', '$routeParams', '
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                alert('Article successfully updated');
+                alert('WebRecommendation successfully updated');
 
-                $location.path('webrecommendations');
+                $location.path('webRecommendations');
             });
         };
     }]);

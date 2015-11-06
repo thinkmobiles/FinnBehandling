@@ -1,6 +1,6 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
-    <a class="btn btn-primary" href="#/webrecommendations/new"> Legg Til Ny </a>
+    <a class="btn btn-primary" href="#/webRecommendations/new"> Legg Til Ny </a>
     <div ng-show="webRecommendations.length">
         <span class="dynamic-font-md">Viser resultater: {{webRecommendations.length}} av {{totalItems}}</span>
     </div>
@@ -30,7 +30,7 @@
                 <div class="col-md-12">
                     <a class="pull-left blue dynamic-font-md-lg" href="{{webRecommendation.link}}" >{{webRecommendation.link}}</a>
                 </div>
-                <a class="pull-left blue dynamic-font-md-lg bold" href="#/webrecommendations/{{webRecommendation.id}}">Edit</a>
+                <a class="pull-left blue dynamic-font-md-lg bold" href="#/webRecommendations/{{webRecommendation.id}}">Edit</a>
                 <a class="pull-right blue dynamic-font-md-lg bold" ng-click="webRecommendationsCtrl.deleteWebRecommendation(webRecommendation.id)">Delete</a>
             </div>
             <h5 class="col-md-12 dynamic-font-md"> {{webRecommendation.created_at | date: "d MMM, y"}}</h5>
