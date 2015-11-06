@@ -1,0 +1,47 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix">
+    <a class="btn btn-primary" href="#/webrecommendations/new"> Legg Til Ny </a>
+    <div ng-show="webRecommendations.length">
+        <span class="dynamic-font-md">Viser resultater: {{webRecommendations.length}} av {{totalItems}}</span>
+    </div>
+
+    <div ng-show="pending">
+        <h3>Loading...</h3>
+    </div>
+
+    <dir-pagination-controls
+            on-page-change="webRecommendationsCtrl.refreshWebRecommendations()"
+            pagination-id="webRecommendations"
+            class="dynamic-font-md"
+            ng-show="webRecommendations.length">
+
+    </dir-pagination-controls>
+
+    <div
+            dir-paginate="webRecommendation in webRecommendations | itemsPerPage: resultater" total-items="totalItems"
+            current-page="webRecommendationsPage" pagination-id="webRecommendations"
+            class="hospital-item grey" style="padding-right: 25px;">
+
+        <div style="display: inline-block">
+
+            <h4 class="col-md-12 blue bold dynamic-font-lg">{{webRecommendation.name}}</h4>
+
+            <div class="col-md-8 clearfix">
+                <div class="col-md-12">
+                    <a class="pull-left blue dynamic-font-md-lg" href="{{webRecommendation.link}}" >{{webRecommendation.link}}</a>
+                </div>
+                <a class="pull-left blue dynamic-font-md-lg bold" href="#/webrecommendations/{{webRecommendation.id}}">Edit</a>
+                <a class="pull-right blue dynamic-font-md-lg bold" ng-click="webRecommendationsCtrl.deleteWebRecommendation(webRecommendation.id)">Delete</a>
+            </div>
+            <h5 class="col-md-12 dynamic-font-md"> {{webRecommendation.created_at | date: "d MMM, y"}}</h5>
+        </div>
+    </div>
+
+    <dir-pagination-controls
+            on-page-change="webRecommendationsCtrl.refreshWebRecommendations()"
+            pagination-id="webRecommendations"
+            class="dynamic-font-md"
+            ng-show="webRecommendations.length">
+
+    </dir-pagination-controls>
+</div>
