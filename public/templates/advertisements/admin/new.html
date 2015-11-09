@@ -1,0 +1,31 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix" style="padding: 32px">
+    <h1 class="blue bold">Create advertisement</h1>
+    <br/>
+
+    <form
+            role="form"
+            class="one-block"
+            name="newAdvertisementForm"
+            ng-submit="newAdvertisementCtrl.createAdvertisement()"
+            novalidate>
+
+        <div class="form-group clearfix">
+
+            <div
+                    text-angular
+                    required
+                    ng-model="newAdvertisementCtrl.advertisement.text">
+
+            </div>
+            <div style="color:red" ng-show="newAdvertisementForm.$submitted && newAdvertisementForm.text.$invalid">
+                <p ng-show="newAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Create</button>
+        </div>
+    </form>
+    <br/>
+</div>
