@@ -15,9 +15,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
     $routeProvider.when('/', {
         controller: 'blank',
-        templateUrl: 'templates/admin.html',
+        templateUrl: 'templates/index.html',
         controllerAs: 'blank',
         reloadOnSearch: false
+    }).when('/admin', {
+        controller: 'conflictsController',
+        templateUrl: 'templates/admin.html',
+        controllerAs: 'conflictsCtrl'
     }).when('/nyheter', {
         controller: 'newsController',
         templateUrl: 'templates/news/admin/list.html',
