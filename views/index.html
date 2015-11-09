@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
+
     <head lang="en">
         <title>Finnbehanding</title>
+
+
+
         <link rel="stylesheet" type="text/css" href="dist/css/style.css"/>
         <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
         <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -14,6 +18,24 @@
         </style>
     </head>
     <body>
+        <script>
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '429206487274548',
+                    xfbml      : true,
+                    version    : 'v2.5'
+                });
+            };
+
+            (function(d, s, id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {return;}
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        </script>
+
         <div id="main-container">
             <div id="top-menu">
                 <div class="inner-block clearfix">
@@ -139,6 +161,56 @@
                                 <li class="margin-top">Legemiddelverket</li>
                             </ul>
                         </div>
+
+
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Spre ordet!</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <div ng-click="shareFB()" style="background-color:darkblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                f
+                            </div>
+
+                            <a href="{{shareTwitter()}}" >
+                                <span style="background-color:cornflowerblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    t
+                                </span>
+                            </a>
+
+
+                            <div
+                                itemscope itemtype="http://schema.org/Thing"
+                                class="g-interactivepost"
+                                data-contenturl="{{ shareGoogle().link }}"
+                                data-contentdeeplinkid="/"
+                                data-clientid="126764424643-badq7lkj6tdodm4g1kp20a6kqovirlr7.apps.googleusercontent.com"
+                                data-cookiepolicy="single_host_origin"
+                                data-prefilltext="{{ shareGoogle().name }}"
+                                data-calltoactionlabel="CREATE"
+                                data-calltoactionurl="http://plus.google.com/pages/create"
+                                data-calltoactiondeeplinkid="/pages/create"
+                                style="background-color:red; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                <!-- properties for google+ sharing -->
+                                <meta itemprop="headline" content="{{ shareGoogle().name }}" />
+                                <meta itemprop="description" content="{{ shareGoogle().description }}" />
+                                <meta itemprop="image" content="{{ shareGoogle().pictureUrl }}" />
+                                g+
+                            </div>
+
+                            <a href="{{ shareBlogger() }}" target="_blank" >
+                                <span style="background-color:darkorange; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    B
+                                </span>
+                            </a>
+                            <a href="{{ shareYahoo() }}" target="_blank">
+                                <span style="background-color:darkviolet; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    Y!
+                                </span>
+                            </a>
+                        </div>
+
+
                         <!--<h2 class="title">
                             <span class="text blue dynamic-font-md-lg">Logg inn</span>
                             <span class="end"></span>
@@ -210,6 +282,15 @@
 
             <footer></footer>
         </div>
+
+        <script >
+            window.___gcfg = {
+                lang: 'uk',
+                parsetags: 'onload'
+            };
+        </script>
         <script type="text/javascript" src="dist/js/app.js"></script>
+        <script src="https://platform.twitter.com/widgets.js" async></script>
+        <script src="https://apis.google.com/js/client:platform.js" async defer></script>
     </body>
 </html>
