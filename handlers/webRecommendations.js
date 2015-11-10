@@ -31,6 +31,7 @@ var WebRecommendations = function (PostGre) {
          *      "id": 4,
          *      "name": "Clinic research2",
          *      "link": "www.example.test",
+         *      "private": false,
          *      "created_at": "2015-09-29T13:39:44.644Z",
          *      "updated_at": "2015-09-29T13:39:44.644Z"
          *  },
@@ -38,6 +39,7 @@ var WebRecommendations = function (PostGre) {
          *     "id": 3,
          *     "name": "Clinic research updated",
          *     "link": "www.example.test",
+         *     "private": false,
          *     "created_at": "2015-09-29T13:39:39.870Z",
          *     "updated_at": "2015-09-29T13:48:39.981Z"
          *  }
@@ -85,10 +87,12 @@ var WebRecommendations = function (PostGre) {
          *
          * {
          *     "name": "Clinic research",
-         *     "link": "www.example.test"
+         *     "link": "www.example.test",
+         *     "private": false,
          * }
          * @param {string} name - name of new recommendation
          * @param {string} link - link of new recommendation
+         * @param {boolean} private - secrecy of new recommendation
          * @method createRecommendation
          * @instance
          */
@@ -125,11 +129,15 @@ var WebRecommendations = function (PostGre) {
          *       "id": 3,
          *       "name": "Clinic research updated",
          *       "link": "www.example.test",
+         *       "private": false,
          *       "created_at": "2015-09-29T13:39:39.870Z",
          *       "updated_at": "2015-09-29T13:48:39.981Z"
          * }
          *
          * @param {number} id - id of recommendation
+         * @param {string} name - name of recommendation
+         * @param {string} link - link of recommendation
+         * @param {boolean} private - secrecy of recommendation
          * @method getRecommendation
          * @instance
          */
@@ -166,11 +174,14 @@ var WebRecommendations = function (PostGre) {
          *
          * {
          *     "name": "Clinic research",
-         *     "link": "www.example.test"
+         *     "link": "www.example.test",
+         *     "private": false
          * }
+         *
          * @param {number} id - id of recommendation
          * @param {string} name - name of recommendation (optional)
          * @param {string} link - link of recommendation (optional)
+         * @param {boolean} private - secrecy of recommendation
          * @method updateRecommendation
          * @instance
          */
