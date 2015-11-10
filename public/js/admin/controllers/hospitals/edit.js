@@ -17,7 +17,6 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
         self.createHospital = function () {
-
             HospitalsManager.createHospital(self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
@@ -44,8 +43,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             getHospital ();
         }
 
-        self.updateHospital = function () {
 
+        self.updateHospital = function () {
             HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
