@@ -49064,6 +49064,18 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/webRecommendations', {
+        controller: 'webRecommendationsController',
+        templateUrl: 'templates/webRecommendations/admin/list.html',
+        controllerAs: 'webRecommendationsCtrl'
+    }).when('/webRecommendations/new', {
+        controller: 'newWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/new.html',
+        controllerAs: 'newWebRecommendationCtrl'
+    }).when('/webRecommendations/:id', {
+        controller: 'updateWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/edit.html',
+        controllerAs: 'updateWebRecommendationCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -49246,6 +49258,113 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         };
     }]);
 ;
+app.controller('updateWebRecommendationController', ['$scope', '$routeParams', '$location', 'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, WebRecommendationsManager, GeneralHelpers) {
+        var self = this;
+        var recommendationId = $routeParams.id;
+
+        function getRecommendation () {
+
+            WebRecommendationsManager.getWebRecommendation(recommendationId, function (err, recommendation) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.webRecommendation = recommendation;
+            });
+        }
+
+        getRecommendation();
+
+        this.updateWebRecommendation = function () {
+
+            WebRecommendationsManager.updateWebRecommendation(recommendationId, self.webRecommendation, function (err, recommendation) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('WebRecommendation successfully updated');
+
+                $location.path('webRecommendations');
+            });
+        };
+    }]);;
+app.controller('newWebRecommendationController', ['$scope', '$routeParams', '$location', 'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, WebRecommendationsManager, GeneralHelpers) {
+        var self = this;
+
+        this.createWebRecommendation = function () {
+
+            WebRecommendationsManager.createWebRecommendation(self.webRecommendation, function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('WebRecommendation successfully created');
+
+                $location.path('webRecommendations');
+            });
+        };
+
+    }]);;
+app.controller('webRecommendationsController', ['$scope', 'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, WebRecommendationsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.webRecommendationsPage = GeneralHelpers.getLocalData("webRecommendations") || 1;
+        $scope.resultater = 10;
+
+        function getWebRecommendationsCount () {
+
+            WebRecommendationsManager.getWebRecommendationsCount(function (err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getWebRecommendationsCount();
+
+        this.refreshWebRecommendations = function () {
+            GeneralHelpers.saveAsLocalData('webRecommendations', $scope.webRecommendationsPage);
+
+            getWebRecommendations();
+        };
+
+        function getWebRecommendations () {
+
+            $scope.pending = true;
+
+            WebRecommendationsManager.getRecommendationsList({limit: $scope.resultater, page: $scope.webRecommendationsPage},
+                function (err, webRecommendations) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+                    $scope.pending = false;
+
+                    $scope.webRecommendations = webRecommendations;
+                });
+        }
+
+        getWebRecommendations();
+
+        this.deleteWebRecommendation = function (remommendationId) {
+
+            WebRecommendationsManager.removeWebRecommendation(remommendationId, function (err) {
+                if (err){
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Deleted successfully');
+
+                getWebRecommendations();
+                getWebRecommendationsCount();
+            });
+        };
+
+    }]);;
 app.directive('fileread', ['$timeout', function ($timeout) {
     return {
         restrict: "A",
@@ -49561,6 +49680,86 @@ app.factory('NewsManager', ['$http', function ($http) {
     this.removeArticle = function (id, callback) {
         $http({
             url: '/news/' + id,
+            method: "DELETE"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    return this;
+}]);;
+app.factory('WebRecommendationsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getRecommendationsList = function (params, callback) {
+        $http({
+            url: '/webRecommendations',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendation = function (id, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendationsCount = function (callback) {
+        $http({
+            url: '/webRecommendations/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createWebRecommendation = function (data, callback) {
+        $http({
+            url: '/webRecommendations',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.updateWebRecommendation = function (id, data, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
+            method: "PUT",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(null, response);
+        });
+    };
+
+    this.removeWebRecommendation = function (id, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
             method: "DELETE"
         }).then(function (response) {
             if (callback)
