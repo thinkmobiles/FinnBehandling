@@ -30,6 +30,18 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/webRecommendations', {
+        controller: 'webRecommendationsController',
+        templateUrl: 'templates/webRecommendations/admin/list.html',
+        controllerAs: 'webRecommendationsCtrl'
+    }).when('/webRecommendations/new', {
+        controller: 'newWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/new.html',
+        controllerAs: 'newWebRecommendationCtrl'
+    }).when('/webRecommendations/:id', {
+        controller: 'updateWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/edit.html',
+        controllerAs: 'updateWebRecommendationCtrl'
     }).otherwise({
         redirectTo: '/'
     });
