@@ -11,8 +11,10 @@
     <div class="row ">
         <div class="col-md-2">* Annonsetype:</div>
         <div class="col-md-6">
-            <label class="radio-inline"><input type="radio" ng-model="hospitalEditCtrl.hospital.type" name="adType">Betalt</label>
-            <label class="radio-inline"><input type="radio" ng-model="hospitalEditCtrl.hospital.type" name="adType" checked="checked">Standard</label>
+            <label class="radio-inline"><input type="radio" ng-model="editHospitalCtrl.hospital.is_paid" ng-value="true"
+                                               name="adType">Betalt</label>
+            <label class="radio-inline"><input type="radio" ng-model="editHospitalCtrl.hospital.is_paid"
+                                               ng-value="false" name="adType">Standard</label>
         </div>
     </div>
 
@@ -20,27 +22,27 @@
 
     <div class="row">
         <div class="col-md-2">* Navn på senter:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.name" required /></div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.name" required/></div>
 
         <div class="col-md-2">* Sted:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.place" required /></div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.place" required/></div>
     </div>
 
     <br/>
 
     <div class="row">
         <div class="col-md-2">* Adresse:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.address" required /></div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.address" required/></div>
 
         <div class="col-md-2">* Postnumber:</div>
-        <div class="col-md-1"><input type="text" ng-model="hospitalEditCtrl.hospital.address.zip_code" required /></div>
+        <div class="col-md-1"><input type="text" ng-model="editHospitalCtrl.hospital.address.zip_code" required/></div>
     </div>
 
     <br/>
 
     <div class="row">
         <div class="col-md-2">* Nettside:</div>
-        <div class="col-md-10"><input type="text" ng-model="hospitalEditCtrl.hospital.web_address" required /></div>
+        <div class="col-md-10"><input type="text" ng-model="editHospitalCtrl.hospital.web_address" required/></div>
     </div>
 
     <br/>
@@ -48,61 +50,66 @@
     <div class="row">
         <div class="col-md-2">* Telefon m. prefiks:</div>
         <div class="col-md-4">
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[0].prefix" required />
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[0]" required />
+            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0].prefix" required/>
+            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0]" required/>
         </div>
 
         <div class="col-md-2">* E-post:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.email[0]" required /></div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[0]" required/></div>
     </div>
 
     <br/>
 
-    <div class="row" ng-show="hospitalEditCtrl.hospital.type === 'Betalt'" >
-        <div class="col-md-2">Telefon m. prefiks 2:</div>
-        <div class="col-md-4">
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[1].prefix"  />
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[1]"  />
+    <div ng-show="editHospitalCtrl.hospital.is_paid">
+
+        <div class="row">
+            <div class="col-md-2">Telefon m. prefiks 2:</div>
+            <div class="col-md-4">
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1].prefix"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1]"/>
+            </div>
+
+            <div class="col-md-2">E-post 2:</div>
+            <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[1]"/></div>
         </div>
 
-        <div class="col-md-2">E-post 2:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.email[1]"  /></div>
-    </div>
+        <br/>
 
-    <br/>
+        <div class="row">
+            <div class="col-md-2">Telefon m. prefiks 3:</div>
+            <div class="col-md-4">
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2].prefix"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2]"/>
+            </div>
 
-    <div class="row" ng-show="hospitalEditCtrl.hospital.type === 'Betalt'">
-        <div class="col-md-2">Telefon m. prefiks 3:</div>
-        <div class="col-md-4">
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[2].prefix"  />
-            <input type="text" ng-model="hospitalEditCtrl.hospital.phone_number[2]"  />
+            <div class="col-md-2">E-post 3:</div>
+            <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[2]"/></div>
         </div>
 
-        <div class="col-md-2">E-post 3:</div>
-        <div class="col-md-4"><input type="text" ng-model="hospitalEditCtrl.hospital.email[2]"  /></div>
+        <br/>
+
+        <div class="row">
+            <div class="col-md-2">* Bilde:</div>
+            <div class="col-md-6"><input type="file" ng-model="editHospitalCtrl.hospital.picture" required/></div>
+
+            <label class="col-md-2">Standardsymbol: <input type="checkbox"
+                                                           ng-model="editHospitalCtrl.hospital.standardSymbol"></label>
+        </div>
+
+        <br/>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">* Beskrivelse: <br/> (maks {{ editHospitalCtrl.getDescriptionMaxLength() }} tegn)</div>
+        <div class="col-md-10"><textarea ng-model="editHospitalCtrl.hospital.description" maxlength="{{ editHospitalCtrl.getDescriptionMaxLength() }}" required></textarea></div>
     </div>
 
     <br/>
 
     <div class="row">
-        <div class="col-md-2">* Bilde:</div>
-        <div class="col-md-6"><input type="file" ng-model="hospitalEditCtrl.hospital.picture" required /></div>
-
-        <label class="col-md-2">Standardsymbol: <input type="checkbox" ng-model="hospitalEditCtrl.hospital.standardSymbol" name="adType"></label>
-    </div>
-
-    <br/>
-
-    <div class="row">
-        <div class="col-md-2">* Beskrivelse: <br/> (maks 600 tegn) </div>
-        <div class="col-md-10"><textarea ng-model="hospitalEditCtrl.hospital.description" required></textarea> </div>
-    </div>
-
-    <br/>
-
-    <div class="row">
-        <div class="col-md-2">* Hovedkategori: </div>
-        <div class="col-md-10"> </div>
+        <div class="col-md-2">* Hovedkategori:</div>
+        <div class="col-md-10"></div>
     </div>
 
     <br/>

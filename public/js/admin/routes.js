@@ -33,7 +33,7 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
     }).when('/hospital/new', {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
-        controllerAs: 'hospitalEditCtrl'
+        controllerAs: 'editHospitalCtrl'
     }).otherwise({
         redirectTo: '/'
     });

@@ -73073,7 +73073,7 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
     }).when('/hospital/new', {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
-        controllerAs: 'hospitalEditCtrl'
+        controllerAs: 'editHospitalCtrl'
     }).otherwise({
         redirectTo: '/'
     });
@@ -73085,6 +73085,65 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 app.controller('blank', ['$scope',
     function ($scope) {
 
+    }]);;
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, GeneralHelpers) {
+        var self = this;
+        var hospitalId = $routeParams.id;
+
+        self.getDescriptionMaxLength = getDescriptionMaxLength;
+
+        self.hospital = {};
+        self.hospital.is_paid = false;
+
+
+        function getDescriptionMaxLength() {
+            if (self.hospital.description && !self.hospital.is_paid) {
+                self.hospital.description = self.hospital.description.substring(0, 200);
+            }
+            return self.hospital.is_paid ? 600 : 200;
+        }
+
+        self.createHospital = function () {
+
+            HospitalsManager.createHospital(self.hospital, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital created successful');
+
+                $location.path('');
+            });
+        };
+
+        function getHospital () {
+
+            HospitalsManager.getHospital(hospitalId, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        if (hospitalId) {
+            getHospital ();
+        }
+
+        self.updateHospital = function () {
+
+            HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital updated successful');
+
+                $location.path('');
+            });
+        };
     }]);;
 app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
@@ -73500,6 +73559,84 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
             default:
                 console.log(err);
         }
+    };
+
+    return this;
+}]);;
+app.factory('HospitalsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getHospitalsList = function (callback) {
+        $http({
+            url: '/hospitals',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createHospital = function (data, callback) {
+        $http({
+            url: '/hospitals',
+            method: 'POST',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.getHospitalsCount = function (params, callback) {
+        $http({
+            url: '/hospitals/count',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateHospital = function (id, data, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'PUT',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.deleteHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'DELETE'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
     };
 
     return this;
