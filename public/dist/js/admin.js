@@ -56465,8 +56465,8 @@ app.controller('blank', ['$scope',
     function ($scope) {
 
     }]);;
-app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, HospitalsManager, GeneralHelpers) {
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, GeneralHelpers) {
         var self = this;
         var hospitalId = $routeParams.id;
         self.hospital = {};
@@ -56511,6 +56511,39 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 $location.path('');
             });
         };
+
+
+        self.getTreatments = function () {
+
+            TreatmentsManager.getTreatments(function (err, treatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.treatments = treatments;
+            });
+        };
+
+        getTreatments();
+
+         self.getSubTreatments = function () {
+
+            TreatmentsManager.getSubTreatments(self.treatmentId, function (err, subTreatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.subTreatments = subTreatments;
+            });
+        };
+
+    }]);;
+app.controller('treatmentsController', ['$scope', 'TreatmentsManager', 'GeneralHelpers',
+    function ($scope, TreatmentsManager, GeneralHelpers) {
+        var self = this;
+
+
+
     }]);;
 app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
@@ -57083,6 +57116,32 @@ app.factory('NewsManager', ['$http', function ($http) {
             if (callback)
                 callback(response);
         });
+    };
+
+    return this;
+}]);;
+app.factory('TreatmentsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getTreatments = function (callback) {
+        $http({
+            url: '/treatment',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getSubTreatments = function (id, callback) {
+        $http({
+            url: '/treatment' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;
