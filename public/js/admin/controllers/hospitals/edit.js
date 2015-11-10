@@ -1,5 +1,5 @@
-app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, HospitalsManager, GeneralHelpers) {
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, GeneralHelpers) {
         var self = this;
         var hospitalId = $routeParams.id;
         self.hospital = {};
@@ -44,4 +44,30 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 $location.path('');
             });
         };
+
+
+        self.getTreatments = function () {
+
+            TreatmentsManager.getTreatments(function (err, treatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.treatments = treatments;
+            });
+        };
+
+        getTreatments();
+
+         self.getSubTreatments = function () {
+
+            TreatmentsManager.getSubTreatments(self.treatmentId, function (err, subTreatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.subTreatments = subTreatments;
+            });
+        };
+
     }]);
