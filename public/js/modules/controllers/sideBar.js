@@ -130,7 +130,9 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
          */
         $scope.shareGoogle = function(){
             var data = getShareableInfo();
-            return data;
+            return 'https://plus.google.com/share?url={' + data.link + '}';
+
+            //return data;
         };
 
         /**
@@ -179,7 +181,7 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
         function getShareableInfo() {
             var data = {
                 name: 'FinnBehandling',
-                link: 'http://FinnBehandling.com',
+                link: 'http://facebook.com',
                 description: 'FinnBehandling - best site ever... Some other description for test purpose',
                 pictureUrl: 'http://placehold.it/350x350'
             };

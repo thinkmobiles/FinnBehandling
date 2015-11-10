@@ -12070,5 +12070,20 @@ body .ui-tooltip {
     color: red;
     font-size: 12px;
 }
+#cookie-bar.fixed {
+    display: none;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    background: #000 none repeat scroll 0% 0%;
+    text-align: center;
+    padding: 10px 0px;
+    opacity: 0.85;
+    color: #FFF;
+}
 
+.cookie-button {
+    color: #FFF;
+}
 
