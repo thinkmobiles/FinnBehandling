@@ -30,6 +30,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/hospital/new', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'hospitalEditCtrl'
     }).otherwise({
         redirectTo: '/'
     });
