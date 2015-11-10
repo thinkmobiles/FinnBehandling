@@ -2,10 +2,21 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
     function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, GeneralHelpers) {
         var self = this;
         var hospitalId = $routeParams.id;
+
+        self.getDescriptionMaxLength = getDescriptionMaxLength;
+
         self.hospital = {};
+        self.hospital.is_paid = false;
 
-        this.createHospital = function () {
 
+        function getDescriptionMaxLength() {
+            if (self.hospital.description && !self.hospital.is_paid) {
+                self.hospital.description = self.hospital.description.substring(0, 200);
+            }
+            return self.hospital.is_paid ? 600 : 200;
+        }
+
+        self.createHospital = function () {
             HospitalsManager.createHospital(self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
@@ -32,8 +43,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             getHospital ();
         }
 
-        this.updateHospital = function () {
 
+        self.updateHospital = function () {
             HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
