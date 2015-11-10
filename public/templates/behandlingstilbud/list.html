@@ -8,6 +8,10 @@
         <h3>Loading...</h3>
     </div>
 
+    <div ng-show="noHospitalsFound">
+        <h2 class="bold" style="text-align: center">Ingen treff</h2>
+    </div>
+
     <dir-pagination-controls
             on-page-change="behandlingstilbudCtrl.refreshHospitals()"
             pagination-id="hospitals"
@@ -37,15 +41,17 @@
 
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-3 dynamic-font-md">
 
-                <span class="contact-data">{{hospital.address}}</span> <br/>
-                <span class="contact-data">{{hospital.phone_number[0]}}</span>
+                <span class="contact-data dynamic-font-sm">{{hospital.address}}</span> <br/>
+                <span class="contact-data dynamic-font-sm">{{hospital.city}}</span> <br/>
+                <span class="contact-data dynamic-font-sm">{{hospital.phone_number[0]}}</span>
 
                 <div ng-show="hospital.is_paid">
-                    <a class="btn btn-default margin-top" href="#/behandlingstilbud/{{hospital.id}}">Se hele profilen</a><br/>
+                    <a class="btn btn-default margin-top dynamic-font-md" href="#/behandlingstilbud/{{hospital.id}}">Se hele profilen</a><br/>
+                    <a class="btn btn-default margin-top dynamic-font-md" ng-click="behandlingstilbudCtrl.redirect(hospital.web_address)">Gå til nettside</a><br/>
                     <a
-                            class="btn btn-default margin-top"
+                            class="btn btn-default margin-top dynamic-font-md"
                             ng-click="behandlingstilbudCtrl.setCoordinates(hospital.latitude, hospital.longitude)"
                             data-animation="am-fade-and-scale"
                             data-template-url="templates/modal/map.tpl.html"

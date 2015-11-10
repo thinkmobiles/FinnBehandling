@@ -3,16 +3,14 @@ module.exports = {
 
     REGIONS_DIC: 'CREATE TABLE IF NOT EXISTS tb_regions_dic ( ' +
                     'id serial NOT NULL, ' +
-                    'zip_code varchar(35), ' +
-                    'kommune_name varchar(50), ' +
-                    'fylke_name varchar(50), ' +
+                    'postnummer varchar(35), ' +
+                    'poststed varchar(50), ' +
+                    'kommunenummer varchar(50), ' +
+                    'kommunenavn varchar(50), ' +
+                    'kategori varchar(50), ' +
+                    'fylke varchar(50), ' +
                     'CONSTRAINT tb_regions_dic_pkey PRIMARY KEY (id)' +
                     ') WITHOUT OIDS; ',
-    HOSPITAL_TYPES_DIC: 'CREATE TABLE IF NOT EXISTS tb_hospital_types_dic ( ' +
-                        'id serial NOT NULL, ' +
-                        'name varchar(80), ' +
-                        'CONSTRAINT tb_hospital_types_dic_pkey PRIMARY KEY (id)' +
-                        ') WITHOUT OIDS; ',
     TREATMENTS_DIC: 'CREATE TABLE IF NOT EXISTS tb_treatments_dic ( ' +
                     'id serial NOT NULL, ' +
                     'name varchar(30) NOT NULL, ' +
@@ -21,15 +19,16 @@ module.exports = {
     SUB_TREATMENTS_DIC: 'CREATE TABLE IF NOT EXISTS tb_sub_treatments_dic ( ' +
                         'id serial NOT NULL, ' +
                         'name varchar(30) NOT NULL, ' +
-                        'CONSTRAINT tb_sub_treatments_dic_pkey PRIMARY KEY (id)' +
+                        'treatment_id integer NOT NULL, ' +
+                        'CONSTRAINT tb_sub_treatments_dic_pkey PRIMARY KEY (id),' +
+                        'CONSTRAINT tb_sub_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_treatments_dic (id) MATCH SIMPLE ' +
                         ') WITHOUT OIDS;',
 
     //OTHER TABLES
 
     USERS: 'CREATE TABLE IF NOT EXISTS tb_users ( ' +
                     'id serial NOT NULL, ' +
-                    'first_name varchar(25) NOT NULL, ' +
-                    'last_name varchar(25) NOT NULL, ' +
+                    'name varchar(50) NOT NULL, ' +
                     'uuid uuid DEFAULT uuid_generate_v4(), ' +
                     'email varchar(35), ' +
                     'password varchar(255) NOT NULL, ' +
@@ -80,34 +79,19 @@ module.exports = {
 
     HOSPITAL: 'CREATE TABLE IF NOT EXISTS tb_hospitals ( ' +
                     'id serial NOT NULL, ' +
-                    'region_id integer NOT NULL, ' +
                     'is_paid boolean NOT NULL, ' +
-                    'type_id integer NOT NULL, ' +
                     'name varchar(80) NOT NULL, ' +
                     'web_address varchar(80), ' +
                     'phone_number text[3], ' +
                     'email text[3], ' +
                     'position point, ' +
+                    'postcode varchar(4) NOT NULL, ' +
                     'description text, ' +
                     'address varchar(40), ' +
-                    'updated_at timestamp without time zone,' +
-                    'created_at timestamp without time zone,' +
-                    'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id), ' +
-                    'CONSTRAINT tb_hospitals_region_id_foreign FOREIGN KEY (region_id) REFERENCES tb_regions_dic (id) MATCH SIMPLE ' +
-                    'ON UPDATE CASCADE ON DELETE CASCADE, ' +
-                    'CONSTRAINT tb_hospitals_type_id_foreign FOREIGN KEY (type_id) REFERENCES tb_hospital_types_dic (id) MATCH SIMPLE ' +
-                    'ON UPDATE CASCADE ON DELETE CASCADE ' +
+                    'updated_at timestamp without time zone, ' +
+                    'created_at timestamp without time zone, ' +
+                    'CONSTRAINT tb_hospitals_pkey PRIMARY KEY (id) ' +
                     ') WITHOUT OIDS; ',
-    HOSPITAL_TREATMENTS: 'CREATE TABLE tb_hospital_treatments ( ' +
-                                'id serial NOT NULL, ' +
-                                'hospital_id integer NOT NULL, ' +
-                                'treatment_id integer NOT NULL, ' +
-                                'CONSTRAINT tb_hospital_treatments_pkey PRIMARY KEY (id), ' +
-                                'CONSTRAINT tb_hospital_treatments_hospital_id_foreign FOREIGN KEY (hospital_id) REFERENCES tb_hospitals (id) MATCH SIMPLE ' +
-                                'ON UPDATE CASCADE ON DELETE CASCADE, ' +
-                                'CONSTRAINT tb_hospital_treatments_treatment_id_foreign FOREIGN KEY (treatment_id) REFERENCES tb_treatments_dic (id) MATCH SIMPLE ' +
-                                'ON UPDATE CASCADE ON DELETE CASCADE ' +
-                                ') WITHOUT OIDS;',
     HOSPITAL_SUB_TREATMENTS: 'CREATE TABLE tb_hospital_sub_treatments ( ' +
                                 'id serial NOT NULL, ' +
                                 'hospital_id integer NOT NULL, ' +

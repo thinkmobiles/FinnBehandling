@@ -13,5 +13,16 @@ app.factory('UserManager', ['$http', function ($http) {
         }, callback);
     };
 
+    this.sendEmail = function (data, callback) {
+        $http({
+            url: '/user/sendEmail',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
     return this;
 }]);

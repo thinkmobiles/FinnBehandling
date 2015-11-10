@@ -74,9 +74,6 @@ Hospitals = function (PostGre) {
             var hospitalId = hospital.id;
             var functionsToExecute = [
                 function (callback) {
-                    HospitalTreatment.create(options.treatment_ids, hospitalId, callback);
-                },
-                function (callback) {
                     HospitalSubTreatment.create(options.sub_treatments, hospitalId, callback);
                 }
             ];
@@ -165,9 +162,6 @@ Hospitals = function (PostGre) {
 
             var hospitalId = hospital.id;
             var functionsToExecute = [
-                function (callback) {
-                    HospitalTreatment.update(options.treatment_ids, hospitalId, callback);
-                },
                 function (callback) {
                     HospitalSubTreatment.update(options.sub_treatments, hospitalId, callback);
                 }
@@ -264,6 +258,10 @@ Hospitals = function (PostGre) {
 
         options.limit = limitIsValid ? limit : 25;
         options.offset = offsetIsValid ? (page - 1) * options.limit : 0;
+        options.fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
+        options.textSearch = req.query.textSearch ? req.query.textSearch : null;
+        options.subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
+        options.treatment = req.query.treatment ? req.query.treatment : null;
 
         Hospital.getAll(options, function (err, hospitals) {
 
@@ -297,18 +295,103 @@ Hospitals = function (PostGre) {
          * @instance
          */
 
-        PostGre.knex(TABLES.HOSPITALS)
-            .count()
-            .asCallback(function (err, queryResult) {
+        var fylke = req.query.fylke !== 'Alle' ? req.query.fylke : null;
+        var textSearch = req.query.textSearch ? req.query.textSearch : null;
+        var subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
+        var treatment = req.query.treatment ? req.query.treatment : null;
+
+        Hospital
+            .query(function (qb) {
+                if (fylke) {
+                    qb.where(TABLES.REGIONS_LIST + '.fylke', fylke);
+                }
+
+                if (textSearch) {
+                    qb.where(PostGre.knex.raw(
+                        '(LOWER(' + TABLES.HOSPITALS + '.name) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.description) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.address) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.postcode) LIKE LOWER(\'%' + textSearch + '%\') OR ' +
+                        'LOWER(' + TABLES.HOSPITALS + '.web_address) LIKE LOWER(\'%' + textSearch + '%\'))'
+                    ));
+                }
+
+                qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+
+                qb.whereNotNull(TABLES.REGIONS_LIST + '.postnummer');
+
+                if (subTreatment) {
+
+                    qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                    qb.where(TABLES.SUB_TREATMENTS + '.sub_treatment_id', subTreatment);
+
+                } else if (treatment) {
+
+                    qb.leftJoin(TABLES.SUB_TREATMENTS, TABLES.SUB_TREATMENTS + '.hospital_id', TABLES.HOSPITALS + '.id');
+                    qb.leftJoin(TABLES.SUB_TREATMENTS_LIST, TABLES.SUB_TREATMENTS_LIST + '.id', TABLES.SUB_TREATMENTS + '.sub_treatment_id');
+                    qb.where(TABLES.SUB_TREATMENTS_LIST + '.treatment_id', treatment);
+                }
+
+                qb.count();
+            })
+            .fetch()
+            .asCallback(function (err, result) {
                 var  count;
 
                 if (err) {
                     return next(err);
                 }
 
-                count = queryResult && queryResult.length ? +queryResult[0].count : 0;
+                count = result ? result.get('count') : 0;
 
                 res.status(200).send({count: count});
+            });
+    };
+
+    this.getConflicts = function (req, res, next) {
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _get list of hospitals where postcode not in regions DB_
+         *
+         * @example Request example:
+         *         http://localhost:8787/hospitals/conflicts
+         *
+         *
+         * @example Response example:
+         *     [
+         *        {
+         *            "id": 3,
+         *            "name": "rfrfr",
+         *            "web_address": "www.clinic.com",
+         *            "phone_number": "+380660237194",
+         *            "type": "type1",
+         *            "adress": {
+         *                "zip_code": "111",
+         *                "kommune_name": "kom1",
+         *                "fylke_name": "ful1"
+         *            }
+         *        }
+         *    ]
+         * @method getConflicts
+         * @instance
+         */
+
+        Hospital
+            .query(function (qb) {
+                qb.leftJoin(TABLES.REGIONS_LIST, TABLES.REGIONS_LIST + '.postnummer', TABLES.HOSPITALS + '.postcode');
+                qb.whereNull('postnummer');
+            })
+            .fetchAll({
+                columns: [TABLES.HOSPITALS + '.id', 'name']
+            })
+            .asCallback(function (err, hospitals) {
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send(hospitals);
             });
     };
 

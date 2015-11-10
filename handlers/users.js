@@ -1,6 +1,8 @@
 var RESPONSES = require('../constants/responseMessages');
 var CONSTANTS = require('../constants/constants');
 var TABLES = require('../constants/tables');
+var Mailer = require('../helpers/mailer');
+var mailer = new Mailer();
 
 //helpers
 
@@ -77,8 +79,7 @@ var Users = function (PostGre) {
          *
          * {
          *       "id": 3,
-         *       "first_name": "John",
-         *       "last_name": "Smith",
+         *       "name": "John Smith",
          *       "uuid": "111111-1111-1111-1111-1111111111",
          *       "email": "john@mail.com",
          *       "updated_at": "2015-09-29T13:48:39.981Z"
@@ -131,8 +132,7 @@ var Users = function (PostGre) {
          * [
          *  {
          *    "id": 1,
-         *    "first_name": "John",
-         *    "last_name": "Smith",
+         *    "name": "John Smith",
          *    "uuid": "111111-1111-1111-1111-1111111111",
          *    "email": "john@mail.com",
          *    "password": "8d969eef6ecad3c",
@@ -145,8 +145,7 @@ var Users = function (PostGre) {
          *  },
          *  {
          *    "id": 2,
-         *    "first_name": "Jimm",
-         *    "last_name": "Smith",
+         *    "name": "Jimm Smith",
          *    "uuid": "111111-2222-1111-2222-1111111111",
          *    "email": "jimm@mail.com",
          *    "password": "29a3a629280e686cf",
@@ -206,7 +205,7 @@ var Users = function (PostGre) {
          * @instance
          */
 
-        User
+        PostGre.knex(TABLES.USERS)
             .count()
             .asCallback(function (err, queryResult) {
 
@@ -239,10 +238,10 @@ var Users = function (PostGre) {
          *     "success": "Was created successfully"
          * }
          *
-         * @param {string} first_name - users first name
-         * @param {string} last_name - users last name
+         * @param {string} name - users name
          * @param {string} email - users email
          * @param {string} password - users password
+         * @param {string} pass_confirm - users password confirmation
          * @param {string} google_id - users google_id (optional)
          * @param {string} facebook_id - users facebook_id (optional)
          * @param {string} twitter_id - users twitter_id (optional)
@@ -333,6 +332,48 @@ var Users = function (PostGre) {
 
     };
 
+    this.sendEmail = function (req, res, next) {
+
+        /**
+         * __Type__ `POST`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows _users send email_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/users/sendEmail
+         *
+         * @example Response example:
+         *
+         *       {
+         *          "success": "Email have successfully sent"
+         *      }
+         *
+         * @param {string} name - sender's name
+         * @param {string} email - sender's email
+         * @param {string} topic - email topic
+         * @param {string} notification - email body
+         *
+         * @method sendEmail
+         * @instance
+         */
+
+        var options = req.body;
+
+        mailer.sendEmail({
+            name: options.name,
+            email: options.email,
+            notification: options.notification,
+            topic: options.topic
+        }, function (err) {
+            if (err) {
+                next(err);
+            }
+
+            res.status(200).send({success: RESPONSES.EMAIL_SENT});
+        });
+    };
+
     this.updateUser = function (req, res, next){
 
         /**
@@ -357,8 +398,7 @@ var Users = function (PostGre) {
          * }
          *
          * @param {id} id - user id
-         * @param {string} first_name - users first name (optional)
-         * @param {string} last_name - users last name (optional)
+         * @param {string} name - users name (optional)
          * @param {string} email - users email (optional)
          * @param {string} password - users password (optional)
          * @param {string} google_id - users google_id (optional)
@@ -373,12 +413,35 @@ var Users = function (PostGre) {
         var userId = req.params.id;
         var options = req.body;
         var error;
+        var password = options.password;
+        var passConfirm = options.pass_confirm;
 
         if(!userId){
             error = new Error(RESPONSES.NOT_ENOUGH_PARAMETERS);
             error.status = 400;
 
             return next(error);
+        }
+
+        if(password){
+
+            if (password.length < 6) {
+                error = new Error(RESPONSES.PASSWORD_TOO_SHORT);
+                error.status = 400;
+
+                return next(error);
+            }
+
+            if (password !== passConfirm) {
+                error = new Error(RESPONSES.PASSWORD_NOT_EQUAL);
+                error.status = 400;
+
+                return next(error);
+            }
+
+
+            options.password = cryptoPass.getEncryptedPass(password);
+
         }
 
         options.id = userId;

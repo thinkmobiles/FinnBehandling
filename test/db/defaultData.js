@@ -16,7 +16,7 @@ module.exports.setUp = function (db, callback) {
 
         factory.createMany(name, count, function (err, created) {
 
-            var createdLength = created.length;
+            var createdLength = created ? created.length : 0;
 
             if (err) {
                 return callback(err);
@@ -33,8 +33,6 @@ module.exports.setUp = function (db, callback) {
     function createInstance (mainCallback) {
         var createStack = [];
         var fixturesObj = {
-            hospital_type: [],
-            region: [],
             treatment: [],
             sub_treatment: []
         };

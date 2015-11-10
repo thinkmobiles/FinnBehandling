@@ -3,8 +3,9 @@
     <h1 class="bold blue">{{hospitalCtrl.hospital.name}}</h1>
     <hr/>
     <div class="clearfix">
-        <div class="col-md-6">
-            {{hospitalCtrl.hospital.address}}
+        <div class="col-md-6 dynamic-font-md">
+            {{hospitalCtrl.hospital.address}} <br/>
+            {{hospitalCtrl.hospital.city}}
         </div>
         <div class="col-md-6 dynamic-font-md">
             <span><span class="bold">Telefon:</span> {{hospitalCtrl.hospital.phone_number[0]}} </span><br/>

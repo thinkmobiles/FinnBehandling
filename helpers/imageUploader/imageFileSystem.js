@@ -194,6 +194,8 @@ var imagesUploader = function (dirConfig) {
             if (callback && typeof callback === 'function') {
                 callback(err);
             }
+
+            callback();
         });
     }
 

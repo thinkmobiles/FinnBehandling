@@ -29,7 +29,6 @@ before(function (done) {
 
 describe('Models', function () {
     require('./models/hospitals');
-    require('./models/hospitalTypesList');
     require('./models/images');
     require('./models/news');
     require('./models/regionsList');
@@ -42,6 +41,10 @@ describe('Handlers', function () {
     require('./handlers/news');
     require('./handlers/staticData');
     require('./handlers/advertisement');
+    require('./handlers/users');
+    require('./handlers/regions');
+    require('./handlers/treatments');
+    require('./handlers/webRecommendations');
 });
 
 after(function (done) {

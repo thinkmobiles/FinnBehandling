@@ -54,7 +54,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-if (app.get('env') === 'development') {
+/*if (app.get('env') === 'development') {
     require('./config/development');
 
 } else if (app.get('env') === 'test') {
@@ -62,7 +62,8 @@ if (app.get('env') === 'development') {
 
 } else {
     require('./config/production');
-}
+}*/
+require('./config/development');
 
 config = {
     db: process.env.REDIS_DB_KEY,

@@ -38908,6 +38908,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/kontakt', {
+        controller: 'contactController',
+        templateUrl: 'templates/contact.html',
+        controllerAs: 'contactCtrl',
+        reloadOnSearch: false
     }).when('/behandlingstilbud', {
         controller: 'behandlingstilbudController',
         templateUrl: 'templates/behandlingstilbud/list.html',
@@ -38940,9 +38945,9 @@ app.controller('articleController', ['$scope', '$routeParams', '$location', 'New
 
         $location.hash('main-menu');
 
-        function getArticle () {
+        function getArticle() {
 
-            NewsManager.getArticle(articleId, function(err, article) {
+            NewsManager.getArticle(articleId, function (err, article) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -38958,7 +38963,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
         var self = this;
 
         $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
-        $scope.$parent.resultater = GeneralHelpers.getLocalData('resultater') || 25;
+        $scope.resultater = 10;
 
         this.setCoordinates = function (lat, long) {
             $scope.$parent.coordinates = {
@@ -38967,13 +38972,34 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
             };
         };
 
+        this.redirect = function (address) {
+            if (address.indexOf('http') === -1) {
+                address = 'http://' + address;
+            }
+
+            window.location.href = address;
+        };
+
         function getHospitalsCount () {
-            HospitalManager.getHospitalsCount(function(err, result) {
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+            var behandling = GeneralHelpers.getLocalData('behandling');
+            var underkategori = GeneralHelpers.getLocalData('underkategori');
+
+            var searchData = {
+                fylke: fylke,
+                textSearch: textSearch,
+                treatment: behandling,
+                subTreatment: underkategori
+            };
+
+            HospitalManager.getHospitalsCount(searchData, function(err, result) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 $scope.totalItems = result.count;
+                $scope.noHospitalsFound = result.count === '0';
             });
         }
 
@@ -38989,13 +39015,22 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         function getHospitals () {
             var behandling = GeneralHelpers.getLocalData('behandling');
+            var underkategori = GeneralHelpers.getLocalData('underkategori');
             var fylke = GeneralHelpers.getLocalData('fylke');
-            var tekstsok = GeneralHelpers.getLocalData('tekstsok');
-            var resultater = GeneralHelpers.getLocalData('resultater');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+
+            var searchData = {
+                limit: $scope.resultater,
+                page: $scope.hospitalPage,
+                fylke: fylke,
+                textSearch: textSearch,
+                treatment: behandling,
+                subTreatment: underkategori
+            };
 
             $scope.pending = true;
 
-            HospitalManager.getHospitalsList({limit: resultater, page: $scope.hospitalPage}, function(err, hospitals) {
+            HospitalManager.getHospitalsList(searchData, function(err, hospitals) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -39012,6 +39047,27 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
 
         getHospitals();
 }]);;
+app.controller('contactController', ['$scope', 'UserManager', 'GeneralHelpers',
+    function ($scope, UserManager, GeneralHelpers) {
+
+        var self = this;
+
+        this.sendEmail = function () {
+
+            if ($scope.sendEmailForm.$valid) {
+
+                UserManager.sendEmail(self.email, function(err, response) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    } else {
+                        alert('success');
+                        $scope.sendEmailForm.$submitted = false;
+                        self.email = {};
+                    }
+                });
+            }
+        };
+    }]);;
 app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
         var self = this;
@@ -39075,38 +39131,75 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         getNews();
     }]);
 ;
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
 
-        $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-        $scope.chosenBehandling =  GeneralHelpers.getLocalData('behandling') || 'Alle';
-        $scope.resultater =  GeneralHelpers.getLocalData('resultater') || '25';
+        $scope.chosenFylke = GeneralHelpers.getLocalData('fylke') || 'Alle';
+        $scope.chosenBehandling = +GeneralHelpers.getLocalData('behandling') || null;
+        $scope.chosenUnderkategori = +GeneralHelpers.getLocalData('underkategori') || null;
 
-        $scope.fylkes = [
-            'Alle',
-            'Østfold',
-            'Akershus',
-            'Oslo',
-            'Hedmark',
-            'Oppland',
-            'Buskerud'
-        ];
 
-        $scope.behandlings = [
-            'Alle',
-            'ear',
-            'nose',
-            'mouth treatment',
-            'plastic surgery',
-            'bone problems'
-        ];
+        RegionManager.getFylkes(function (err, fylkes) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (fylkes && fylkes.length) {
+                fylkes.unshift({
+                    fylke: 'Alle'
+                });
+            }
+
+            $scope.fylkes = fylkes;
+        });
+
+        TreatmentManager.getTreaments(function (err, treaments) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (treaments && treaments.length) {
+                treaments.unshift({
+                    id: null,
+                    name: 'Alle'
+                });
+            }
+
+            $scope.behandlings = treaments;
+        });
+
+        $scope.getUnderkategoris = function () {
+
+            if ($scope.chosenBehandling) {
+                TreatmentManager.getSubTreatments($scope.chosenBehandling, function (err, subTreaments) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+                    if (subTreaments && subTreaments.length) {
+                        subTreaments.unshift({
+                            id: null,
+                            name: 'Alle'
+                        });
+
+                        $scope.underkategoris = subTreaments;
+
+                    } else {
+                        setUnderkategoriEmpty();
+                    }
+                });
+            } else {
+
+                setUnderkategoriEmpty();
+            }
+        };
+
+        $scope.getUnderkategoris();
 
         $scope.search = function () {
             GeneralHelpers.saveAsLocalData('hospitalPage', 1);
             GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
             GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('underkategori', $scope.chosenUnderkategori);
             GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
-            GeneralHelpers.saveAsLocalData('resultater', $scope.resultater);
+
 
             $scope.$parent.searchResponse = true;
 
@@ -39126,7 +39219,110 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Gene
                 });
             }
         };
-}]);;
+
+        function setUnderkategoriEmpty() {
+
+            $scope.underkategoris = [
+                {
+                    id: null,
+                    name: 'Alle'
+                }
+            ];
+        }
+
+        /**
+         *  Share with facebook function
+         */
+        $scope.shareFB = function () {
+            var data = getShareableInfo();
+            FB.ui({
+                method: 'share',
+                name: data.name,
+                href: data.link,
+                description: data.description,
+                picture: data.pictureUrl
+            }, function (response) {
+                console.log(response);
+            });
+        };
+
+        /**
+         *  Share with twitter function
+         */
+        $scope.shareTwitter = function () {
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var text = encodeURI(data.description);
+
+            return "http://twitter.com/intent/tweet?url=" + url + "&text=" + text;
+        };
+
+        /**
+         *  Share with google+ function
+         */
+        $scope.shareGoogle = function(){
+            var data = getShareableInfo();
+            return 'https://plus.google.com/share?url={' + data.link + '}';
+
+            //return data;
+        };
+
+        /**
+         *  Share with blogger function
+         */
+        $scope.shareBlogger = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var imageCode = '<img src="http://placehold.it/350x350" style="float: left; margin-right: 20px;"/>';
+            var text = encodeURI(imageCode + data.description);
+
+            return 'https://www.blogger.com/blog-this.g?u=' + url + '&n=' + name + '&t=' + text;
+        };
+
+        /**
+         *  Share with yahoo function
+         */
+        $scope.shareYahoo = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var text = encodeURI(data.description);
+
+            return 'http://compose.mail.yahoo.com/?subject=' + name + '&body='   + text + ' \n' + url;
+        };
+
+
+        /**
+         * Encode URI wrapper
+         * @param text
+         * @returns {string}
+         */
+        $scope.urlEncoder = function (text) {
+            return encodeURI(text);
+        };
+
+
+         //ymsgr:im?+&msg=<?=$currentPageURL;?>
+        /**
+         * You can specify share information here
+         * @returns {{name: string, link: string, description: string, pictureUrl: string}}
+         */
+        function getShareableInfo() {
+            var data = {
+                name: 'FinnBehandling',
+                link: 'http://facebook.com',
+                description: 'FinnBehandling - best site ever... Some other description for test purpose',
+                pictureUrl: 'http://placehold.it/350x350'
+            };
+            return data;
+        }
+
+
+    }]);;
 app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
     function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
 
@@ -39370,10 +39566,11 @@ app.factory('HospitalManager', ['$http', function ($http) {
         }, callback);
     };
 
-    this.getHospitalsCount = function (callback) {
+    this.getHospitalsCount = function (params, callback) {
         $http({
             url: '/hospitals/count',
-            method: "GET"
+            method: "GET",
+            params: params
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
@@ -39402,6 +39599,7 @@ app.factory('NewsManager', ['$http', function ($http) {
             url: '/news/' + id,
             method: "GET"
         }).then(function (response) {
+
             if (callback)
                 callback(null, response.data);
         }, callback);
@@ -39410,6 +39608,22 @@ app.factory('NewsManager', ['$http', function ($http) {
     this.getNewsCount = function (callback) {
         $http({
             url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('RegionManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getFylkes = function (callback) {
+        $http({
+            url: '/regions/fylkes',
             method: "GET"
         }).then(function (response) {
             if (callback)
@@ -39435,6 +39649,32 @@ app.factory('StaticDataManager', ['$http', function ($http) {
 
     return this;
 }]);;
+app.factory('TreatmentManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getTreaments = function (callback) {
+        $http({
+            url: '/treatment',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getSubTreatments = function (id, callback) {
+        $http({
+            url: '/treatment/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
 app.factory('UserManager', ['$http', function ($http) {
     "use strict";
     var self = this;
@@ -39442,6 +39682,17 @@ app.factory('UserManager', ['$http', function ($http) {
     this.signIn = function (data, callback) {
         $http({
             url: '/user/signIn',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.sendEmail = function (data, callback) {
+        $http({
+            url: '/user/sendEmail',
             method: "POST",
             data: data
         }).then(function (response) {

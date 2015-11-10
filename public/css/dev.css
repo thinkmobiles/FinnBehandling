@@ -45,10 +45,16 @@
     border: 1px solid #CDCDCD;
     border-radius: 15px;
     padding: 8px;
-    box-shadow: none;
-    text-shadow: none;
     cursor: pointer;
     font-size: 11.0pt;
+}
+
+#create-hospital {
+    margin-top: 40px;
+    padding: 4px 12px;
+    color: white;
+    background: #009ec8;
+    cursor: pointer;
 }
 
 .normal {
@@ -240,4 +246,78 @@ footer {
     margin-top: 100px;
     background: #009ec8;
     height: 300px;
+}
+
+
+.clients-photo {
+    overflow: hidden;
+    height: 445px;
+    width: 445px;
+    position: relative;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+}
+/*.clients-photo span {
+    font-size: 30px;
+    font-family: ProximaNova-Semibold, serif;
+    color: #ffffff;
+    width: 100%;
+    position: absolute;
+    top: calc((100% - 42px) / 2);
+    left: 0;
+}*/
+/*.clients-photo input[type=file] {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+}*/
+.clients-photo img {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    top: 0;
+    left: 0;
+}
+.remove-image,
+.remove-image:hover,
+.remove-image:focus,
+.remove-image:active {
+    z-index: 4;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #999999;
+    text-decoration: none;
+    outline: none;
+    outline-offset: 0;
+    cursor: pointer;
+}
+.slider-block {
+    width: 20px;
+    padding: 0;
+    display: inline-block;
+    height: 433px;
+    padding-top: 6px;
+}
+.slider-block > div {
+    height: 433px;
+}
+.slider-block .ui-slider-disabled {
+    display: none;
+}
+
+.image-container:after {
+    clear: both;
+    content: '';
+    display: table;
+}
+
+.slim {
+    height: 40px
 }

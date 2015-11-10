@@ -18,20 +18,18 @@ module.exports = function (postGre, ParentModel) {
     },
         {
             create: {
-                first_name: ['required', 'isString'],
-                last_name: ['required', 'isString'],
+                name: ['required', 'isString'],
                 email: ['required', 'isEmail'],
                 password: ['required', 'isString'],
                 google_id: ['isString'],
                 facebook_id: ['isString'],
                 twitter_id: ['isString'],
-                role: ['required', 'isString']
+                role: ['isString']
             },
 
             update: {
                 id: ['required', 'isInt'],
-                first_name: ['isString'],
-                last_name: ['isString'],
+                name: ['isString'],
                 email: ['isEmail'],
                 password: ['isString'],
                 google_id: ['isString'],

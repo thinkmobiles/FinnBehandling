@@ -4,6 +4,11 @@ app.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'templates/startPage.html',
         controllerAs: 'startPageCtrl',
         reloadOnSearch: false
+    }).when('/kontakt', {
+        controller: 'contactController',
+        templateUrl: 'templates/contact.html',
+        controllerAs: 'contactCtrl',
+        reloadOnSearch: false
     }).when('/behandlingstilbud', {
         controller: 'behandlingstilbudController',
         templateUrl: 'templates/behandlingstilbud/list.html',
