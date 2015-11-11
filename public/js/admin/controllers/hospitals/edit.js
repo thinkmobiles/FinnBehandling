@@ -19,6 +19,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         self.isSubTreatmentOpen = false;
         self.isMouseOverSubTreatment = true;
 
+        $scope.resultater = 1000000;
+        $scope.hospitalsPage = GeneralHelpers.getLocationData('hospitalsPage') || 1;
 
         function getDescriptionMaxLength() {
             if (self.hospital.description && !self.hospital.is_paid) {
@@ -123,7 +125,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 $location.path('');
             });
-        };
+        }
 
 
         (function getTreatments() {
@@ -145,6 +147,36 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 }
 
                 self.subTreatments = subTreatments;
+            });
+        }
+
+
+        function getHospitals () {
+
+            HospitalsManager.getHospitalsList({},
+                function (err, hospitals) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.hospitals = hospitals;
+                });
+        }
+
+        this.refreshHospitals = function () {
+            GeneralHelpers.saveAsLocalData('hospitalsPage', $scope.hospitalsPage);
+
+            getHospitals();
+        };
+
+        function getHospitalsCount () {
+
+            HospitalsManager.getHospitalsCount({}, function (err, count) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
             });
         }
 

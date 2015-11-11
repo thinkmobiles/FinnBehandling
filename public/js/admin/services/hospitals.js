@@ -2,10 +2,11 @@ app.factory('HospitalsManager', ['$http', function ($http) {
     "use strict";
     var self = this;
 
-    this.getHospitalsList = function (callback) {
+    this.getHospitalsList = function (params, callback) {
         $http({
             url: '/hospitals',
-            method: 'GET'
+            method: 'GET',
+            params: params
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
