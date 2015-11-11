@@ -1,10 +1,22 @@
-<div class="side-container">
+<div class="side-container" ng-click="editHospitalCtrl.closeTreatmentDialog()">
 
     <h3 class="blue">Legg til nytt senter</h3>
 
     <br/>
 
-    <div class="row">* = må fylles ut</div>
+    <div class="row">
+        <div class="col-md-2">* = må fylles ut</div>
+        <div class="col-md-6">
+            <select ng-model="editHospitalCtrl.hospital"
+                    ng-options="item.id as item.label for item in values">
+                <option value="" disabled selected style="display: none;"> Kopier eksisterende senter</option>
+            </select>
+
+        </div>
+        <div class="col-md-2">
+            <button class="pull-right blue" ng-click="editHospitalCtrl.resetFields()">Nullstill felter</button>
+        </div>
+    </div>
 
     <br/>
 
@@ -102,14 +114,45 @@
 
     <div class="row">
         <div class="col-md-2">* Beskrivelse: <br/> (maks {{ editHospitalCtrl.getDescriptionMaxLength() }} tegn)</div>
-        <div class="col-md-10"><textarea ng-model="editHospitalCtrl.hospital.description" maxlength="{{ editHospitalCtrl.getDescriptionMaxLength() }}" required></textarea></div>
+        <div class="col-md-10">
+            <textarea ng-model="editHospitalCtrl.hospital.description"
+                      maxlength="{{ editHospitalCtrl.getDescriptionMaxLength() }}" required></textarea>
+
+            <div>
+                {{ editHospitalCtrl.hospital.description.length || 0 }}/{{editHospitalCtrl.getDescriptionMaxLength()}}
+            </div>
+        </div>
     </div>
 
     <br/>
 
     <div class="row">
         <div class="col-md-2">* Hovedkategori:</div>
-        <div class="col-md-10"></div>
+        <div class="col-md-10">
+            <div ng-class="row" ng-repeat="treatment in editHospitalCtrl.treatments">
+                <div class="col-md-3">
+                    {{treatment.name}} <input class="pull-right" type="checkbox" ng-model="treatment.isSelected"
+                                              ng-click="editHospitalCtrl.changeTreatmentSelection(treatment)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="editHospitalCtrl.isSubTreatmentOpen && editHospitalCtrl.subTreatments.length">
+        <div class="side-container col-md-10 pull-right">
+            <div ng-class="row" ng-repeat="subTreatment in editHospitalCtrl.subTreatments">
+                <div class="col-md-3">
+                    {{subTreatment.name}} <input class="pull-right" type="checkbox" ng-model="subTreatment.isSelected"
+                                                 ng-click="editHospitalCtrl.changeSubTreatmentSelection(subTreatment)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <button class="pull-right blue" ng-click="editHospitalCtrl.createHospital()">Lagre</button>
     </div>
 
     <br/>

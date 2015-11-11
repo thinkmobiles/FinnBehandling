@@ -14,7 +14,7 @@ app.factory('TreatmentsManager', ['$http', function ($http) {
 
     this.getSubTreatments = function (id, callback) {
         $http({
-            url: '/treatment' + id,
+            url: '/treatment/' + id,
             method: 'GET'
         }).then(function (response) {
             if (callback)

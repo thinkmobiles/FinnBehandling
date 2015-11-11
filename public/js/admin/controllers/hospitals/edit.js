@@ -3,10 +3,20 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         var self = this;
         var hospitalId = $routeParams.id;
 
+        self.createHospital = createHospital;
+        self.updateHospital = updateHospital;
+
         self.getDescriptionMaxLength = getDescriptionMaxLength;
+        self.changeTreatmentSelection = changeTreatmentSelection;
+        self.changeSubTreatmentSelection = changeSubTreatmentSelection;
+        self.closeTreatmentDialog = closeTreatmentDialog;
 
         self.hospital = {};
         self.hospital.is_paid = false;
+        self.hospital.treatment_ids = [];
+        self.hospital.sub_treatments = [];
+
+        self.isSubTreatmentOpen = false;
 
 
         function getDescriptionMaxLength() {
@@ -16,7 +26,61 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             return self.hospital.is_paid ? 600 : 200;
         }
 
-        self.createHospital = function () {
+        /**
+         * Manage selected treatments depending on user selection
+         * @param treatment
+         */
+        function changeTreatmentSelection(treatment) {
+            if (treatment.isSelected) {
+                getSubTreatments(treatment.id);
+                self.hospital.treatment_ids.push(treatment.id);
+                openTreatmentDialog();
+            } else {
+                self.isSubTreatmentOpen = false;
+                self.hospital.treatment_ids = [];
+                for (var i = self.treatments.length - 1; i >= 0; i--) {
+                    if (self.treatments[i].isSelected) {
+                        self.hospital.treatment_ids.push(self.treatments[i].id);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Manage selected subTreatments depending on user selection
+         * @param subTreatment
+         */
+        function changeSubTreatmentSelection(subTreatment) {
+            if (subTreatment.isSelected) {
+                self.hospital.sub_treatments.push(subTreatment.id);
+                openTreatmentDialog();
+            } else {
+                self.hospital.sub_treatments = [];
+                for (var i = self.subTreatments.length - 1; i >= 0; i--) {
+                    if (self.subTreatments[i].isSelected) {
+                        self.hospital.sub_treatments.push(self.subTreatments[i].id);
+                    }
+                }
+            }
+        }
+
+        function resetFields() {
+            self.hospital = {};
+            self.hospital.is_paid = false;
+            self.hospital.treatment_ids = [];
+            self.hospital.sub_treatments = [];
+        }
+
+        function openTreatmentDialog() {
+            self.isSubTreatmentOpen = true;
+        }
+
+        function closeTreatmentDialog() {
+            //self.isSubTreatmentOpen = false;
+            self.subTreatments = [];
+        }
+
+        function createHospital() {
             HospitalsManager.createHospital(self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
@@ -26,9 +90,9 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 $location.path('');
             });
-        };
+        }
 
-        function getHospital () {
+        function getHospital(hospitalId) {
 
             HospitalsManager.getHospital(hospitalId, function (err, hospital) {
                 if (err) {
@@ -40,11 +104,11 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
         if (hospitalId) {
-            getHospital ();
+            getHospital();
         }
 
 
-        self.updateHospital = function () {
+        function updateHospital() {
             HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
@@ -57,7 +121,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         };
 
 
-        self.getTreatments = function () {
+        (function getTreatments() {
 
             TreatmentsManager.getTreatments(function (err, treatments) {
                 if (err) {
@@ -66,19 +130,17 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 self.treatments = treatments;
             });
-        };
+        }());
 
-        getTreatments();
+        function getSubTreatments(treatmentId) {
 
-         self.getSubTreatments = function () {
-
-            TreatmentsManager.getSubTreatments(self.treatmentId, function (err, subTreatments) {
+            TreatmentsManager.getSubTreatments(treatmentId, function (err, subTreatments) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 self.subTreatments = subTreatments;
             });
-        };
+        }
 
     }]);
