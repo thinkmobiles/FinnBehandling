@@ -139,7 +139,7 @@
     </div>
 
     <div class="row" ng-show="editHospitalCtrl.isSubTreatmentOpen && editHospitalCtrl.subTreatments.length">
-        <div class="side-container col-md-10 pull-right">
+        <div class="side-container col-md-10 pull-right" ng-mouseenter="editHospitalCtrl.isMouseOverSubTreatment = true" ng-mouseleave="editHospitalCtrl.isMouseOverSubTreatment = false">
             <div ng-class="row" ng-repeat="subTreatment in editHospitalCtrl.subTreatments">
                 <div class="col-md-3">
                     {{subTreatment.name}} <input class="pull-right" type="checkbox" ng-model="subTreatment.isSelected"

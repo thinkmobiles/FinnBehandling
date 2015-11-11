@@ -17,6 +17,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         self.hospital.sub_treatments = [];
 
         self.isSubTreatmentOpen = false;
+        self.isMouseOverSubTreatment = true;
 
 
         function getDescriptionMaxLength() {
@@ -75,9 +76,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             self.isSubTreatmentOpen = true;
         }
 
+        /**
+         * Hide subTreatment selection dialog, only works if clicked outside of
+         */
         function closeTreatmentDialog() {
-            //self.isSubTreatmentOpen = false;
-            self.subTreatments = [];
+            if (!self.isMouseOverSubTreatment) {
+                self.subTreatments = [];
+            }
         }
 
         function createHospital() {
