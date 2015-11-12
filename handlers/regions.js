@@ -36,15 +36,29 @@ var Regions = function (PostGre) {
          *  {"fylke":"Nord-Trøndelag"}
          *  ]
          *
+         *  Can take optional query parameter `postCode` and return one "fylke" by postcode
+         *
+         *  @example Request example:
+         *         http://192.168.88.250:8787/regions/fylkes?postCode=1111
+         *
+         * @example Response example:
+         *
+         *  {"fylke":"Hordaland"}
+         *
          * @method getFylkes
          * @instance
          */
 
+        var postCode = req.query.postCode;
+
         RegionsList
             .query(function (qb) {
+                if(postCode){
+                    qb.where('postnummer', postCode)
+                }
                 qb.whereNot('fylke', null);
                 qb.distinct('fylke');
-                qb.select('fylke');
+                qb.select('fylke', 'kommunenavn');
             })
             .fetchAll()
             .asCallback(function(err, result){
@@ -52,6 +66,8 @@ var Regions = function (PostGre) {
                 if (err) {
                     return next(err);
                 }
+
+                result = result.length > 1 ? result : result.toJSON()[0] || {};
 
                 res.status(200).send(result);
             });
