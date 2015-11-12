@@ -39131,8 +39131,9 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         getNews();
     }]);
 ;
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager',
+    'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, WebRecommendationsManager, GeneralHelpers) {
 
         $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling =  +GeneralHelpers.getLocalData('behandling') || null;
@@ -39228,6 +39229,20 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
                 }
             ];
         }
+
+
+        function getWebRecommendations () {
+
+            WebRecommendationsManager.getRecommendationsList({}, function (err, webRecommendations) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.webRecommendations = webRecommendations;
+                });
+        }
+
+        getWebRecommendations();
 }]);;
 app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
     function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
@@ -39601,6 +39616,45 @@ app.factory('UserManager', ['$http', function ($http) {
             url: '/user/sendEmail',
             method: "POST",
             data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('WebRecommendationsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getRecommendationsList = function (params, callback) {
+        $http({
+            url: '/webRecommendations',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendation = function (id, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendationsCount = function (callback) {
+        $http({
+            url: '/webRecommendations/count',
+            method: "GET"
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
