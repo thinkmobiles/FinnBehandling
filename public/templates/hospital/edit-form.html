@@ -8,8 +8,10 @@
         <div class="col-md-2">* = må fylles ut</div>
         <div class="col-md-6">
             <select ng-model="editHospitalCtrl.hospital"
-                    ng-options="item.id as item.label for item in values">
-                <option value="" disabled selected style="display: none;"> Kopier eksisterende senter</option>
+                    ng-options="item as item.name for item in editHospitalCtrl.hospitals"
+                    ng-change="editHospitalCtrl.updateForm()"
+                    >
+                <option value="" disabled selected > Kopier eksisterende senter</option>
             </select>
 
         </div>
@@ -37,7 +39,7 @@
         <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.name" required/></div>
 
         <div class="col-md-2">* Sted:</div>
-        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.place" required/></div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.city" required/></div>
     </div>
 
     <br/>
@@ -47,7 +49,7 @@
         <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.address" required/></div>
 
         <div class="col-md-2">* Postnumber:</div>
-        <div class="col-md-1"><input type="text" ng-model="editHospitalCtrl.hospital.address.zip_code" required/></div>
+        <div class="col-md-1"><input type="text" ng-model="editHospitalCtrl.hospital.postcode" required/></div>
     </div>
 
     <br/>
@@ -62,7 +64,7 @@
     <div class="row">
         <div class="col-md-2">* Telefon m. prefiks:</div>
         <div class="col-md-4">
-            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0].prefix" required/>
+            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0]" required/>
             <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0]" required/>
         </div>
 
@@ -77,7 +79,7 @@
         <div class="row">
             <div class="col-md-2">Telefon m. prefiks 2:</div>
             <div class="col-md-4">
-                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1].prefix"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1]"/>
                 <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1]"/>
             </div>
 
@@ -90,7 +92,7 @@
         <div class="row">
             <div class="col-md-2">Telefon m. prefiks 3:</div>
             <div class="col-md-4">
-                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2].prefix"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2]"/>
                 <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2]"/>
             </div>
 
@@ -128,26 +130,32 @@
 
     <div class="row">
         <div class="col-md-2">* Hovedkategori:</div>
-        <div class="col-md-10">
+        <div class="col-md-10" ng-mouseenter="editHospitalCtrl.isMouseOverSubTreatment = true" ng-mouseleave="editHospitalCtrl.isMouseOverSubTreatment = false">
             <div ng-class="row" ng-repeat="treatment in editHospitalCtrl.treatments">
                 <div class="col-md-3">
                     {{treatment.name}} <input class="pull-right" type="checkbox" ng-model="treatment.isSelected"
                                               ng-click="editHospitalCtrl.changeTreatmentSelection(treatment)">
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="row" ng-show="editHospitalCtrl.isSubTreatmentOpen && editHospitalCtrl.subTreatments.length">
-        <div class="side-container col-md-10 pull-right" ng-mouseenter="editHospitalCtrl.isMouseOverSubTreatment = true" ng-mouseleave="editHospitalCtrl.isMouseOverSubTreatment = false">
-            <div ng-class="row" ng-repeat="subTreatment in editHospitalCtrl.subTreatments">
-                <div class="col-md-3">
-                    {{subTreatment.name}} <input class="pull-right" type="checkbox" ng-model="subTreatment.isSelected"
-                                                 ng-click="editHospitalCtrl.changeSubTreatmentSelection(subTreatment)">
+            <div class="row" ng-show="editHospitalCtrl.isSubTreatmentOpen && editHospitalCtrl.subTreatments.length">
+                <div class="side-container col-md-12 pull-right" >
+                    <div ng-class="row" ng-repeat="subTreatment in editHospitalCtrl.subTreatments">
+                        <div class="col-md-3">
+                           {{subTreatment.name}} <input class="pull-right" type="checkbox" ng-model="subTreatment.isSelected"
+                                                         ng-click="editHospitalCtrl.changeSubTreatmentSelection(subTreatment)">
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
+
+
+
     </div>
+
+
 
     <br/>
 

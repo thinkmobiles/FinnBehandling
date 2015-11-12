@@ -10,6 +10,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         self.changeTreatmentSelection = changeTreatmentSelection;
         self.changeSubTreatmentSelection = changeSubTreatmentSelection;
         self.closeTreatmentDialog = closeTreatmentDialog;
+        self.resetFields = resetFields;
+        self.updateForm = updateForm;
 
         self.hospital = {};
         self.hospital.is_paid = false;
@@ -19,8 +21,6 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         self.isSubTreatmentOpen = false;
         self.isMouseOverSubTreatment = true;
 
-        $scope.resultater = 1000000;
-        $scope.hospitalsPage = GeneralHelpers.getLocationData('hospitalsPage') || 1;
 
         function getDescriptionMaxLength() {
             if (self.hospital.description && !self.hospital.is_paid) {
@@ -35,16 +35,18 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
          */
         function changeTreatmentSelection(treatment) {
             if (treatment.isSelected) {
-                getSubTreatments(treatment.id);
+                self.subTreatments = treatment.subTreatments;
                 self.hospital.treatment_ids.push(treatment.id);
                 openTreatmentDialog();
             } else {
                 self.isSubTreatmentOpen = false;
-                self.hospital.treatment_ids = [];
-                for (var i = self.treatments.length - 1; i >= 0; i--) {
-                    if (self.treatments[i].isSelected) {
-                        self.hospital.treatment_ids.push(self.treatments[i].id);
-                    }
+                var index = self.hospital.treatment_ids.indexOf(treatment.id);
+                if (index >= 0) {
+                    self.hospital.treatment_ids.splice(index, 1);
+                }
+                for (var i = treatment.subTreatments.length - 1; i >= 0; i--) {
+                    treatment.subTreatments[i].isSelected = false;
+                    self.hospital.sub_treatments.splice(self.hospital.sub_treatments.indexOf(treatment.subTreatments[i].id), 1);
                 }
             }
         }
@@ -58,21 +60,47 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 self.hospital.sub_treatments.push(subTreatment.id);
                 openTreatmentDialog();
             } else {
-                self.hospital.sub_treatments = [];
-                for (var i = self.subTreatments.length - 1; i >= 0; i--) {
-                    if (self.subTreatments[i].isSelected) {
-                        self.hospital.sub_treatments.push(self.subTreatments[i].id);
-                    }
+                var index = self.hospital.sub_treatments.indexOf(subTreatment.id);
+                if (index >= 0) {
+                    self.hospital.sub_treatments.splice(index, 1);
                 }
             }
         }
 
+
+        /**
+         * Set default values for the form
+         */
         function resetFields() {
             self.hospital = {};
             self.hospital.is_paid = false;
             self.hospital.treatment_ids = [];
             self.hospital.sub_treatments = [];
+            updateForm();
         }
+
+        function updateForm() {
+
+            if (!self.hospital.treatment_ids) {
+                self.hospital.treatment_ids = [];
+            }
+            if (!self.hospital.sub_treatments) {
+                self.hospital.sub_treatments = [];
+            }
+
+            for (var i = self.treatments.length - 1; i >= 0; i--) {
+                if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
+                    self.treatments[i].isSelected = true;
+
+                    for (var j = self.treatments[i].subTreatments.length - 1; j >= 0; j--) {
+                        if (self.hospital.sub_treatments && self.hospital.sub_treatments.indexOf(self.treatments[i].subTreatments[j].id) >= 0) {
+                            self.treatments[i].subTreatments[j].isSelected = true;
+                        }
+                    }
+                }
+            }
+        }
+
 
         function openTreatmentDialog() {
             self.isSubTreatmentOpen = true;
@@ -88,7 +116,25 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
         function createHospital() {
-            HospitalsManager.createHospital(self.hospital, function (err, hospital) {
+
+            var data = {
+                is_paid: self.hospital.is_paid,
+                name: self.hospital.name,
+                treatment_ids: self.hospital.treatment_ids,
+                sub_treatments: self.hospital.sub_treatments,
+                description: self.hospital.description,
+                email: self.hospital.email,
+                phone_number: self.hospital.phone_number,
+                web_address: self.hospital.web_address,
+                postcode: self.hospital.postcode
+            };
+
+            if (!data.sub_treatments) {
+                alert('Spesifiser hovedkategori');
+                return;
+            }
+
+            HospitalsManager.createHospital(data, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -136,22 +182,25 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 }
 
                 self.treatments = treatments;
+                for (var i = self.treatments.length - 1; i >= 0; i--) {
+                    getSubTreatments(self.treatments[i]);
+                }
             });
         }());
 
-        function getSubTreatments(treatmentId) {
+        function getSubTreatments(treatment) {
 
-            TreatmentsManager.getSubTreatments(treatmentId, function (err, subTreatments) {
+            TreatmentsManager.getSubTreatments(treatment.id, function (err, subTreatments) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                self.subTreatments = subTreatments;
+                treatment.subTreatments = subTreatments;
             });
         }
 
 
-        function getHospitals () {
+        (function getHospitals() {
 
             HospitalsManager.getHospitalsList({},
                 function (err, hospitals) {
@@ -160,8 +209,9 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                     }
 
                     self.hospitals = hospitals;
+                    console.log(self.hospitals);
                 });
-        }
+        }());
 
         this.refreshHospitals = function () {
             GeneralHelpers.saveAsLocalData('hospitalsPage', $scope.hospitalsPage);
@@ -169,7 +219,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             getHospitals();
         };
 
-        function getHospitalsCount () {
+        function getHospitalsCount() {
 
             HospitalsManager.getHospitalsCount({}, function (err, count) {
                 if (err) {
