@@ -1,5 +1,5 @@
-app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, GeneralHelpers) {
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, RegionsManager, GeneralHelpers) {
         var self = this;
         var hospitalId = $routeParams.id;
 
@@ -10,18 +10,24 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         self.changeTreatmentSelection = changeTreatmentSelection;
         self.changeSubTreatmentSelection = changeSubTreatmentSelection;
         self.closeTreatmentDialog = closeTreatmentDialog;
+        self.setFormDirty = setFormDirty;
         self.resetFields = resetFields;
         self.updateForm = updateForm;
-
-        self.hospital = {};
-        self.hospital.is_paid = false;
-        self.hospital.treatment_ids = [];
-        self.hospital.sub_treatments = [];
+        self.getRegion = getRegion;
 
         self.isSubTreatmentOpen = false;
         self.isMouseOverSubTreatment = true;
+        self.isFormDirty = false;
 
 
+        getTreatments();
+        resetFields();
+
+
+        /**
+         * Check max length for currently selected entry type
+         * @returns {number}
+         */
         function getDescriptionMaxLength() {
             if (self.hospital.description && !self.hospital.is_paid) {
                 self.hospital.description = self.hospital.description.substring(0, 200);
@@ -73,12 +79,29 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
          */
         function resetFields() {
             self.hospital = {};
+            self.hospital.phones = [{}, {}, {}];
             self.hospital.is_paid = false;
             self.hospital.treatment_ids = [];
             self.hospital.sub_treatments = [];
+            self.isFormDirty = false;
             updateForm();
         }
 
+        /**
+         * Form validation initializer.
+         * Once it's invoked invalid fields will be highlighted
+         * @returns {boolean}
+         */
+        function setFormDirty() {
+            self.isFormDirty = true;
+            return self.isFormDirty;
+        }
+
+
+        /**
+         * Do form fields set up routine.
+         * Could be used for initialization or reinitialization
+         */
         function updateForm() {
 
             if (!self.hospital.treatment_ids) {
@@ -87,8 +110,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             if (!self.hospital.sub_treatments) {
                 self.hospital.sub_treatments = [];
             }
+            if(!self.treatments) {
+                self.treatments = [];
+            }
 
             for (var i = self.treatments.length - 1; i >= 0; i--) {
+                console.log(self.hospital.treatment_ids)
+                console.log(self.hospital.sub_treatments)
                 if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
                     self.treatments[i].isSelected = true;
 
@@ -97,11 +125,25 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                             self.treatments[i].subTreatments[j].isSelected = true;
                         }
                     }
+                    console.log(self.treatments);
                 }
             }
+
+            if (self.hospital.phone_number) {
+                self.hospital.phones = [{}, {}, {}];
+
+                for (var i = self.hospital.phone_number.length - 1; i >= 0; i--) {
+                    self.hospital.phones[i].prefix = self.hospital.phone_number[i].substring(0, 4);
+                    self.hospital.phones[i].suffix = self.hospital.phone_number[i].substring(4);
+                }
+            }
+
         }
 
 
+        /**
+         * Changes indicator for treatment dialog
+         */
         function openTreatmentDialog() {
             self.isSubTreatmentOpen = true;
         }
@@ -115,9 +157,19 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             }
         }
 
+        /**
+         * Prepare and persist hospital object
+         */
         function createHospital() {
+            //TODO refactor this: create new method for object preparing
+            for (var i = self.hospital.phones.length - 1; i >= 0; i--) {
+                if(self.hospital.phones[i].prefix && self.hospital.phones[i].suffix) {
+                    self.hospital.phone_number[i] = self.hospital.phones[i].prefix + self.hospital.phones[i].suffix;
+                }
+            }
 
             var data = {
+                region_id: self.hospital.region_id,
                 is_paid: self.hospital.is_paid,
                 name: self.hospital.name,
                 treatment_ids: self.hospital.treatment_ids,
@@ -145,6 +197,10 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             });
         }
 
+        /**
+         * Fetch hospital by its id
+         * @param hospitalId
+         */
         function getHospital(hospitalId) {
 
             HospitalsManager.getHospital(hospitalId, function (err, hospital) {
@@ -161,6 +217,9 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
 
+        /**
+         * Hospital update function, prepare and persist hospital object
+         */
         function updateHospital() {
             HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
                 if (err) {
@@ -173,8 +232,29 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
             });
         }
 
+        /**
+         * Fetch region by zip code as soon as
+         */
+        function getRegion() {
+            if (self.hospital.postcode && self.hospital.postcode.length !== 4) {
+                return;
+            }
 
-        (function getTreatments() {
+            RegionsManager.getFylkesByPostCode(self.hospital.postcode, function (err, region) {
+
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.currentRegion = region;
+                self.hospital.region_id = self.currentRegion.id;
+                self.hospital.city = self.currentRegion.poststed ? self.currentRegion.poststed.substring(0, 1).toUpperCase() + self.currentRegion.poststed.substring(1).toLowerCase() : '';
+
+            });
+        }
+
+
+        function getTreatments() {
 
             TreatmentsManager.getTreatments(function (err, treatments) {
                 if (err) {
@@ -186,8 +266,12 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                     getSubTreatments(self.treatments[i]);
                 }
             });
-        }());
+        }
 
+        /**
+         * Fetch all subtreatments for specified treatment
+         * @param treatment
+         */
         function getSubTreatments(treatment) {
 
             TreatmentsManager.getSubTreatments(treatment.id, function (err, subTreatments) {
@@ -213,12 +297,15 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 });
         }());
 
-        this.refreshHospitals = function () {
+        self.refreshHospitals = function () {
             GeneralHelpers.saveAsLocalData('hospitalsPage', $scope.hospitalsPage);
 
             getHospitals();
         };
 
+        /**
+         * Fetch hospital quantity
+         */
         function getHospitalsCount() {
 
             HospitalsManager.getHospitalsCount({}, function (err, count) {
@@ -226,7 +313,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                $scope.totalItems = result.count;
+                self.totalItems = result.count;
             });
         }
 

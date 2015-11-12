@@ -58,7 +58,7 @@ var Regions = function (PostGre) {
                 }
                 qb.whereNot('fylke', null);
                 qb.distinct('fylke');
-                qb.select('fylke', 'kommunenavn');
+                qb.select('id', 'poststed', 'fylke', 'kommunenavn');
             })
             .fetchAll()
             .asCallback(function(err, result){

@@ -8739,6 +8739,13 @@ footer {
 .top-buffer {
     margin-top: 20px;
 }
+
+.form-invalid-label {
+    color: red;
+}
+.form-invalid-border {
+    border-color: red;
+}
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)

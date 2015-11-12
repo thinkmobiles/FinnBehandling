@@ -73070,6 +73070,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/hospital/new', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',
@@ -73092,6 +73096,326 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
+
+    }]);;
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, RegionsManager, GeneralHelpers) {
+        var self = this;
+        var hospitalId = $routeParams.id;
+
+        self.createHospital = createHospital;
+        self.updateHospital = updateHospital;
+
+        self.getDescriptionMaxLength = getDescriptionMaxLength;
+        self.changeTreatmentSelection = changeTreatmentSelection;
+        self.changeSubTreatmentSelection = changeSubTreatmentSelection;
+        self.closeTreatmentDialog = closeTreatmentDialog;
+        self.setFormDirty = setFormDirty;
+        self.resetFields = resetFields;
+        self.updateForm = updateForm;
+        self.getRegion = getRegion;
+
+        self.isSubTreatmentOpen = false;
+        self.isMouseOverSubTreatment = true;
+        self.isFormDirty = false;
+
+
+        getTreatments();
+        resetFields();
+
+
+        /**
+         * Check max length for currently selected entry type
+         * @returns {number}
+         */
+        function getDescriptionMaxLength() {
+            if (self.hospital.description && !self.hospital.is_paid) {
+                self.hospital.description = self.hospital.description.substring(0, 200);
+            }
+            return self.hospital.is_paid ? 600 : 200;
+        }
+
+        /**
+         * Manage selected treatments depending on user selection
+         * @param treatment
+         */
+        function changeTreatmentSelection(treatment) {
+            if (treatment.isSelected) {
+                self.subTreatments = treatment.subTreatments;
+                self.hospital.treatment_ids.push(treatment.id);
+                openTreatmentDialog();
+            } else {
+                self.isSubTreatmentOpen = false;
+                var index = self.hospital.treatment_ids.indexOf(treatment.id);
+                if (index >= 0) {
+                    self.hospital.treatment_ids.splice(index, 1);
+                }
+                for (var i = treatment.subTreatments.length - 1; i >= 0; i--) {
+                    treatment.subTreatments[i].isSelected = false;
+                    self.hospital.sub_treatments.splice(self.hospital.sub_treatments.indexOf(treatment.subTreatments[i].id), 1);
+                }
+            }
+        }
+
+        /**
+         * Manage selected subTreatments depending on user selection
+         * @param subTreatment
+         */
+        function changeSubTreatmentSelection(subTreatment) {
+            if (subTreatment.isSelected) {
+                self.hospital.sub_treatments.push(subTreatment.id);
+                openTreatmentDialog();
+            } else {
+                var index = self.hospital.sub_treatments.indexOf(subTreatment.id);
+                if (index >= 0) {
+                    self.hospital.sub_treatments.splice(index, 1);
+                }
+            }
+        }
+
+
+        /**
+         * Set default values for the form
+         */
+        function resetFields() {
+            self.hospital = {};
+            self.hospital.phones = [{}, {}, {}];
+            self.hospital.is_paid = false;
+            self.hospital.treatment_ids = [];
+            self.hospital.sub_treatments = [];
+            self.isFormDirty = false;
+            updateForm();
+        }
+
+        /**
+         * Form validation initializer.
+         * Once it's invoked invalid fields will be highlighted
+         * @returns {boolean}
+         */
+        function setFormDirty() {
+            self.isFormDirty = true;
+            return self.isFormDirty;
+        }
+
+
+        /**
+         * Do form fields set up routine.
+         * Could be used for initialization or reinitialization
+         */
+        function updateForm() {
+
+            if (!self.hospital.treatment_ids) {
+                self.hospital.treatment_ids = [];
+            }
+            if (!self.hospital.sub_treatments) {
+                self.hospital.sub_treatments = [];
+            }
+            if(!self.treatments) {
+                self.treatments = [];
+            }
+
+            for (var i = self.treatments.length - 1; i >= 0; i--) {
+                console.log(self.hospital.treatment_ids)
+                console.log(self.hospital.sub_treatments)
+                if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
+                    self.treatments[i].isSelected = true;
+
+                    for (var j = self.treatments[i].subTreatments.length - 1; j >= 0; j--) {
+                        if (self.hospital.sub_treatments && self.hospital.sub_treatments.indexOf(self.treatments[i].subTreatments[j].id) >= 0) {
+                            self.treatments[i].subTreatments[j].isSelected = true;
+                        }
+                    }
+                    console.log(self.treatments);
+                }
+            }
+
+            if (self.hospital.phone_number) {
+                self.hospital.phones = [{}, {}, {}];
+
+                for (var i = self.hospital.phone_number.length - 1; i >= 0; i--) {
+                    self.hospital.phones[i].prefix = self.hospital.phone_number[i].substring(0, 4);
+                    self.hospital.phones[i].suffix = self.hospital.phone_number[i].substring(4);
+                }
+            }
+
+        }
+
+
+        /**
+         * Changes indicator for treatment dialog
+         */
+        function openTreatmentDialog() {
+            self.isSubTreatmentOpen = true;
+        }
+
+        /**
+         * Hide subTreatment selection dialog, only works if clicked outside of
+         */
+        function closeTreatmentDialog() {
+            if (!self.isMouseOverSubTreatment) {
+                self.subTreatments = [];
+            }
+        }
+
+        /**
+         * Prepare and persist hospital object
+         */
+        function createHospital() {
+            //TODO refactor this: create new method for object preparing
+            for (var i = self.hospital.phones.length - 1; i >= 0; i--) {
+                if(self.hospital.phones[i].prefix && self.hospital.phones[i].suffix) {
+                    self.hospital.phone_number[i] = self.hospital.phones[i].prefix + self.hospital.phones[i].suffix;
+                }
+            }
+
+            var data = {
+                region_id: self.hospital.region_id,
+                is_paid: self.hospital.is_paid,
+                name: self.hospital.name,
+                treatment_ids: self.hospital.treatment_ids,
+                sub_treatments: self.hospital.sub_treatments,
+                description: self.hospital.description,
+                email: self.hospital.email,
+                phone_number: self.hospital.phone_number,
+                web_address: self.hospital.web_address,
+                postcode: self.hospital.postcode
+            };
+
+            if (!data.sub_treatments) {
+                alert('Spesifiser hovedkategori');
+                return;
+            }
+
+            HospitalsManager.createHospital(data, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital created successful');
+
+                $location.path('');
+            });
+        }
+
+        /**
+         * Fetch hospital by its id
+         * @param hospitalId
+         */
+        function getHospital(hospitalId) {
+
+            HospitalsManager.getHospital(hospitalId, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        if (hospitalId) {
+            getHospital();
+        }
+
+
+        /**
+         * Hospital update function, prepare and persist hospital object
+         */
+        function updateHospital() {
+            HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital updated successful');
+
+                $location.path('');
+            });
+        }
+
+        /**
+         * Fetch region by zip code as soon as
+         */
+        function getRegion() {
+            if (self.hospital.postcode && self.hospital.postcode.length !== 4) {
+                return;
+            }
+
+            RegionsManager.getFylkesByPostCode(self.hospital.postcode, function (err, region) {
+
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.currentRegion = region;
+                self.hospital.region_id = self.currentRegion.id;
+                self.hospital.city = self.currentRegion.poststed ? self.currentRegion.poststed.substring(0, 1).toUpperCase() + self.currentRegion.poststed.substring(1).toLowerCase() : '';
+
+            });
+        }
+
+
+        function getTreatments() {
+
+            TreatmentsManager.getTreatments(function (err, treatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.treatments = treatments;
+                for (var i = self.treatments.length - 1; i >= 0; i--) {
+                    getSubTreatments(self.treatments[i]);
+                }
+            });
+        }
+
+        /**
+         * Fetch all subtreatments for specified treatment
+         * @param treatment
+         */
+        function getSubTreatments(treatment) {
+
+            TreatmentsManager.getSubTreatments(treatment.id, function (err, subTreatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                treatment.subTreatments = subTreatments;
+            });
+        }
+
+
+        (function getHospitals() {
+
+            HospitalsManager.getHospitalsList({},
+                function (err, hospitals) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.hospitals = hospitals;
+                    console.log(self.hospitals);
+                });
+        }());
+
+        self.refreshHospitals = function () {
+            GeneralHelpers.saveAsLocalData('hospitalsPage', $scope.hospitalsPage);
+
+            getHospitals();
+        };
+
+        /**
+         * Fetch hospital quantity
+         */
+        function getHospitalsCount() {
+
+            HospitalsManager.getHospitalsCount({}, function (err, count) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.totalItems = result.count;
+            });
+        }
 
     }]);;
 app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
@@ -73619,6 +73943,85 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
 
     return this;
 }]);;
+app.factory('HospitalsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getHospitalsList = function (params, callback) {
+        $http({
+            url: '/hospitals',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createHospital = function (data, callback) {
+        $http({
+            url: '/hospitals',
+            method: 'POST',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.getHospitalsCount = function (params, callback) {
+        $http({
+            url: '/hospitals/count',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateHospital = function (id, data, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'PUT',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.deleteHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'DELETE'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    return this;
+}]);;
 app.factory('NewsManager', ['$http', function ($http) {
     "use strict";
     var self = this;
@@ -73694,6 +74097,62 @@ app.factory('NewsManager', ['$http', function ($http) {
             if (callback)
                 callback(response);
         });
+    };
+
+    return this;
+}]);;
+/**
+ * Created by vasylhoshovsky on 12.11.15.
+ */
+app.factory('RegionsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    self.getFylkes = function (callback) {
+        $http({
+            url: '/regions/fylkes',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    self.getFylkesByPostCode = function (postcode, callback) {
+        $http({
+            url: '/regions/fylkes?postCode=' + postcode,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+
+    return self;
+}]);;
+app.factory('TreatmentsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getTreatments = function (callback) {
+        $http({
+            url: '/treatment',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getSubTreatments = function (id, callback) {
+        $http({
+            url: '/treatment/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;
