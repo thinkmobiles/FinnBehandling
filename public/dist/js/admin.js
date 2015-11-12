@@ -73074,6 +73074,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
         controllerAs: 'editHospitalCtrl'
+    }).when('/hospital/:id', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',
@@ -73101,8 +73105,9 @@ app.controller('blank', ['$scope',
 app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, RegionsManager, GeneralHelpers) {
         var self = this;
-        var hospitalId = $routeParams.id;
+        self.hospitalId = $routeParams.id;
 
+        self.persistHospital = persistHospital;
         self.createHospital = createHospital;
         self.updateHospital = updateHospital;
 
@@ -73122,6 +73127,11 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
         getTreatments();
         resetFields();
+
+
+        if (self.hospitalId) {
+            getHospital(self.hospitalId);
+        }
 
 
         /**
@@ -73258,10 +73268,23 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
         /**
-         * Prepare and persist hospital object
+         * Invoke either update hospital (if route params is present) or create ne one otherwise
          */
-        function createHospital() {
-            //TODO refactor this: create new method for object preparing
+        function persistHospital() {
+            if (self.hospitalId) {
+                updateHospital();
+            } else {
+                createHospital();
+            }
+        }
+
+
+        /**
+         * Prepare object before db update
+         * @returns {{region_id: *, is_paid: boolean, name: *, treatment_ids: Array, sub_treatments: Array, description: (string|*), email: *, phone_number: *, web_address: (*|string|Array|string|Document.web_address), postcode: *}}
+         */
+        function prepareData() {
+
             for (var i = self.hospital.phones.length - 1; i >= 0; i--) {
                 if(self.hospital.phones[i].prefix && self.hospital.phones[i].suffix) {
                     self.hospital.phone_number[i] = self.hospital.phones[i].prefix + self.hospital.phones[i].suffix;
@@ -73281,10 +73304,16 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 postcode: self.hospital.postcode
             };
 
-            if (!data.sub_treatments) {
-                alert('Spesifiser hovedkategori');
-                return;
-            }
+            return data;
+        }
+
+        /**
+         * Persist hospital object
+         */
+        function createHospital() {
+
+            var data = prepareData();
+
 
             HospitalsManager.createHospital(data, function (err, hospital) {
                 if (err) {
@@ -73305,23 +73334,27 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
             HospitalsManager.getHospital(hospitalId, function (err, hospital) {
                 if (err) {
+                    self.hospitalId = null;
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
                 self.hospital = hospital;
+                updateForm();
             });
         }
 
-        if (hospitalId) {
-            getHospital();
-        }
+
 
 
         /**
-         * Hospital update function, prepare and persist hospital object
+         * Hospital update function, persist hospital object
          */
         function updateHospital() {
-            HospitalsManager.createHospital(hospitalId, self.hospital, function (err, hospital) {
+
+            var data = prepareData();
+
+
+            HospitalsManager.updateHospital(self.hospitalId, data, function (err, hospital) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -73354,6 +73387,9 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
 
+        /**
+         * Fetch treatments from db
+         */
         function getTreatments() {
 
             TreatmentsManager.getTreatments(function (err, treatments) {
