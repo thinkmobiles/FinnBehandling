@@ -1,0 +1,168 @@
+<div class="side-container" ng-click="editHospitalCtrl.closeTreatmentDialog()">
+
+    <h3 class="blue">Legg til nytt senter</h3>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* = må fylles ut</div>
+        <div class="col-md-6">
+            <select ng-model="editHospitalCtrl.hospital"
+                    ng-options="item as item.name for item in editHospitalCtrl.hospitals"
+                    ng-change="editHospitalCtrl.updateForm()"
+                    >
+                <option value="" disabled selected > Kopier eksisterende senter</option>
+            </select>
+
+        </div>
+        <div class="col-md-2">
+            <button class="pull-right blue" ng-click="editHospitalCtrl.resetFields()">Nullstill felter</button>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="row ">
+        <div class="col-md-2">* Annonsetype:</div>
+        <div class="col-md-6">
+            <label class="radio-inline"><input type="radio" ng-model="editHospitalCtrl.hospital.is_paid" ng-value="true"
+                                               name="adType">Betalt</label>
+            <label class="radio-inline"><input type="radio" ng-model="editHospitalCtrl.hospital.is_paid"
+                                               ng-value="false" name="adType">Standard</label>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* Navn på senter:</div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.name" required/></div>
+
+        <div class="col-md-2">* Sted:</div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.city" required/></div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* Adresse:</div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.address" required/></div>
+
+        <div class="col-md-2">* Postnumber:</div>
+        <div class="col-md-1"><input type="text" ng-model="editHospitalCtrl.hospital.postcode" required/></div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* Nettside:</div>
+        <div class="col-md-10"><input type="text" ng-model="editHospitalCtrl.hospital.web_address" required/></div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* Telefon m. prefiks:</div>
+        <div class="col-md-4">
+            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0]" required/>
+            <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[0]" required/>
+        </div>
+
+        <div class="col-md-2">* E-post:</div>
+        <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[0]" required/></div>
+    </div>
+
+    <br/>
+
+    <div ng-show="editHospitalCtrl.hospital.is_paid">
+
+        <div class="row">
+            <div class="col-md-2">Telefon m. prefiks 2:</div>
+            <div class="col-md-4">
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1]"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[1]"/>
+            </div>
+
+            <div class="col-md-2">E-post 2:</div>
+            <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[1]"/></div>
+        </div>
+
+        <br/>
+
+        <div class="row">
+            <div class="col-md-2">Telefon m. prefiks 3:</div>
+            <div class="col-md-4">
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2]"/>
+                <input type="text" ng-model="editHospitalCtrl.hospital.phone_number[2]"/>
+            </div>
+
+            <div class="col-md-2">E-post 3:</div>
+            <div class="col-md-4"><input type="text" ng-model="editHospitalCtrl.hospital.email[2]"/></div>
+        </div>
+
+        <br/>
+
+        <div class="row">
+            <div class="col-md-2">* Bilde:</div>
+            <div class="col-md-6"><input type="file" ng-model="editHospitalCtrl.hospital.picture" required/></div>
+
+            <label class="col-md-2">Standardsymbol: <input type="checkbox"
+                                                           ng-model="editHospitalCtrl.hospital.standardSymbol"></label>
+        </div>
+
+        <br/>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">* Beskrivelse: <br/> (maks {{ editHospitalCtrl.getDescriptionMaxLength() }} tegn)</div>
+        <div class="col-md-10">
+            <textarea ng-model="editHospitalCtrl.hospital.description"
+                      maxlength="{{ editHospitalCtrl.getDescriptionMaxLength() }}" required></textarea>
+
+            <div>
+                {{ editHospitalCtrl.hospital.description.length || 0 }}/{{editHospitalCtrl.getDescriptionMaxLength()}}
+            </div>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-2">* Hovedkategori:</div>
+        <div class="col-md-10" ng-mouseenter="editHospitalCtrl.isMouseOverSubTreatment = true" ng-mouseleave="editHospitalCtrl.isMouseOverSubTreatment = false">
+            <div ng-class="row" ng-repeat="treatment in editHospitalCtrl.treatments">
+                <div class="col-md-3">
+                    {{treatment.name}} <input class="pull-right" type="checkbox" ng-model="treatment.isSelected"
+                                              ng-click="editHospitalCtrl.changeTreatmentSelection(treatment)">
+                </div>
+            </div>
+
+            <div class="row" ng-show="editHospitalCtrl.isSubTreatmentOpen && editHospitalCtrl.subTreatments.length">
+                <div class="side-container col-md-12 pull-right" >
+                    <div ng-class="row" ng-repeat="subTreatment in editHospitalCtrl.subTreatments">
+                        <div class="col-md-3">
+                           {{subTreatment.name}} <input class="pull-right" type="checkbox" ng-model="subTreatment.isSelected"
+                                                         ng-click="editHospitalCtrl.changeSubTreatmentSelection(subTreatment)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <br/>
+
+    <div class="row">
+        <button class="pull-right blue" ng-click="editHospitalCtrl.createHospital()">Lagre</button>
+    </div>
+
+    <br/>
+
+</div>
