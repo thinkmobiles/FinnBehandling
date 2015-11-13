@@ -1,13 +1,56 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
 
-    <div class="hospital-item grey" style="padding-right: 25px;">
+    <h4 class="col-md-12 blue dynamic-font-lg">VELCOMMEN</h4>
 
-        <h5 style="margin-top: 0;" class="dynamic-font-md"  ng-bind-html="startSideCtrl.startSide.text"> </h5>
+    <div style="margin-top: 25px; padding: 15px; border: 1px solid grey; border-radius: 5px">
 
-        <div class="clearfix"></div>
+        <div style="padding: 0 15px; border: 1px solid grey">
 
-        <a class="pull-down blue dynamic-font-md-lg bold" href="#/startside/edit">Edit</a>
+            <h5 style="margin-top: 0;" class="dynamic-font-md"> {{startSideCtrl.startSide.text | limitTo: 800}}
+                {{startSideCtrl.startSide.text.length > 800 ? '...' : ''}} </h5>
+
+            <div class="row clearfix">
+                <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/startside">Les mer...</a>
+                <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/startside/edit">Rediger</a>
+                <a class="col-md-1 pull-right dynamic-font-md-lg" href="#">Slett</a>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <a class="col-md-2 pull-left dynamic-font-md-lg" href="#">Legg til ny</a>
+            <a class="col-md-2 pull-right dynamic-font-md-lg" href="#">Tidligere nyheter</a>
+        </div>
+    </div>
+
+    <div ng-repeat="news in startSideCtrl.saticNews" style="display: inline-block">
+
+            <h4 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 blue dynamic-font-lg">NYHET VENSTRE</h4>
+            <h4 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 blue dynamic-font-lg">NYHET MYDTEN</h4>
+            <h4 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 blue dynamic-font-lg">NYHET H?YRE</h4>
+
+        <div style="margin-top: 25px; padding: 15px; border: 1px solid grey; border-radius: 5px">
+
+
+            <div style="padding: 0 15px; border: 1px solid grey">
+
+                <h4 class="col-md-12 dynamic-font-lg">{{news.subject}}</h4>
+
+                <div class="clearfix">
+                    <h5 style="margin-top: 0;" class="dynamic-font-md"> {{news.content | limitTo: 800}}
+                        {{news.content.length > 800 ? '...' : ''}} </h5>
+                </div>
+
+                <div class="row clearfix">
+                    <a class="col-md-2 pull-left dynamic-font-md-lg">Les mer...</a>
+                    <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/nyheter/{{news.id}}">Rediger</a>
+                    <a class="col-md-1 pull-right dynamic-font-md-lg">Slett</a>
+                </div>
+            </div>
+            <div class="row clearfix">
+                <a class="col-md-2 pull-left dynamic-font-md-lg">Legg til ny</a>
+                <a class="col-md-2 pull-right dynamic-font-md-lg">Tidligere nyheter</a>
+            </div>
+        </div>
 
     </div>
 

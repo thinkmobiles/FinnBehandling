@@ -1,8 +1,8 @@
-app.controller('startSideController', ['$scope', 'StartSideManager', 'GeneralHelpers',
-    function($scope, StartSideManager, GeneralHelpers){
+app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
+    function($scope, StartSideManager, NewsManager, GeneralHelpers){
         var self = this;
 
-        function getStartSide () {
+        (function getStartSide () {
 
             $scope.pending = true;
 
@@ -15,7 +15,19 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'GeneralHel
 
                 self.startSide = startSide;
             });
+        })();
+
+        function getStaticNews () {
+
+            NewsManager.getNewsList({limit: 3}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+                console.log(news);
+                self.saticNews = news;
+            });
         }
 
-        getStartSide();
+        getStaticNews();
+
     }]);
