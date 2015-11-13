@@ -271,18 +271,18 @@ Hospitals = function (PostGre) {
                     return next(err);
                 }
 
-                res.status(200).send(hospitals);
-            });
-        } else {
-            Hospital.getAllHospitals(options, function (err, hospitals) {
-
-                if (err) {
-                    return next(err);
-                }
-
-                res.status(200).send(hospitals);
+                return res.status(200).send(hospitals);
             });
         }
+
+        Hospital.getAllHospitals(options, function (err, hospitals) {
+
+            if (err) {
+                return next(err);
+            }
+
+            res.status(200).send(hospitals);
+        });
     };
 
     this.getHospitalsCount = function (req, res, next) {
