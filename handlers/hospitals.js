@@ -262,15 +262,27 @@ Hospitals = function (PostGre) {
         options.textSearch = req.query.textSearch ? req.query.textSearch : null;
         options.subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
         options.treatment = req.query.treatment ? req.query.treatment : null;
+        options.admin = req.query.admin ? req.query.admin : null;
 
-        Hospital.getAll(options, function (err, hospitals) {
+        if (options.admin) {
+            Hospital.getAllAdmin(options, function (err, hospitals) {
 
-            if (err) {
-                return next(err);
-            }
+                if (err) {
+                    return next(err);
+                }
 
-            res.status(200).send(hospitals);
-        });
+                res.status(200).send(hospitals);
+            });
+        } else {
+            Hospital.getAllHospitals(options, function (err, hospitals) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send(hospitals);
+            });
+        }
     };
 
     this.getHospitalsCount = function (req, res, next) {
