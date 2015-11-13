@@ -136,7 +136,7 @@ module.exports = function (postGre, ParentModel) {
                         postGre.knex.raw(
                             '(SELECT JSON_AGG(sub_treatments_result) ' +
                             '   FROM ( ' +
-                            '       SELECT sub_treatment.name ' +
+                            '       SELECT sub_treatment.name, sub_treatment.id, sub_treatment.treatment_id ' +
                             '           FROM ' + TABLES.SUB_TREATMENTS_LIST + ' sub_treatment ' +
                             '           LEFT JOIN ' + TABLES.SUB_TREATMENTS + ' hospital_sub_treatment ' +
                             '               ON sub_treatment.id = hospital_sub_treatment.sub_treatment_id ' +
