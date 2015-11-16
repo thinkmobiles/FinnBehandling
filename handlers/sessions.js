@@ -1,6 +1,3 @@
-/**
- * Created by Roman on 12.02.2015.
- */
 var CONSTANTS = require('../constants/constants');
 var RESPONSES = require('../constants/responseMessages');
 

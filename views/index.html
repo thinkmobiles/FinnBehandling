@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+
+    <head lang="en">
+        <title>Finnbehanding</title>
+
+
+
+        <link rel="stylesheet" type="text/css" href="dist/css/style.css"/>
+        <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+        <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMozaLCHWMIwPCHCwjCpdZwAse-62PJpo"></script>
+        <style type="text/css" id="dynamic-styles">
+            .dynamic-font-sm { font-size: {{$root.fontSize || 12}}px !important }
+            .dynamic-font-md { font-size: {{($root.fontSize || 12) + 2}}px !important }
+            .dynamic-font-md-lg { font-size: {{($root.fontSize || 12) + 4}}px !important }
+            .dynamic-font-lg { font-size: {{($root.fontSize || 12) + 6}}px !important }
+        </style>
+
+        <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+        <script type="text/javascript">
+            window.cookieconsent_options = {"message":"BarnasNorge.no benytter informasjonskapsler (cookies) slik at vi kan yte deg bedre service. Informasjonskapslene blir hovedsakelig benyttet for trafikkmåling og optimalisering av tjenesten.","dismiss":"Godta bruken av cookies","learnMore":"Les mer om cookies","link":"http://www.cookielaw.org/the-cookie-law/","theme":"dark-bottom"};
+        </script>
+
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+        <!-- End Cookie Consent plugin -->
+    </head>
+    <body>
+
+
+        <div id="main-container">
+            <div id="top-menu">
+                <div class="inner-block clearfix">
+                    <ul id="top-menu-list" class="pull-right">
+                        <li>
+                            <a class="normal" href="/pdf/annonsering.pdf" ng-click="$root.fontSize = 12">A</a>
+                            <a class="medium" ng-click="$root.fontSize = 14">A</a>
+                            <a class="large" ng-click="$root.fontSize = 16">A</a>
+                        </li>
+                        <li>
+                            <a href="/pdf/om_oss.pdf" class="dynamic-font-sm" target="_blank">OM OSS</a>
+                        </li>
+                        <li>
+                            <a href="/pdf/betingelser_for_bruk_av_nettsted.pdf" class="dynamic-font-sm" target="_blank">BETINGELSER</a>
+                        </li>
+                        <li>
+                            <a  href="/pdf/annonsering.pdf" class="dynamic-font-sm" target="_blank">ANNONSERING</a>
+                        </li>
+                        <li>
+                            <a href="/pdf/personopplysninger.pdf" class="dynamic-font-sm" target="_blank">PERSONOPPLYSNINGER</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="inner-block">
+                <div id="main-logo">
+                    <h2 class="pull-right">FinnBehandling.no</h2>
+                </div>
+
+                <div id="main-menu">
+                    <ul id="main-menu-list">
+                        <li class="text-center dynamic-font-md"><a href="#/">STARTSIDE</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/behandlingstilbud">BEHANDLINGSTILBUD</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/nyheter">NYHETER</a></li>
+                        <li class="text-center dynamic-font-md"><a href="#/kontakt">KONTAKT</a></li>
+                    </ul>
+                </div>
+
+                <div class="content row">
+                    <div id="side-bar" class="col-md-3" ng-controller="sideBarController">
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Velg</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <div class="form-group clearfix">
+
+                                <label for="fylke" class="pull-left side-label-holder dynamic-font-md">Fylke:</label>
+
+                                <select
+                                        id="fylke"
+                                        class="pull-right form-control side-input dynamic-font-md"
+                                        ng-model="chosenFylke"
+                                        ng-change="search()"
+                                        ng-options="fylke.fylke as fylke.fylke for fylke in fylkes">
+                                </select>
+                            </div>
+                        </div>
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Søk</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+
+                            <div class="form-group clearfix">
+
+                                <label for="behandling" class="pull-left side-label-holder dynamic-font-md">Behandling:</label>
+
+                                <select
+                                        id="behandling"
+                                        class="pull-right form-control side-input dynamic-font-md"
+                                        ng-model="chosenBehandling"
+                                        ng-options="behandling.id as behandling.name for behandling in behandlings"
+                                        ng-change="getUnderkategoris()">
+                                </select>
+                            </div>
+
+                            <div class="form-group clearfix margin-top">
+
+                                <label for="underkategori" class="pull-left side-label-holder dynamic-font-md">Underkategori:</label>
+
+                                <select
+                                        id="underkategori"
+                                        class="pull-right form-control side-input dynamic-font-md"
+                                        ng-model="chosenUnderkategori"
+                                        ng-options="underkategori.id as underkategori.name for underkategori in underkategoris">
+                                </select>
+                            </div>
+
+                            <div class="form-group clearfix  margin-top">
+
+                                <label for="tekstsøk" class="pull-left side-label-holder dynamic-font-md">Fritekst:</label>
+
+                                <input
+                                        type="text"
+                                        id="tekstsøk"
+                                        placeholder="Skriv ord..."
+                                        class="pull-right form-control side-input dynamic-font-md"
+                                        ng-model="tekstsok"/>
+                            </div>
+
+                            <div class="form-group clearfix margin-top">
+
+                                <a class="btn btn-default btn-block dynamic-font-md" ng-click="search()">Søk</a>
+                            </div>
+                        </div>
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Relaterte nettsider</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <h5 class="bold  dynamic-font-md">Privat:</h5>
+                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
+                                <li class="margin-top">Lommelegen</li>
+                                <li class="margin-top">Legemiddelindustrien</li>
+                                <li class="margin-top">Felleskatalogen</li>
+                            </ul>
+                            <h5 class="bold  dynamic-font-md">Offentlig:</h5>
+                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
+                                <li class="margin-top">Nasjonalt folkehelseinstitutt</li>
+                                <li class="margin-top">Helse- og omsorgsdepartementet</li>
+                                <li class="margin-top">Legemiddelverket</li>
+                            </ul>
+                        </div>
+
+
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Spre ordet!</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <div ng-click="shareFB()" style="background-color:darkblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                f
+                            </div>
+
+                            <a href="{{shareTwitter()}}" >
+                                <span style="background-color:cornflowerblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    t
+                                </span>
+                            </a>
+
+
+                            <a href="{{ shareGoogle() }}" onclick="javascript:window.open(this.href,
+                                '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+                                <span style="background-color:red; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    <meta itemprop="headline" content="{{ shareGoogle().name }}" />
+                                    <meta itemprop="description" content="{{ shareGoogle().description }}" />
+                                    <meta itemprop="image" content="{{ shareGoogle().pictureUrl }}" />
+                                    g+
+                                </span>
+                            </a>
+
+                            <a href="{{ shareBlogger() }}" target="_blank" >
+                                <span style="background-color:darkorange; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    B
+                                </span>
+                            </a>
+                            <a href="{{ shareYahoo() }}" target="_blank">
+                                <span style="background-color:darkviolet; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    Y!
+                                </span>
+                            </a>
+                        </div>
+
+
+                        <!--<h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Logg inn</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+
+                            <form
+                                    role="form"
+                                    class="one-block"
+                                    name="signInForm"
+                                    ng-submit="signIn()"
+                                    novalidate>
+                                <div class="form-group clearfix">
+
+                                    <label for="email" class="pull-left side-label-holder dynamic-font-md">E-post:</label>
+
+                                    <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            class="pull-right form-control side-input"
+                                            required
+                                            ng-model="loginParams.email"/>
+                                </div>
+
+                                <div class="form-group clearfix  margin-top">
+
+                                    <label for="password" class="pull-left side-label-holder dynamic-font-md">Passord:</label>
+
+                                    <input
+                                            type="text"
+                                            id="password"
+                                            name="password"
+                                            class="pull-right form-control side-input"
+                                            required
+                                            ng-model="loginParams.password"/>
+                                </div>
+
+                                <div ng-hide="!signInForm.$submitted">
+                                    <div style="color:red" ng-show="signInForm.email.$invalid">
+                                        <p ng-show="signInForm.email.$error.required">Feltet skal utfylles</p>
+                                        <p ng-show="signInForm.email.$error.email">Ugyldig e-post adresse</p>
+                                    </div>
+                                    <div style="color:red" ng-show="signInForm.password.$invalid">
+                                        <p>Passord er ikke korrekt</p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group clearfix margin-top">
+
+                                    <button class="btn btn-default btn-block">Logg inn</button>
+                                </div>
+                            </form>
+                            <hr/>
+
+                            <div class="form-group clearfix margin-top">
+
+                                <a class="btn btn-default btn-block" ng-click="search()">Registrer deg</a>
+                            </div>
+                        </div>-->
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="advertising"></div>
+                        <div class="page-content clearfix" ng-view></div>
+                    </div>
+                </div>
+            </div>
+
+            <footer></footer>
+
+            <!-- Cookie enable/disable dialog -->
+            <!--<div style="display: block;" id="cookie-bar" class="fixed">-->
+                <!--<p>-->
+                    <!--BarnasNorge.no benytter informasjonskapsler (cookies) slik at vi kan yte deg bedre service. Informasjonskapslene blir hovedsakelig benyttet for trafikkmåling og optimalisering av tjenesten. <br>-->
+                    <!--<a href="#" class="cookie-button">-->
+                        <!--<strong>Godta bruken av cookies</strong>-->
+                    <!--</a>-->
+                    <!--<a href="#" class="cookie-button">-->
+                        <!--<strong>Les mer om cookies</strong>-->
+                    <!--</a>-->
+                <!--</p>-->
+            <!--</div>-->
+        </div>
+
+
+        <script type="text/javascript" src="dist/js/app.js"></script>
+
+        <script>
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '429206487274548',
+                    xfbml      : true,
+                    version    : 'v2.5'
+                });
+            };
+
+            (function(d, s, id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {return;}
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        </script>
+
+
+        <script src="https://platform.twitter.com/widgets.js" async></script>
+    </body>
+</html>

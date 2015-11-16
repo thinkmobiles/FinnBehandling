@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" type="text/css" href="dist/css/admin_style.css"/>
+    <style type="text/css" id="dynamic-styles">
+        .dynamic-font-sm { font-size: {{$root.fontSize || 12}}px !important }
+        .dynamic-font-md { font-size: {{($root.fontSize || 12) + 2}}px !important }
+        .dynamic-font-md-lg { font-size: {{($root.fontSize || 12) + 4}}px !important }
+        .dynamic-font-lg { font-size: {{($root.fontSize || 12) + 6}}px !important }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+
+        <div id="top-menu">
+            <div class="inner-block clearfix">
+                <ul id="top-menu-list" class="pull-right">
+                    <li>
+                        <a class="normal" ng-click="$root.fontSize = 12">A</a>
+                        <a class="medium" ng-click="$root.fontSize = 14">A</a>
+                        <a class="large" ng-click="$root.fontSize = 16">A</a>
+                    </li>
+                    <li>
+                        <a href="/pdf/om_oss.pdf" class="dynamic-font-sm" target="_blank">OM OSS</a>
+                    </li>
+                    <li>
+                        <a href="/pdf/betingelser_for_bruk_av_nettsted.pdf" class="dynamic-font-sm" target="_blank">BETINGELSER</a>
+                    </li>
+                    <li>
+                        <a  href="/pdf/annonsering.pdf" class="dynamic-font-sm" target="_blank">ANNONSERING</a>
+                    </li>
+                    <li>
+                        <a href="/pdf/personopplysninger.pdf" class="dynamic-font-sm" target="_blank">PERSONOPPLYSNINGER</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="inner-block">
+            <div id="top-containe" class="clearfix">
+                <div id="main-logo" class="pull-left">
+                    <h2 class="pull-right">FinnBehandling.no</h2>
+                </div>
+                <div id="create-hospital" class="pull-right">
+                    <a href="#/hospital/new">
+                        <h5>LEGG TIL NYTT SENTER</h5>
+                    </a>
+                </div>
+            </div>
+
+            <div id="main-menu">
+                <ul id="main-menu-list">
+                    <li class="text-center dynamic-font-md"><a href="#/admin">ADMIN</a></li>
+                    <li class="text-center dynamic-font-md"><a href="#/startside">STARTSIDE</a></li>
+                    <li class="text-center dynamic-font-md"><a href="#/nyheter">NYHETER</a></li>
+                    <li class="text-center dynamic-font-md"><a href="#/anonser">ANONSER</a></li>
+                </ul>
+            </div>
+
+            <div class="content row">
+                <div class="col-md-12">
+                    <div ng-view></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="dist/js/admin.js"></script>
+</body>
+</html>

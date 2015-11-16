@@ -1,0 +1,87 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix" style="padding: 32px">
+    <h1 class="blue bold">Create article</h1>
+    <br/>
+
+    <form
+            role="form"
+            class="one-block"
+            name="newArticleForm"
+            ng-submit="newArticleCtrl.createArticle()"
+            novalidate>
+
+        <div class="form-group">
+
+            <label for="subject" class="side-label-holder dynamic-font-md">Title:</label>
+
+            <input
+                    type="text"
+                    name="subject"
+                    placeholder="Subject"
+                    id="subject"
+                    class="form-control side-input dynamic-font-md"
+                    required
+                    ng-model="newArticleCtrl.article.subject"/>
+            <div style="color:red" ng-show="newArticleForm.$submitted && newArticleForm.subject.$invalid">
+                <p ng-show="newArticleForm.subject.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label for="source" class="side-label-holder dynamic-font-md">Source:</label>
+
+            <input
+                    type="text"
+                    name="source"
+                    placeholder="Source"
+                    id="source"
+                    class="form-control side-input dynamic-font-md"
+                    required
+                    ng-model="newArticleCtrl.article.source"/>
+            <div style="color:red" ng-show="newArticleForm.$submitted && newArticleForm.source.$invalid">
+                <p ng-show="newArticleForm.source.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="image-container">
+            <div class="clients-photo" >
+                <div ng-show='newArticleCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
+                    <a ng-click="newArticleCtrl.removeImage('image')"  class="remove-image">X</a>
+                    <img ng-src="{{newArticleCtrl.image}}">
+                </div>
+                <input
+                        id="image"
+                        type="file"
+                        name="image"
+                        ng-model="newArticleCtrl.image"
+                        accept="image/jpeg,image/png,image/gif"
+                        fileread
+                        crop-result="newArticleCtrl.cropResult"
+                        ng-change="newArticleCtrl.checkImageType('image')"
+                        >
+            </div>
+            <div class="slider-block">
+                <div id="image-slider"></div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix">
+
+            <div
+                    text-angular
+                    required
+                    ng-model="newArticleCtrl.article.content">
+
+            </div>
+            <div style="color:red" ng-show="newArticleForm.$submitted && newArticleForm.content.$invalid">
+                <p ng-show="newArticleForm.content.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Create</button>
+        </div>
+    </form>
+    <br/>
+</div>

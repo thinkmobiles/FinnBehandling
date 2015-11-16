@@ -1,0 +1,327 @@
+#main-container {
+    /*position: relative;*/
+    margin: 0 auto;
+    width: 1280px;
+    min-width: 1280px;
+}
+
+#top-menu {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    background: #009ec8;
+    min-width: 1200px;
+}
+
+#top-menu-list {
+    list-style: none;
+    height: 36px;
+}
+
+#top-menu-list li {
+    display:inline;
+    padding-left: 6px;
+    padding-right: 6px;
+    cursor: pointer;
+}
+
+#top-menu-list a {
+    color: #fff;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.inner-block {
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+#main-logo {
+    margin-left: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 405px;
+    height: 85px;
+    border: 1px solid #CDCDCD;
+    border-radius: 15px;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 11.0pt;
+}
+
+#create-hospital {
+    margin-top: 40px;
+    padding: 4px 12px;
+    color: white;
+    background: #009ec8;
+    cursor: pointer;
+}
+
+.normal {
+    font-size: 12px;
+}
+
+.medium {
+    font-size: 16px;
+}
+
+.large {
+    font-size: 20px;
+}
+
+#main-menu-list {
+    border: 1px solid #CDCDCD;
+    border-radius: 5px;
+    list-style: none;
+    width: 1080px;
+    padding: 0;
+}
+
+#main-menu-list li {
+    border-right: 1px solid #CDCDCD;
+    vertical-align: middle;
+    display:inline-block;
+    width: 263px;
+    padding: 3px;
+    cursor: pointer;
+    font-size: 11.0pt;
+}
+
+#main-menu-list li:last-child {
+    border: none !important;
+}
+
+.advertising {
+    background: #eee;
+    width: 100%;
+    height: 120px;
+}
+
+#start-page-static {
+    background: #009ec8;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.start-page-news {
+    display: inline-block;
+    vertical-align: top;
+    width: 260px;
+    overflow: hidden;
+    margin-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.content {
+    max-width: 100%;
+    margin: 0 !important;
+}
+
+.start-page-news img {
+    /*width: 192px;*/
+    height: 180px;
+    max-width:100%;
+}
+
+.start-page-news h5 {
+    font-weight: bold;
+}
+
+.hospital-logo {
+    height: 80px;
+    max-width:100%;
+}
+
+.hospital-details {
+    margin-top: 10px;
+}
+
+.contact-data {
+    color: #009ec8;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.blue {
+    color: #009ec8;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.hospitals-list {
+    border: 18px solid #009ec8;
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 6px;
+}
+
+.hospital-item {
+    background: #fff;
+    padding: 10px;
+    margin-top: 15px;
+}
+
+.hospital-item-paid {
+    border: 6px solid #009ec8;
+}
+
+.grey {
+    background: #ebebeb;
+}
+
+.margin-top {
+    margin-top: 10px !important;
+}
+
+#side-bar .title {
+    line-height: 30px;
+    background: url(../../img/title-start.png) no-repeat left center;
+    padding: 0 0 0 29px;
+    margin: 0;
+}
+
+#side-bar .title .text {
+    vertical-align: middle;
+    padding: 0 10px 0 0;
+    display: table-cell;
+    word-break: keep-all;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#side-bar .title .end {
+    width: 100%;
+    display: table-cell;
+    height: 30px;
+    background: url(../../img/title-repeat.png) repeat-x center;
+}
+
+.repeat-title {
+    padding-top: 18px;
+    margin-top: 25px;
+    height: 0;
+    width: 100%;
+    background: url(../../img/title-repeat.png) repeat-x center;
+}
+
+.side-container {
+    padding: 25px 15px 15px;
+    border: 10px solid #009ec8;
+    border-radius: 5px;
+    margin: 0 0 15px;
+    background: #fff;
+}
+
+.side-container div {
+    margin: 0
+}
+
+.side-container div label {
+    margin: 0
+}
+
+.side-label-holder {
+    height: 34px;
+    padding: 7px 0;
+}
+
+.side-input {
+    display: inline-block;
+    width: 45%;
+}
+
+.side-input-sm {
+    display: inline-block;
+    width: 35%;
+}
+
+footer {
+    margin-top: 100px;
+    background: #009ec8;
+    height: 300px;
+}
+
+
+.clients-photo {
+    overflow: hidden;
+    height: 445px;
+    width: 445px;
+    position: relative;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+}
+/*.clients-photo span {
+    font-size: 30px;
+    font-family: ProximaNova-Semibold, serif;
+    color: #ffffff;
+    width: 100%;
+    position: absolute;
+    top: calc((100% - 42px) / 2);
+    left: 0;
+}*/
+/*.clients-photo input[type=file] {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+}*/
+.clients-photo img {
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    top: 0;
+    left: 0;
+}
+.remove-image,
+.remove-image:hover,
+.remove-image:focus,
+.remove-image:active {
+    z-index: 4;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #999999;
+    text-decoration: none;
+    outline: none;
+    outline-offset: 0;
+    cursor: pointer;
+}
+.slider-block {
+    width: 20px;
+    padding: 0;
+    display: inline-block;
+    height: 433px;
+    padding-top: 6px;
+}
+.slider-block > div {
+    height: 433px;
+}
+.slider-block .ui-slider-disabled {
+    display: none;
+}
+
+.image-container:after {
+    clear: both;
+    content: '';
+    display: table;
+}
+
+.slim {
+    height: 40px
+}
+
+.top-buffer {
+    margin-top: 20px;
+}
