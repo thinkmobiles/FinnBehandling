@@ -73055,9 +73055,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
     $routeProvider.when('/', {
         controller: 'blank',
-        templateUrl: 'templates/admin.html',
+        templateUrl: 'templates/index.html',
         controllerAs: 'blank',
         reloadOnSearch: false
+    }).when('/admin', {
+        controller: 'conflictsController',
+        templateUrl: 'templates/admin.html',
+        controllerAs: 'conflictsCtrl'
     }).when('/nyheter', {
         controller: 'newsController',
         templateUrl: 'templates/news/admin/list.html',
@@ -73226,6 +73230,35 @@ app.controller('newAdvertisementController', ['$scope', '$routeParams', '$locati
     }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
+
+    }]);;
+app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers',
+    function ($scope, ConflictsManager, GeneralHelpers) {
+        var self = this;
+
+        function getConflicts () {
+
+            ConflictsManager.getConflictsList(function (err, conflicts) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.conflicts = conflicts;
+            });
+        }
+
+        getConflicts();
+
+        this.updateZipCodes = function () {
+
+            ConflictsManager.updateDb(function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert("Zip codes updated successful");
+            });
+        };
 
     }]);;
 app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
@@ -74244,6 +74277,30 @@ app.factory('AdvertisementsManager', ['$http', function ($http) {
             if (callback)
                 callback(null, response);
         });
+    };
+
+    return this;
+}]);;
+app.factory('ConflictsManager', ['$http', function ($http) {
+
+    this.getConflictsList = function (callback) {
+        $http({
+            url: '/hospitals/conflicts',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateDb = function (callback) {
+        $http({
+            url: '/regions/updateDB',
+            method: "POST"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;

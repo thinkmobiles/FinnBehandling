@@ -454,7 +454,7 @@ Hospitals = function (PostGre) {
                 qb.whereNull('postnummer');
             })
             .fetchAll({
-                columns: [TABLES.HOSPITALS + '.id', 'name']
+                columns: [TABLES.HOSPITALS + '.id', 'name', TABLES.HOSPITALS + '.postcode']
             })
             .asCallback(function (err, hospitals) {
                 if (err) {
