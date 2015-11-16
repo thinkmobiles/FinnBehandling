@@ -240,6 +240,7 @@ module.exports = function (postGre, ParentModel) {
         getAllAdmin: function (options, callback) {
 
             assert(callback);
+
             this.query(function(qb) {
 
                 qb.select(

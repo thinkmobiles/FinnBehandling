@@ -245,6 +245,58 @@ Hospitals = function (PostGre) {
          *            ]
          *        }
          *        ]
+         *
+         * @example Request example:
+         * http://localhost:8787/hospitals
+         * {
+         *      "admin": true
+         * }
+         *
+
+         *
+         * @example Response example:
+         *     [
+         *        {
+         *            "id": 3,
+         *            "is_paid": true,
+         *            "name": "rfrfr",
+         *            "web_address": "www.clinic.com",
+         *            "phone_number": "+380660237194",
+         *            "type": "type1",
+         *            "email": [
+         *                "Yasmin.Bins@yahoo.com"
+         *             ],
+         *            "position": {
+         *                "x": 58.7186,
+         *                "y": 158.1727
+         *             },
+         *             "description": "Eos blanditiis aspernatur possimus debitis.",
+         *            "adress": {
+         *                "zip_code": "111",
+         *                "kommune_name": "kom1",
+         *                "fylke_name": "ful1"
+         *            },
+         *            "postcode": "4246",
+         *            "updated_at": "2015-11-11T15:53:32.619Z",
+         *            "created_at": "2015-11-11T15:53:32.619Z",
+         *            "treatments": [
+         *                {
+         *                    "name": "treatment3"
+         *                }
+         *            ],
+         *            "sub_treatments": [
+         *                {
+         *                    "name": "sub_treatment1"
+         *                },
+         *                {
+         *                    "name": "sub_treatment2"
+         *                },
+         *                {
+         *                    "name": "sub_treatment4"
+         *                }
+         *            ],
+         *        }
+         *        ]
          * @method getAllHospitals
          * @instance
          */
@@ -265,6 +317,7 @@ Hospitals = function (PostGre) {
         options.admin = req.query.admin ? req.query.admin : null;
 
         if (options.admin) {
+
             Hospital.getAllAdmin(options, function (err, hospitals) {
 
                 if (err) {
