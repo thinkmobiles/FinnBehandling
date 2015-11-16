@@ -73070,6 +73070,18 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/anonser', {
+        controller: 'advertisementsController',
+        templateUrl: 'templates/advertisements/admin/list.html',
+        controllerAs: 'advertisementsCtrl'
+    }).when('/anonser/new', {
+        controller: 'newAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/new.html',
+        controllerAs: 'newAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'updateAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'updateAdvertisementCtrl'
     }).when('/startside', {
         controller: 'startSideController',
         templateUrl: 'templates/startSide/admin/startSide.html',
@@ -73104,8 +73116,114 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 }]).run(['$rootScope', function ($rootScope) {
 
-
 }]);;
+app.controller('advertisementsController', ['$scope', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, AdvertisementsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.advertisementsPage = GeneralHelpers.getLocalData('advertisementsPage') || 1;
+        $scope.resultater = 10;
+
+        function getAdvertisementsCount () {
+
+            AdvertisementsManager.getAdvertisementsCount(function (err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getAdvertisementsCount();
+
+        this.refreshAdvertisements = function () {
+            GeneralHelpers.saveAsLocalData('advertisementsPage', $scope.advertisementsPage);
+
+            getAdvertisements();
+        };
+
+        function getAdvertisements () {
+
+            $scope.pending = true;
+
+            AdvertisementsManager.getAdvertisements({limit: $scope.resultater, page: $scope.advertisementsPage},
+                function (err, advertisements) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.pending = false;
+                    $scope.advertisements = advertisements;
+                });
+        }
+
+        getAdvertisements();
+
+
+        this.deleteAdvertisement = function (id) {
+
+            AdvertisementsManager.removeAdvertisement(id, function (err) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Deleted successfully');
+
+                getAdvertisements();
+
+                getAdvertisementsCount();
+            });
+        };
+    }]);;
+app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, AdvertisementsManager, GeneralHelpers) {
+        var self = this;
+        var advertisementId = $routeParams.id;
+
+        function getAdvertisement () {
+
+            AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.advertisement = advertisement;
+            });
+        }
+
+        getAdvertisement();
+
+        this.updateAdvertisement = function () {
+
+            AdvertisementsManager.updateAdvertisement(advertisementId, self.advertisement, function (err, advertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert("Advertisement successfully updated");
+
+                $location.path('anonser');
+            });
+        };
+    }]);;
+app.controller('newAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, AdvertisementManager, GeneralHelpers){
+        var self = this;
+
+        this.createAdvertisement = function () {
+
+            AdvertisementManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert(' Advertisement successfully created');
+
+                $location.path('anonser');
+            });
+        };
+    }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
 
@@ -74051,6 +74169,84 @@ app.directive('fileread', ['$timeout', function ($timeout) {
             });
         }
     }
+}]);;
+app.factory('AdvertisementsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getAdvertisements = function (params, callback) {
+        $http({
+            url: '/advertisement',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createAdvertisement = function (data, callback) {
+        $http({
+            url: '/advertisement',
+            method: 'POST',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.getAdvertisementsCount = function (callback) {
+        $http({
+            url:'/advertisement/count',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getOneAdvertisement = function (id, callback) {
+        $http({
+            url: '/advertisement/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateAdvertisement = function (id, data, callback) {
+        $http({
+            url:  '/advertisement/' + id,
+            method: 'PUT',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(null, response);
+        });
+    };
+
+    this.removeAdvertisement = function (id, callback) {
+        $http({
+            url: '/advertisement/' + id,
+            method: 'DELETE'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(null, response);
+        });
+    };
+
+    return this;
 }]);;
 app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
     "use strict";

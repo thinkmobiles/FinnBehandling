@@ -30,6 +30,18 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/anonser', {
+        controller: 'advertisementsController',
+        templateUrl: 'templates/advertisements/admin/list.html',
+        controllerAs: 'advertisementsCtrl'
+    }).when('/anonser/new', {
+        controller: 'newAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/new.html',
+        controllerAs: 'newAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'updateAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'updateAdvertisementCtrl'
     }).when('/startside', {
         controller: 'startSideController',
         templateUrl: 'templates/startSide/admin/startSide.html',
@@ -63,6 +75,5 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
     });
 
 }]).run(['$rootScope', function ($rootScope) {
-
 
 }]);
