@@ -15,6 +15,7 @@
     "jquery-mousewheel": "~3.1.13",
     "jquery-ui": "~1.11.4",
     "jquery-validation": "~1.14.0",
+    "textAngular": "~1.4.6",
     "underscore": "~1.8.3",
     "angular-underscore-module": "~1.0.3"
   }
