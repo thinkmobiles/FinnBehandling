@@ -38,6 +38,14 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateStartSideController',
         templateUrl: 'templates/startSide/admin/edit.html',
         controllerAs: 'updateStartSideCtrl'
+    }).when('/hospital/new', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
+    }).when('/hospital/:id', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',

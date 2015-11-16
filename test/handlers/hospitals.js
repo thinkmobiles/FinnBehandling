@@ -335,6 +335,26 @@ describe('Hospitals', function () {
             });
     });
 
+    it('should get hospitals', function (done) {
+
+        agent
+            .get('/hospitals?admin=true')
+            .send()
+            .expect(200)
+            .end(function (err, res) {
+
+                if (err) {
+                    return done(err);
+                }
+
+                var response = res.body;
+
+                expect(response).to.be.instanceOf(Array);
+
+                done();
+            });
+    });
+
     it('should search hospitals by text', function (done) {
 
         agent
