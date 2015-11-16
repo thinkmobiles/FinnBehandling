@@ -246,6 +246,11 @@ Hospitals = function (PostGre) {
          *        }
          *        ]
          *
+         * * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get list of hospitals for admin
+         *
          * @example Request example:
          * http://localhost:8787/hospitals
          * {
