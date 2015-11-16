@@ -34,11 +34,50 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/anonser', {
+        controller: 'advertisementsController',
+        templateUrl: 'templates/advertisements/admin/list.html',
+        controllerAs: 'advertisementsCtrl'
+    }).when('/anonser/new', {
+        controller: 'newAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/new.html',
+        controllerAs: 'newAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'updateAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'updateAdvertisementCtrl'
+    }).when('/startside', {
+        controller: 'startSideController',
+        templateUrl: 'templates/startSide/admin/startSide.html',
+        controllerAs: 'startSideCtrl'
+    }).when('/startside/edit', {
+        controller: 'updateStartSideController',
+        templateUrl: 'templates/startSide/admin/edit.html',
+        controllerAs: 'updateStartSideCtrl'
+    }).when('/hospital/new', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
+    }).when('/hospital/:id', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
+    }).when('/webRecommendations', {
+        controller: 'webRecommendationsController',
+        templateUrl: 'templates/webRecommendations/admin/list.html',
+        controllerAs: 'webRecommendationsCtrl'
+    }).when('/webRecommendations/new', {
+        controller: 'newWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/new.html',
+        controllerAs: 'newWebRecommendationCtrl'
+    }).when('/webRecommendations/:id', {
+        controller: 'updateWebRecommendationController',
+        templateUrl: 'templates/webRecommendations/admin/edit.html',
+        controllerAs: 'updateWebRecommendationCtrl'
     }).otherwise({
         redirectTo: '/'
     });
 
 }]).run(['$rootScope', function ($rootScope) {
-
 
 }]);

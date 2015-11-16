@@ -58,6 +58,7 @@ describe('WebRecommendations', function () {
                 expect(recommendation).to.be.instanceOf(Object);
                 expect(recommendation).to.have.property('name');
                 expect(recommendation).to.have.property('link');
+                expect(recommendation).to.have.property('private');
 
                 done();
             });
@@ -66,7 +67,8 @@ describe('WebRecommendations', function () {
     it('should create a new recommendation', function (done) {
         var data = {
             name: 'Clinic research',
-            link: 'www.example.com'
+            link: 'www.example.com',
+            private: false
         };
 
         agent
@@ -96,6 +98,8 @@ describe('WebRecommendations', function () {
                             expect(recommendation.name).equal(data.name);
                             expect(recommendation).to.have.property('link');
                             expect(recommendation.link).equal(data.link);
+                            expect(recommendation).to.have.property('private');
+                            expect(recommendation.private).equal(data.private);
 
                             callback( null, recommendation);
                         });
@@ -121,6 +125,7 @@ describe('WebRecommendations', function () {
                 expect(recommendation[0]).to.be.instanceOf(Object);
                 expect(recommendation[0]).to.have.property('name');
                 expect(recommendation[0]).to.have.property('link');
+                expect(recommendation[0]).to.have.property('private');
 
                 done();
             });
@@ -129,7 +134,8 @@ describe('WebRecommendations', function () {
     it('should update recommendation', function (done) {
         var data = {
             name: 'Updated research',
-            link: 'www.example.com'
+            link: 'www.example.com',
+            private: false
         };
 
         agent
@@ -159,6 +165,8 @@ describe('WebRecommendations', function () {
                             expect(recommendation.name).equal(data.name);
                             expect(recommendation).to.have.property('link');
                             expect(recommendation.link).equal(data.link);
+                            expect(recommendation).to.have.property('private');
+                            expect(recommendation.private).equal(data.private);
 
                             callback( null, recommendation);
                         });

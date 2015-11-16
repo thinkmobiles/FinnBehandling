@@ -5,9 +5,9 @@ app.controller('articleController', ['$scope', '$routeParams', '$location', 'New
 
         $location.hash('main-menu');
 
-        function getArticle () {
+        function getArticle() {
 
-            NewsManager.getArticle(articleId, function(err, article) {
+            NewsManager.getArticle(articleId, function (err, article) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }

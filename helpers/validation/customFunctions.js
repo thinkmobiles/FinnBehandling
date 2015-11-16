@@ -38,8 +38,8 @@ module.exports = function (postGre) {
 
             assert(callback);
 
-            postGre.Models[TABLES.HOSPITALS].where({
-                name: validatedOptions.name
+            postGre.Models[TABLES.HOSPITALS].where(function () {
+                this.where('name', validatedOptions.name).andWhereNot('id', options.id)
             })
                 .fetch()
                 .asCallback(function (err, hospital) {

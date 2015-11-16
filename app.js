@@ -63,6 +63,7 @@ if (app.get('env') === 'development') {
 } else {
     require('./config/production');
 }
+//require('./config/development');
 
 config = {
     db: process.env.REDIS_DB_KEY,
