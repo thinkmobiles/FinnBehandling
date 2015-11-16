@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
+
     <head lang="en">
         <title>Finnbehanding</title>
+
+
+
         <link rel="stylesheet" type="text/css" href="dist/css/style.css"/>
         <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
         <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -12,8 +16,18 @@
             .dynamic-font-md-lg { font-size: {{($root.fontSize || 12) + 4}}px !important }
             .dynamic-font-lg { font-size: {{($root.fontSize || 12) + 6}}px !important }
         </style>
+
+        <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+        <script type="text/javascript">
+            window.cookieconsent_options = {"message":"FinnBehandling.no benytter informasjonskapsler (cookies) slik at vi kan yte deg bedre service. Informasjonskapslene blir hovedsakelig benyttet for trafikkmåling og optimalisering av tjenesten.","dismiss":"Godta bruken av cookies","learnMore":"Les mer om cookies","link":"http://www.cookielaw.org/the-cookie-law/","theme":"dark-bottom"};
+        </script>
+
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+        <!-- End Cookie Consent plugin -->
     </head>
     <body>
+
+
         <div id="main-container">
             <div id="top-menu">
                 <div class="inner-block clearfix">
@@ -139,6 +153,66 @@
                                 <li class="margin-top">Legemiddelverket</li>
                             </ul>
                         </div>
+
+
+                        <h2 class="title">
+                            <span class="text blue dynamic-font-md-lg">Spre ordet!</span>
+                            <span class="end"></span>
+                        </h2>
+                        <div class="side-container">
+                            <div ng-click="shareFB()" style="background-color:darkblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                f
+                            </div>
+
+                            <a href="{{shareTwitter()}}" >
+                                <span style="background-color:cornflowerblue; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    t
+                                </span>
+                            </a>
+
+
+                            <a href="{{ shareGoogle() }}" onclick="javascript:window.open(this.href,
+                                '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+                                <span style="background-color:red; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    <meta itemprop="headline" content="{{ shareGoogle().name }}" />
+                                    <meta itemprop="description" content="{{ shareGoogle().description }}" />
+                                    <meta itemprop="image" content="{{ shareGoogle().pictureUrl }}" />
+                                    g+
+                                </span>
+                            </a>
+
+                            <!--<div-->
+                                <!--itemscope itemtype="http://schema.org/Thing"-->
+                                <!--class="g-interactivepost"-->
+                                <!--data-contenturl="{{ shareGoogle().link }}"-->
+                                <!--data-contentdeeplinkid="/"-->
+                                <!--data-clientid="126764424643-badq7lkj6tdodm4g1kp20a6kqovirlr7.apps.googleusercontent.com"-->
+                                <!--data-cookiepolicy="single_host_origin"-->
+                                <!--data-prefilltext="{{ shareGoogle().name }}"-->
+                                <!--data-calltoactionlabel="CREATE"-->
+                                <!--data-calltoactionurl="http://plus.google.com/pages/create"-->
+                                <!--data-calltoactiondeeplinkid="/pages/create"-->
+                                <!--style="background-color:red; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">-->
+                                <!--&lt;!&ndash; properties for google+ sharing &ndash;&gt;-->
+                                <!--<meta itemprop="headline" content="{{ shareGoogle().name }}" />-->
+                                <!--<meta itemprop="description" content="{{ shareGoogle().description }}" />-->
+                                <!--<meta itemprop="image" content="{{ shareGoogle().pictureUrl }}" />-->
+                                <!--g+-->
+                            <!--</div>-->
+
+                            <a href="{{ shareBlogger() }}" target="_blank" >
+                                <span style="background-color:darkorange; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    B
+                                </span>
+                            </a>
+                            <a href="{{ shareYahoo() }}" target="_blank">
+                                <span style="background-color:darkviolet; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
+                                    Y!
+                                </span>
+                            </a>
+                        </div>
+
+
                         <!--<h2 class="title">
                             <span class="text blue dynamic-font-md-lg">Logg inn</span>
                             <span class="end"></span>
@@ -209,7 +283,43 @@
             </div>
 
             <footer></footer>
+
+            <!-- Cookie enable/disable dialog -->
+            <!--<div style="display: block;" id="cookie-bar" class="fixed">-->
+                <!--<p>-->
+                    <!--BarnasNorge.no benytter informasjonskapsler (cookies) slik at vi kan yte deg bedre service. Informasjonskapslene blir hovedsakelig benyttet for trafikkmåling og optimalisering av tjenesten. <br>-->
+                    <!--<a href="#" class="cookie-button">-->
+                        <!--<strong>Godta bruken av cookies</strong>-->
+                    <!--</a>-->
+                    <!--<a href="#" class="cookie-button">-->
+                        <!--<strong>Les mer om cookies</strong>-->
+                    <!--</a>-->
+                <!--</p>-->
+            <!--</div>-->
         </div>
+
+
         <script type="text/javascript" src="dist/js/app.js"></script>
+
+        <script>
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '429206487274548',
+                    xfbml      : true,
+                    version    : 'v2.5'
+                });
+            };
+
+            (function(d, s, id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) {return;}
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        </script>
+
+
+        <script src="https://platform.twitter.com/widgets.js" async></script>
     </body>
 </html>
