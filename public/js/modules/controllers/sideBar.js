@@ -1,5 +1,6 @@
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager',
+    'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, WebRecommendationsManager, GeneralHelpers) {
 
         $scope.chosenFylke = GeneralHelpers.getLocalData('fylke') || 'Alle';
         $scope.chosenBehandling = +GeneralHelpers.getLocalData('behandling') || null;
@@ -188,5 +189,16 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             return data;
         }
 
+        function getWebRecommendations () {
 
-    }]);
+            WebRecommendationsManager.getRecommendationsList({}, function (err, webRecommendations) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.webRecommendations = webRecommendations;
+                });
+        }
+
+        getWebRecommendations();
+}]);

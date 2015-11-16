@@ -141,17 +141,15 @@
                         </h2>
                         <div class="side-container">
                             <h5 class="bold  dynamic-font-md">Privat:</h5>
-                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
-                                <li class="margin-top">Lommelegen</li>
-                                <li class="margin-top">Legemiddelindustrien</li>
-                                <li class="margin-top">Felleskatalogen</li>
+                            <ul ng-repeat="webRecommendation in webRecommendations | filter: {private: true} | limitTo: 5"
+                                class="blue  dynamic-font-md" style="padding-left: 15px">
+                                    <li class="margin-top">{{webRecommendation.name}}</li>
                             </ul>
                             <h5 class="bold  dynamic-font-md">Offentlig:</h5>
-                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
-                                <li class="margin-top">Nasjonalt folkehelseinstitutt</li>
-                                <li class="margin-top">Helse- og omsorgsdepartementet</li>
-                                <li class="margin-top">Legemiddelverket</li>
-                            </ul>
+                            <ul ng-repeat="webRecommendation in webRecommendations | filter: {private: false} | limitTo: 5"
+                                class="blue  dynamic-font-md" style="padding-left: 15px">
+                                    <li class="margin-top">{{webRecommendation.name}}</li>
+                             </ul>
                         </div>
 
 
