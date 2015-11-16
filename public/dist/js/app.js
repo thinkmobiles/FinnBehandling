@@ -38945,9 +38945,9 @@ app.controller('articleController', ['$scope', '$routeParams', '$location', 'New
 
         $location.hash('main-menu');
 
-        function getArticle () {
+        function getArticle() {
 
-            NewsManager.getArticle(articleId, function(err, article) {
+            NewsManager.getArticle(articleId, function (err, article) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -39131,12 +39131,14 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         getNews();
     }]);
 ;
-app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager', 'GeneralHelpers',
-    function ($scope, $location, UserManager, RegionManager, TreatmentManager, GeneralHelpers) {
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager',
+    'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, WebRecommendationsManager, GeneralHelpers) {
 
-        $scope.chosenFylke =  GeneralHelpers.getLocalData('fylke') || 'Alle';
-        $scope.chosenBehandling =  +GeneralHelpers.getLocalData('behandling') || null;
-        $scope.chosenUnderkategori =  +GeneralHelpers.getLocalData('underkategori') || null;
+        $scope.chosenFylke = GeneralHelpers.getLocalData('fylke') || 'Alle';
+        $scope.chosenBehandling = +GeneralHelpers.getLocalData('behandling') || null;
+        $scope.chosenUnderkategori = +GeneralHelpers.getLocalData('underkategori') || null;
+
 
         RegionManager.getFylkes(function (err, fylkes) {
             if (err) {
@@ -39180,7 +39182,7 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
 
                         $scope.underkategoris = subTreaments;
 
-                    } else{
+                    } else {
                         setUnderkategoriEmpty();
                     }
                 });
@@ -39219,7 +39221,7 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
             }
         };
 
-        function setUnderkategoriEmpty (){
+        function setUnderkategoriEmpty() {
 
             $scope.underkategoris = [
                 {
@@ -39228,7 +39230,112 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
                 }
             ];
         }
-}]);;
+
+        /**
+         *  Share with facebook function
+         */
+        $scope.shareFB = function () {
+            var data = getShareableInfo();
+            FB.ui({
+                method: 'share',
+                name: data.name,
+                href: data.link,
+                description: data.description,
+                picture: data.pictureUrl
+            }, function (response) {
+                console.log(response);
+            });
+        };
+
+        /**
+         *  Share with twitter function
+         */
+        $scope.shareTwitter = function () {
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var text = encodeURI(data.description);
+
+            return "http://twitter.com/intent/tweet?url=" + url + "&text=" + text;
+        };
+
+        /**
+         *  Share with google+ function
+         */
+        $scope.shareGoogle = function(){
+            var data = getShareableInfo();
+            return 'https://plus.google.com/share?url={' + data.link + '}';
+
+            //return data;
+        };
+
+        /**
+         *  Share with blogger function
+         */
+        $scope.shareBlogger = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var imageCode = '<img src="http://placehold.it/350x350" style="float: left; margin-right: 20px;"/>';
+            var text = encodeURI(imageCode + data.description);
+
+            return 'https://www.blogger.com/blog-this.g?u=' + url + '&n=' + name + '&t=' + text;
+        };
+
+        /**
+         *  Share with yahoo function
+         */
+        $scope.shareYahoo = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var text = encodeURI(data.description);
+
+            return 'http://compose.mail.yahoo.com/?subject=' + name + '&body='   + text + ' \n' + url;
+        };
+
+
+        /**
+         * Encode URI wrapper
+         * @param text
+         * @returns {string}
+         */
+        $scope.urlEncoder = function (text) {
+            return encodeURI(text);
+        };
+
+
+         //ymsgr:im?+&msg=<?=$currentPageURL;?>
+        /**
+         * You can specify share information here
+         * @returns {{name: string, link: string, description: string, pictureUrl: string}}
+         */
+        function getShareableInfo() {
+            var data = {
+                name: 'FinnBehandling',
+                link: 'http://facebook.com',
+                description: 'FinnBehandling - best site ever... Some other description for test purpose',
+                pictureUrl: 'http://placehold.it/350x350'
+            };
+            return data;
+        }
+
+        function getWebRecommendations () {
+
+            WebRecommendationsManager.getRecommendationsList({}, function (err, webRecommendations) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.webRecommendations = webRecommendations;
+                });
+        }
+
+        getWebRecommendations();
+}]);
+;
 app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
     function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
 
@@ -39601,6 +39708,45 @@ app.factory('UserManager', ['$http', function ($http) {
             url: '/user/sendEmail',
             method: "POST",
             data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('WebRecommendationsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getRecommendationsList = function (params, callback) {
+        $http({
+            url: '/webRecommendations',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendation = function (id, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendationsCount = function (callback) {
+        $http({
+            url: '/webRecommendations/count',
+            method: "GET"
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);
