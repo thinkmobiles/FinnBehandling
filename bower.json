@@ -7,12 +7,16 @@
     "angular-route": "1.4.5",
     "angular-strap": "2.3.1",
     "angularUtils-pagination": "angular-utils-pagination#~0.9.0",
+    "textAngular": "~1.4.6",
     "binaryajax": "*",
     "cropbox": "~0.1.9",
     "hammerjs": "~2.0.4",
     "jquery": "~2.1.4",
     "jquery-mousewheel": "~3.1.13",
     "jquery-ui": "~1.11.4",
-    "jquery-validation": "~1.14.0"
+    "jquery-validation": "~1.14.0",
+    "textAngular": "~1.4.6"
+    "underscore": "~1.8.3",
+    "angular-underscore-module": "~1.0.3"
   }
 }
