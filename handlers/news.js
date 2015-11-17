@@ -256,7 +256,7 @@ var News = function (PostGre) {
                 return next(err);
             }
 
-            if (options.image) {
+            if (options.image && typeof options.image === 'string') {
 
                 var imageParams = {
                     imageUrl: options.image,
@@ -267,7 +267,7 @@ var News = function (PostGre) {
 
                 image.updateOrCreateImageByClientProfileId(imageParams, function () {
 
-                    res.status(200).send({
+                  res.status(200).send({
                         success: RESPONSES.UPDATED_SUCCESS,
                         article: result
                     });
