@@ -321,3 +321,14 @@ footer {
 .slim {
     height: 40px
 }
+
+.top-buffer {
+    margin-top: 20px;
+}
+
+.form-invalid-label {
+    color: red;
+}
+.form-invalid-border {
+    border-color: red;
+}

@@ -245,6 +245,63 @@ Hospitals = function (PostGre) {
          *            ]
          *        }
          *        ]
+         *
+         * * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get list of hospitals for admin
+         *
+         * @example Request example:
+         * http://localhost:8787/hospitals
+         * {
+         *      "admin": true
+         * }
+         *
+
+         *
+         * @example Response example:
+         *     [
+         *        {
+         *            "id": 3,
+         *            "is_paid": true,
+         *            "name": "rfrfr",
+         *            "web_address": "www.clinic.com",
+         *            "phone_number": "+380660237194",
+         *            "type": "type1",
+         *            "email": [
+         *                "Yasmin.Bins@yahoo.com"
+         *             ],
+         *            "position": {
+         *                "x": 58.7186,
+         *                "y": 158.1727
+         *             },
+         *             "description": "Eos blanditiis aspernatur possimus debitis.",
+         *            "adress": {
+         *                "zip_code": "111",
+         *                "kommune_name": "kom1",
+         *                "fylke_name": "ful1"
+         *            },
+         *            "postcode": "4246",
+         *            "updated_at": "2015-11-11T15:53:32.619Z",
+         *            "created_at": "2015-11-11T15:53:32.619Z",
+         *            "treatments": [
+         *                {
+         *                    "name": "treatment3"
+         *                }
+         *            ],
+         *            "sub_treatments": [
+         *                {
+         *                    "name": "sub_treatment1"
+         *                },
+         *                {
+         *                    "name": "sub_treatment2"
+         *                },
+         *                {
+         *                    "name": "sub_treatment4"
+         *                }
+         *            ],
+         *        }
+         *        ]
          * @method getAllHospitals
          * @instance
          */
@@ -262,8 +319,21 @@ Hospitals = function (PostGre) {
         options.textSearch = req.query.textSearch ? req.query.textSearch : null;
         options.subTreatment = req.query.subTreatment ? req.query.subTreatment : null;
         options.treatment = req.query.treatment ? req.query.treatment : null;
+        options.admin = req.query.admin ? req.query.admin : null;
 
-        Hospital.getAll(options, function (err, hospitals) {
+        if (options.admin) {
+
+            Hospital.getAllAdmin(options, function (err, hospitals) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                return res.status(200).send(hospitals);
+            });
+        }
+
+        Hospital.getAllHospitals(options, function (err, hospitals) {
 
             if (err) {
                 return next(err);
@@ -384,7 +454,7 @@ Hospitals = function (PostGre) {
                 qb.whereNull('postnummer');
             })
             .fetchAll({
-                columns: [TABLES.HOSPITALS + '.id', 'name']
+                columns: [TABLES.HOSPITALS + '.id', 'name', TABLES.HOSPITALS + '.postcode']
             })
             .asCallback(function (err, hospitals) {
                 if (err) {

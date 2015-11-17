@@ -1,0 +1,31 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix" style="padding: 32px">
+    <h1 class="blue bold">Update article</h1>
+    <br/>
+
+    <form
+            role="form"
+            class="one-block"
+            name="updateStartSideForm"
+            ng-submit="updateStartSideCtrl.updateStartSide()"
+            novalidate>
+
+        <div class="form-group clearfix">
+
+            <div
+                    text-angular
+                    required
+                    ng-model="updateStartSideCtrl.startSide.text">
+            </div>
+
+            <div style="color:red" ng-show="updateStartSideForm.$submitted && updateStartSideForm.startSide.text.$invalid">
+                <p ng-show="updateStartSideForm.startSide.text.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Update</button>
+        </div>
+    </form>
+    <br/>
+</div>
