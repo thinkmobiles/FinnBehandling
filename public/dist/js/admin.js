@@ -73055,9 +73055,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
     $routeProvider.when('/', {
         controller: 'blank',
-        templateUrl: 'templates/admin.html',
+        templateUrl: 'templates/index.html',
         controllerAs: 'blank',
         reloadOnSearch: false
+    }).when('/admin', {
+        controller: 'conflictsController',
+        templateUrl: 'templates/admin.html',
+        controllerAs: 'conflictsCtrl'
     }).when('/nyheter', {
         controller: 'newsController',
         templateUrl: 'templates/news/admin/list.html',
@@ -73070,6 +73074,34 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateArticleController',
         templateUrl: 'templates/news/admin/edit.html',
         controllerAs: 'updateArticleCtrl'
+    }).when('/anonser', {
+        controller: 'advertisementsController',
+        templateUrl: 'templates/advertisements/admin/list.html',
+        controllerAs: 'advertisementsCtrl'
+    }).when('/anonser/new', {
+        controller: 'newAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/new.html',
+        controllerAs: 'newAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'updateAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'updateAdvertisementCtrl'
+    }).when('/startside', {
+        controller: 'startSideController',
+        templateUrl: 'templates/startSide/admin/startSide.html',
+        controllerAs: 'startSideCtrl'
+    }).when('/startside/edit', {
+        controller: 'updateStartSideController',
+        templateUrl: 'templates/startSide/admin/edit.html',
+        controllerAs: 'updateStartSideCtrl'
+    }).when('/hospital/new', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
+    }).when('/hospital/:id', {
+        controller: 'editHospitalController',
+        templateUrl: 'templates/hospital/edit-form.html',
+        controllerAs: 'editHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',
@@ -73088,10 +73120,556 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 }]).run(['$rootScope', function ($rootScope) {
 
-
 }]);;
+app.controller('advertisementsController', ['$scope', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, AdvertisementsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.advertisementsPage = GeneralHelpers.getLocalData('advertisementsPage') || 1;
+        $scope.resultater = 10;
+
+        function getAdvertisementsCount () {
+
+            AdvertisementsManager.getAdvertisementsCount(function (err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getAdvertisementsCount();
+
+        this.refreshAdvertisements = function () {
+            GeneralHelpers.saveAsLocalData('advertisementsPage', $scope.advertisementsPage);
+
+            getAdvertisements();
+        };
+
+        function getAdvertisements () {
+
+            $scope.pending = true;
+
+            AdvertisementsManager.getAdvertisements({limit: $scope.resultater, page: $scope.advertisementsPage},
+                function (err, advertisements) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.pending = false;
+                    $scope.advertisements = advertisements;
+                });
+        }
+
+        getAdvertisements();
+
+
+        this.deleteAdvertisement = function (id) {
+
+            AdvertisementsManager.removeAdvertisement(id, function (err) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Deleted successfully');
+
+                getAdvertisements();
+
+                getAdvertisementsCount();
+            });
+        };
+    }]);;
+app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, AdvertisementsManager, GeneralHelpers) {
+        var self = this;
+        var advertisementId = $routeParams.id;
+
+        function getAdvertisement () {
+
+            AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.advertisement = advertisement;
+            });
+        }
+
+        getAdvertisement();
+
+        this.updateAdvertisement = function () {
+
+            AdvertisementsManager.updateAdvertisement(advertisementId, self.advertisement, function (err, advertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert("Advertisement successfully updated");
+
+                $location.path('anonser');
+            });
+        };
+    }]);;
+app.controller('newAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, AdvertisementManager, GeneralHelpers){
+        var self = this;
+
+        this.createAdvertisement = function () {
+
+            AdvertisementManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert(' Advertisement successfully created');
+
+                $location.path('anonser');
+            });
+        };
+    }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
+
+    }]);;
+app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers',
+    function ($scope, ConflictsManager, GeneralHelpers) {
+        var self = this;
+
+        function getConflicts () {
+
+            ConflictsManager.getConflictsList(function (err, conflicts) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.conflicts = conflicts;
+            });
+        }
+
+        getConflicts();
+
+        this.updateZipCodes = function () {
+
+            ConflictsManager.updateDb(function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert("Zip codes updated successful");
+            });
+        };
+
+    }]);;
+app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalsManager, TreatmentsManager, RegionsManager, GeneralHelpers) {
+        var self = this;
+        self.hospitalId = $routeParams.id;
+
+        self.persistHospital = persistHospital;
+        self.createHospital = createHospital;
+        self.updateHospital = updateHospital;
+
+        self.getDescriptionMaxLength = getDescriptionMaxLength;
+        self.changeTreatmentSelection = changeTreatmentSelection;
+        self.changeSubTreatmentSelection = changeSubTreatmentSelection;
+        self.closeTreatmentDialog = closeTreatmentDialog;
+        self.setFormDirty = setFormDirty;
+        self.resetFields = resetFields;
+        self.updateForm = updateForm;
+        self.getRegion = getRegion;
+        self.cropResult = cropResult;
+        self.checkImageType = checkImageType;
+        self.removeImage = removeImage;
+
+        self.isSubTreatmentOpen = false;
+        self.isMouseOverSubTreatment = true;
+        self.isFormDirty = false;
+
+
+        getTreatments();
+        resetFields();
+
+
+        if (self.hospitalId) {
+            getHospital(self.hospitalId);
+        }
+
+
+        /**
+         * Check max length for currently selected entry type
+         * @returns {number}
+         */
+        function getDescriptionMaxLength() {
+            if (self.hospital.description && !self.hospital.is_paid) {
+                self.hospital.description = self.hospital.description.substring(0, 200);
+            }
+            return self.hospital.is_paid ? 600 : 200;
+        }
+
+        /**
+         * Manage selected treatments depending on user selection
+         * @param treatment
+         */
+        function changeTreatmentSelection(treatment) {
+            if (treatment.isSelected) {
+                self.subTreatments = treatment.subTreatments;
+                self.hospital.treatment_ids.push(treatment.id);
+                openTreatmentDialog();
+            } else {
+                self.isSubTreatmentOpen = false;
+                var index = self.hospital.treatment_ids.indexOf(treatment.id);
+                if (index >= 0) {
+                    self.hospital.treatment_ids.splice(index, 1);
+                }
+                for (var i = treatment.subTreatments.length - 1; i >= 0; i--) {
+                    treatment.subTreatments[i].isSelected = false;
+                    self.hospital.sub_treatments.splice(self.hospital.sub_treatments.indexOf(treatment.subTreatments[i].id), 1);
+                }
+            }
+        }
+
+        /**
+         * Manage selected subTreatments depending on user selection
+         * @param subTreatment
+         */
+        function changeSubTreatmentSelection(subTreatment) {
+            if (subTreatment.isSelected) {
+                self.hospital.sub_treatments.push(subTreatment.id);
+            } else {
+                var index = self.hospital.sub_treatments.indexOf(subTreatment.id);
+                if (index >= 0) {
+                    self.hospital.sub_treatments.splice(index, 1);
+                }
+            }
+
+        }
+
+        /**
+         * Fill treatment_ids with data
+         *
+         * Converts subTreatments object array into int array
+         * [Object, Object, Object] -> [1, 4, 9]
+         *
+         * @param hospital
+         */
+        function processSubTreatments(hospital) {
+            self.hospital.treatment_ids = [];
+            for (var i = hospital.sub_treatments.length - 1; i >= 0; i--) {
+                if (hospital.sub_treatments[i].treatment_id && self.hospital.treatment_ids.indexOf(hospital.sub_treatments[i].treatment_id) < 0) {
+                    self.hospital.treatment_ids.push(hospital.sub_treatments[i].treatment_id);
+                }
+                self.hospital.sub_treatments[i] = hospital.sub_treatments[i].id;
+            }
+        }
+
+
+        /**
+         * Set default values for the form
+         */
+        function resetFields() {
+            self.hospital = {};
+            self.hospital.phones = [{}, {}, {}];
+            self.hospital.email = [];
+            self.hospital.is_paid = false;
+            self.hospital.treatment_ids = [];
+            self.hospital.sub_treatments = [];
+            self.isFormDirty = false;
+            updateForm();
+        }
+
+        /**
+         * Form validation initializer.
+         * Once it's invoked invalid fields will be highlighted
+         * @returns {boolean}
+         */
+        function setFormDirty() {
+            self.isFormDirty = true;
+            return self.isFormDirty;
+        }
+
+
+        /**
+         * Do form fields set up routine.
+         * Could be used for initialization or reinitialization
+         */
+        function updateForm() {
+
+            getRegion();
+
+            if (!self.hospital.treatment_ids) {
+                self.hospital.treatment_ids = [];
+            }
+            if (!self.hospital.sub_treatments) {
+                self.hospital.sub_treatments = [];
+            }
+            if (!self.treatments) {
+                self.treatments = [];
+            }
+
+            for (var i = self.treatments.length - 1; i >= 0; i--) {
+
+                if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
+                    self.treatments[i].isSelected = true;
+                    console.log(self.treatments[i].subTreatments);
+                    if (self.treatments[i].subTreatments) {
+                        for (var j = self.treatments[i].subTreatments.length - 1; j >= 0; j--) {
+                            if (self.hospital.sub_treatments && self.hospital.sub_treatments.indexOf(self.treatments[i].subTreatments[j].id) >= 0) {
+                                self.treatments[i].subTreatments[j].isSelected = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (self.hospital.phone_number) {
+                self.hospital.phones = [{}, {}, {}];
+
+                for (var i = self.hospital.phone_number.length - 1; i >= 0; i--) {
+                    self.hospital.phones[i].prefix = self.hospital.phone_number[i].substring(0, 4);
+                    self.hospital.phones[i].suffix = self.hospital.phone_number[i].substring(4);
+                }
+            }
+
+        }
+
+
+        /**
+         * Changes indicator for treatment dialog
+         */
+        function openTreatmentDialog() {
+            self.isSubTreatmentOpen = true;
+        }
+
+        /**
+         * Hide subTreatment selection dialog, only works if clicked outside of
+         */
+        function closeTreatmentDialog() {
+            if (!self.isMouseOverSubTreatment) {
+                self.subTreatments = [];
+            }
+        }
+
+        /**
+         * Invoke either update hospital (if route params is present) or create ne one otherwise
+         */
+        function persistHospital() {
+            if (self.hospitalId) {
+                updateHospital();
+            } else {
+                createHospital();
+            }
+        }
+
+
+        /**
+         * Prepare object before db update
+         * @returns {{region_id: *, is_paid: boolean, name: *, treatment_ids: Array, sub_treatments: Array, description: (string|*), email: *, phone_number: *, web_address: (*|string|Array|string|Document.web_address), postcode: *}}
+         */
+        function prepareData() {
+
+            if(!self.hospital.phone_number){
+                self.hospital.phone_number = [];
+            }
+
+            for (var i = self.hospital.phones.length - 1; i >= 0; i--) {
+                if (self.hospital.phones[i].prefix && self.hospital.phones[i].suffix) {
+                    self.hospital.phone_number[i] = self.hospital.phones[i].prefix + self.hospital.phones[i].suffix;
+                }
+            }
+
+            var data = {
+                region_id: self.hospital.region_id,
+                is_paid: self.hospital.is_paid,
+                name: self.hospital.name,
+                treatment_ids: self.hospital.treatment_ids,
+                sub_treatments: self.hospital.sub_treatments,
+                description: self.hospital.description,
+                email: self.hospital.email,
+                phone_number: self.hospital.phone_number,
+                web_address: self.hospital.web_address,
+                postcode: self.hospital.postcode,
+                address: self.hospital.address
+
+            };
+
+            return data;
+        }
+
+        /**
+         * Persist hospital object
+         */
+        function createHospital() {
+
+            var data = prepareData();
+
+
+            HospitalsManager.createHospital(data, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital created successful');
+
+                $location.path('');
+            });
+        }
+
+        /**
+         * Fetch hospital by its id
+         * @param hospitalId
+         */
+        function getHospital(hospitalId) {
+
+            HospitalsManager.getHospital(hospitalId, function (err, hospital) {
+                if (err) {
+                    self.hospitalId = null;
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+                processSubTreatments(self.hospital);
+                updateForm();
+            });
+        }
+
+
+        /**
+         * Hospital update function, persist hospital object
+         */
+        function updateHospital() {
+
+            var data = prepareData();
+
+
+            HospitalsManager.updateHospital(self.hospitalId, data, function (err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('Hospital updated successful');
+
+                $location.path('');
+            });
+        }
+
+        /**
+         * Fetch region by zip code as soon as
+         */
+        function getRegion() {
+            if (self.hospital.postcode && self.hospital.postcode.length !== 4) {
+                return;
+            }
+
+            RegionsManager.getFylkesByPostCode(self.hospital.postcode, function (err, region) {
+
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.currentRegion = region;
+                self.hospital.region_id = self.currentRegion.id;
+                self.hospital.city = self.currentRegion.poststed ? self.currentRegion.poststed.substring(0, 1).toUpperCase() + self.currentRegion.poststed.substring(1).toLowerCase() : '';
+
+            });
+        }
+
+
+        /**
+         * Fetch treatments from db
+         */
+        function getTreatments() {
+
+            TreatmentsManager.getTreatments(function (err, treatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.treatments = treatments;
+                for (var i = self.treatments.length - 1; i >= 0; i--) {
+                    getSubTreatments(self.treatments[i]);
+                }
+            });
+        }
+
+        /**
+         * Fetch all subtreatments for specified treatment
+         * @param treatment
+         */
+        function getSubTreatments(treatment) {
+
+            TreatmentsManager.getSubTreatments(treatment.id, function (err, subTreatments) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                treatment.subTreatments = subTreatments;
+            });
+        }
+
+
+        (function getHospitals() {
+
+            HospitalsManager.getHospitalsList({},
+                function (err, hospitals) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.hospitals = hospitals;
+                });
+        }());
+
+        self.refreshHospitals = function () {
+            GeneralHelpers.saveAsLocalData('hospitalsPage', $scope.hospitalsPage);
+
+            getHospitals();
+        };
+
+        /**
+         * Fetch hospital quantity
+         */
+        function getHospitalsCount() {
+
+            HospitalsManager.getHospitalsCount({}, function (err, count) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.totalItems = result.count;
+            });
+        }
+
+        function cropResult (croppedImageBase64, type) {
+            self.hospital[type] = croppedImageBase64;
+        };
+
+        function checkImageType (name) {
+            var imageContent = self[name];
+
+            /*if (!imageContent) {
+             return;
+             }
+
+             Client.checkFileType(imageContent, function (err, response) {
+             if (err) {
+             self.removeImage(name);
+             return ErrMsg.show({message: err.data.error, status: err.status});
+             }
+
+             if (!response.validImage) {
+             self.removeImage(name);
+             return alert ('File is not image');
+             }
+             });*/
+        };
+
+        function removeImage(name) {
+            self.hospital[name] = null;
+            self[name] = null;
+            $('#' + name).val(null);
+            $( '#' + name + '-slider').slider('disable');
+        };
 
     }]);;
 app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
@@ -73264,6 +73842,69 @@ app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
         };
     }]);
 ;
+app.controller('updateStartSideController', ['$scope', '$routeParams', '$location', 'StartSideManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, StartSideManager, GeneralHelpers) {
+        var self = this;
+
+        function getStartSide () {
+
+            StartSideManager.getStartSide(function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.startSide = startSide;
+            });
+        }
+
+        getStartSide ();
+
+        this.updateStartSide = function () {
+
+            StartSideManager.updateStartSide(self.startSide, function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('StartSide successfully updated');
+
+                $location.path('startside');
+            });
+        };
+    }]);;
+app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
+    function($scope, StartSideManager, NewsManager, GeneralHelpers){
+        var self = this;
+
+        (function getStartSide () {
+
+            $scope.pending = true;
+
+            StartSideManager.getStartSide(function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                self.startSide = startSide;
+            });
+        })();
+
+        function getStaticNews () {
+
+            NewsManager.getNewsList({limit: 3}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+                console.log(news);
+                self.saticNews = news;
+            });
+        }
+
+        getStaticNews();
+
+    }]);;
 app.controller('updateWebRecommendationController', ['$scope', '$routeParams', '$location', 'WebRecommendationsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, WebRecommendationsManager, GeneralHelpers) {
         var self = this;
@@ -73562,6 +74203,108 @@ app.directive('fileread', ['$timeout', function ($timeout) {
         }
     }
 }]);;
+app.factory('AdvertisementsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getAdvertisements = function (params, callback) {
+        $http({
+            url: '/advertisement',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createAdvertisement = function (data, callback) {
+        $http({
+            url: '/advertisement',
+            method: 'POST',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.getAdvertisementsCount = function (callback) {
+        $http({
+            url:'/advertisement/count',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getOneAdvertisement = function (id, callback) {
+        $http({
+            url: '/advertisement/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateAdvertisement = function (id, data, callback) {
+        $http({
+            url:  '/advertisement/' + id,
+            method: 'PUT',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(null, response);
+        });
+    };
+
+    this.removeAdvertisement = function (id, callback) {
+        $http({
+            url: '/advertisement/' + id,
+            method: 'DELETE'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(null, response);
+        });
+    };
+
+    return this;
+}]);;
+app.factory('ConflictsManager', ['$http', function ($http) {
+
+    this.getConflictsList = function (callback) {
+        $http({
+            url: '/hospitals/conflicts',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateDb = function (callback) {
+        $http({
+            url: '/regions/updateDB',
+            method: "POST"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
 app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
     "use strict";
     var self = this;
@@ -73615,6 +74358,85 @@ app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, 
             default:
                 console.log(err);
         }
+    };
+
+    return this;
+}]);;
+app.factory('HospitalsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getHospitalsList = function (params, callback) {
+        $http({
+            url: '/hospitals',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.createHospital = function (data, callback) {
+        $http({
+            url: '/hospitals',
+            method: 'POST',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.getHospitalsCount = function (params, callback) {
+        $http({
+            url: '/hospitals/count',
+            method: 'GET',
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateHospital = function (id, data, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'PUT',
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    this.deleteHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: 'DELETE'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
     };
 
     return this;
@@ -73694,6 +74516,92 @@ app.factory('NewsManager', ['$http', function ($http) {
             if (callback)
                 callback(response);
         });
+    };
+
+    return this;
+}]);;
+/**
+ * Created by vasylhoshovsky on 12.11.15.
+ */
+app.factory('RegionsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    self.getFylkes = function (callback) {
+        $http({
+            url: '/regions/fylkes',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    self.getFylkesByPostCode = function (postcode, callback) {
+        $http({
+            url: '/regions/fylkes?postCode=' + postcode,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+
+    return self;
+}]);;
+app.factory('StartSideManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getStartSide = function (callback) {
+        $http({
+            url: '/staticData',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.updateStartSide = function (data, callback) {
+        $http({
+            url: '/staticData',
+            method: "PUT",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, function (response) {
+            if (callback)
+                callback(response);
+        });
+    };
+
+    return this;
+}]);;
+app.factory('TreatmentsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getTreatments = function (callback) {
+        $http({
+            url: '/treatment',
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getSubTreatments = function (id, callback) {
+        $http({
+            url: '/treatment/' + id,
+            method: 'GET'
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;

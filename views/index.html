@@ -141,17 +141,15 @@
                         </h2>
                         <div class="side-container">
                             <h5 class="bold  dynamic-font-md">Privat:</h5>
-                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
-                                <li class="margin-top">Lommelegen</li>
-                                <li class="margin-top">Legemiddelindustrien</li>
-                                <li class="margin-top">Felleskatalogen</li>
+                            <ul ng-repeat="webRecommendation in webRecommendations | filter: {private: true} | limitTo: 5"
+                                class="blue  dynamic-font-md" style="padding-left: 15px">
+                                    <li class="margin-top">{{webRecommendation.name}}</li>
                             </ul>
                             <h5 class="bold  dynamic-font-md">Offentlig:</h5>
-                            <ul class="blue  dynamic-font-md" style="padding-left: 15px">
-                                <li class="margin-top">Nasjonalt folkehelseinstitutt</li>
-                                <li class="margin-top">Helse- og omsorgsdepartementet</li>
-                                <li class="margin-top">Legemiddelverket</li>
-                            </ul>
+                            <ul ng-repeat="webRecommendation in webRecommendations | filter: {private: false} | limitTo: 5"
+                                class="blue  dynamic-font-md" style="padding-left: 15px">
+                                    <li class="margin-top">{{webRecommendation.name}}</li>
+                             </ul>
                         </div>
 
 
@@ -180,25 +178,6 @@
                                     g+
                                 </span>
                             </a>
-
-                            <!--<div-->
-                                <!--itemscope itemtype="http://schema.org/Thing"-->
-                                <!--class="g-interactivepost"-->
-                                <!--data-contenturl="{{ shareGoogle().link }}"-->
-                                <!--data-contentdeeplinkid="/"-->
-                                <!--data-clientid="126764424643-badq7lkj6tdodm4g1kp20a6kqovirlr7.apps.googleusercontent.com"-->
-                                <!--data-cookiepolicy="single_host_origin"-->
-                                <!--data-prefilltext="{{ shareGoogle().name }}"-->
-                                <!--data-calltoactionlabel="CREATE"-->
-                                <!--data-calltoactionurl="http://plus.google.com/pages/create"-->
-                                <!--data-calltoactiondeeplinkid="/pages/create"-->
-                                <!--style="background-color:red; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">-->
-                                <!--&lt;!&ndash; properties for google+ sharing &ndash;&gt;-->
-                                <!--<meta itemprop="headline" content="{{ shareGoogle().name }}" />-->
-                                <!--<meta itemprop="description" content="{{ shareGoogle().description }}" />-->
-                                <!--<meta itemprop="image" content="{{ shareGoogle().pictureUrl }}" />-->
-                                <!--g+-->
-                            <!--</div>-->
 
                             <a href="{{ shareBlogger() }}" target="_blank" >
                                 <span style="background-color:darkorange; color: white; height: 32px; width: 32px; margin: 1px; text-align: center; font-size: x-large; display: inline-block; cursor: pointer;">
