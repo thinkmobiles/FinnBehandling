@@ -38292,13 +38292,592 @@ angular.module('ngAnimate', [])
     $templateCache.put('tooltip/tooltip.tpl.html', '<div class="tooltip in" ng-show="title"><div class="tooltip-arrow"></div><div class="tooltip-inner" ng-bind="title"></div></div>');
   } ]);
 })(window, document);;
+/**
+ * dirPagination - AngularJS module for paginating (almost) anything.
+ *
+ *
+ * Credits
+ * =======
+ *
+ * Daniel Tabuenca: https://groups.google.com/d/msg/angular/an9QpzqIYiM/r8v-3W1X5vcJ
+ * for the idea on how to dynamically invoke the ng-repeat directive.
+ *
+ * I borrowed a couple of lines and a few attribute names from the AngularUI Bootstrap project:
+ * https://github.com/angular-ui/bootstrap/blob/master/src/pagination/pagination.js
+ *
+ * Copyright 2014 Michael Bromley <michael@michaelbromley.co.uk>
+ */
+
+(function() {
+
+    /**
+     * Config
+     */
+    var moduleName = 'angularUtils.directives.dirPagination';
+    var DEFAULT_ID = '__default';
+
+    /**
+     * Module
+     */
+    var module;
+    try {
+        module = angular.module(moduleName);
+    } catch(err) {
+        // named module does not exist, so create one
+        module = angular.module(moduleName, []);
+    }
+
+    module
+        .directive('dirPaginate', ['$compile', '$parse', 'paginationService', dirPaginateDirective])
+        .directive('dirPaginateNoCompile', noCompileDirective)
+        .directive('dirPaginationControls', ['paginationService', 'paginationTemplate', dirPaginationControlsDirective])
+        .filter('itemsPerPage', ['paginationService', itemsPerPageFilter])
+        .service('paginationService', paginationService)
+        .provider('paginationTemplate', paginationTemplateProvider)
+        .run(['$templateCache',dirPaginationControlsTemplateInstaller]);
+
+    function dirPaginateDirective($compile, $parse, paginationService) {
+
+        return  {
+            terminal: true,
+            multiElement: true,
+            compile: dirPaginationCompileFn
+        };
+
+        function dirPaginationCompileFn(tElement, tAttrs){
+
+            var expression = tAttrs.dirPaginate;
+            // regex taken directly from https://github.com/angular/angular.js/blob/v1.4.x/src/ng/directive/ngRepeat.js#L339
+            var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
+
+            var filterPattern = /\|\s*itemsPerPage\s*:\s*(.*\(\s*\w*\)|([^\)]*?(?=as))|[^\)]*)/;
+            if (match[2].match(filterPattern) === null) {
+                throw 'pagination directive: the \'itemsPerPage\' filter must be set.';
+            }
+            var itemsPerPageFilterRemoved = match[2].replace(filterPattern, '');
+            var collectionGetter = $parse(itemsPerPageFilterRemoved);
+
+            addNoCompileAttributes(tElement);
+
+            // If any value is specified for paginationId, we register the un-evaluated expression at this stage for the benefit of any
+            // dir-pagination-controls directives that may be looking for this ID.
+            var rawId = tAttrs.paginationId || DEFAULT_ID;
+            paginationService.registerInstance(rawId);
+
+            return function dirPaginationLinkFn(scope, element, attrs){
+
+                // Now that we have access to the `scope` we can interpolate any expression given in the paginationId attribute and
+                // potentially register a new ID if it evaluates to a different value than the rawId.
+                var paginationId = $parse(attrs.paginationId)(scope) || attrs.paginationId || DEFAULT_ID;
+                paginationService.registerInstance(paginationId);
+
+                var repeatExpression = getRepeatExpression(expression, paginationId);
+                addNgRepeatToElement(element, attrs, repeatExpression);
+
+                removeTemporaryAttributes(element);
+                var compiled =  $compile(element);
+
+                var currentPageGetter = makeCurrentPageGetterFn(scope, attrs, paginationId);
+                paginationService.setCurrentPageParser(paginationId, currentPageGetter, scope);
+
+                if (typeof attrs.totalItems !== 'undefined') {
+                    paginationService.setAsyncModeTrue(paginationId);
+                    scope.$watch(function() {
+                        return $parse(attrs.totalItems)(scope);
+                    }, function (result) {
+                        if (0 <= result) {
+                            paginationService.setCollectionLength(paginationId, result);
+                        }
+                    });
+                } else {
+                    scope.$watchCollection(function() {
+                        return collectionGetter(scope);
+                    }, function(collection) {
+                        if (collection) {
+                            paginationService.setCollectionLength(paginationId, collection.length);
+                        }
+                    });
+                }
+
+                // Delegate to the link function returned by the new compilation of the ng-repeat
+                compiled(scope);
+            };
+        }
+
+        /**
+         * If a pagination id has been specified, we need to check that it is present as the second argument passed to
+         * the itemsPerPage filter. If it is not there, we add it and return the modified expression.
+         *
+         * @param expression
+         * @param paginationId
+         * @returns {*}
+         */
+        function getRepeatExpression(expression, paginationId) {
+            var repeatExpression,
+                idDefinedInFilter = !!expression.match(/(\|\s*itemsPerPage\s*:[^|]*:[^|]*)/);
+
+            if (paginationId !== DEFAULT_ID && !idDefinedInFilter) {
+                repeatExpression = expression.replace(/(\|\s*itemsPerPage\s*:[^|]*)/, "$1 : '" + paginationId + "'");
+            } else {
+                repeatExpression = expression;
+            }
+
+            return repeatExpression;
+        }
+
+        /**
+         * Adds the ng-repeat directive to the element. In the case of multi-element (-start, -end) it adds the
+         * appropriate multi-element ng-repeat to the first and last element in the range.
+         * @param element
+         * @param attrs
+         * @param repeatExpression
+         */
+        function addNgRepeatToElement(element, attrs, repeatExpression) {
+            if (element[0].hasAttribute('dir-paginate-start') || element[0].hasAttribute('data-dir-paginate-start')) {
+                // using multiElement mode (dir-paginate-start, dir-paginate-end)
+                attrs.$set('ngRepeatStart', repeatExpression);
+                element.eq(element.length - 1).attr('ng-repeat-end', true);
+            } else {
+                attrs.$set('ngRepeat', repeatExpression);
+            }
+        }
+
+        /**
+         * Adds the dir-paginate-no-compile directive to each element in the tElement range.
+         * @param tElement
+         */
+        function addNoCompileAttributes(tElement) {
+            angular.forEach(tElement, function(el) {
+                if (el.nodeType === 1) {
+                    angular.element(el).attr('dir-paginate-no-compile', true);
+                }
+            });
+        }
+
+        /**
+         * Removes the variations on dir-paginate (data-, -start, -end) and the dir-paginate-no-compile directives.
+         * @param element
+         */
+        function removeTemporaryAttributes(element) {
+            angular.forEach(element, function(el) {
+                if (el.nodeType === 1) {
+                    angular.element(el).removeAttr('dir-paginate-no-compile');
+                }
+            });
+            element.eq(0).removeAttr('dir-paginate-start').removeAttr('dir-paginate').removeAttr('data-dir-paginate-start').removeAttr('data-dir-paginate');
+            element.eq(element.length - 1).removeAttr('dir-paginate-end').removeAttr('data-dir-paginate-end');
+        }
+
+        /**
+         * Creates a getter function for the current-page attribute, using the expression provided or a default value if
+         * no current-page expression was specified.
+         *
+         * @param scope
+         * @param attrs
+         * @param paginationId
+         * @returns {*}
+         */
+        function makeCurrentPageGetterFn(scope, attrs, paginationId) {
+            var currentPageGetter;
+            if (attrs.currentPage) {
+                currentPageGetter = $parse(attrs.currentPage);
+            } else {
+                // if the current-page attribute was not set, we'll make our own
+                var defaultCurrentPage = paginationId + '__currentPage';
+                scope[defaultCurrentPage] = 1;
+                currentPageGetter = $parse(defaultCurrentPage);
+            }
+            return currentPageGetter;
+        }
+    }
+
+    /**
+     * This is a helper directive that allows correct compilation when in multi-element mode (ie dir-paginate-start, dir-paginate-end).
+     * It is dynamically added to all elements in the dir-paginate compile function, and it prevents further compilation of
+     * any inner directives. It is then removed in the link function, and all inner directives are then manually compiled.
+     */
+    function noCompileDirective() {
+        return {
+            priority: 5000,
+            terminal: true
+        };
+    }
+
+    function dirPaginationControlsTemplateInstaller($templateCache) {
+        $templateCache.put('angularUtils.directives.dirPagination.template', '<ul class="pagination" ng-if="1 < pages.length || !autoHide"><li ng-if="boundaryLinks" ng-class="{ disabled : pagination.current == 1 }"><a href="" ng-click="setCurrent(1)">&laquo;</a></li><li ng-if="directionLinks" ng-class="{ disabled : pagination.current == 1 }"><a href="" ng-click="setCurrent(pagination.current - 1)">&lsaquo;</a></li><li ng-repeat="pageNumber in pages track by tracker(pageNumber, $index)" ng-class="{ active : pagination.current == pageNumber, disabled : pageNumber == \'...\' || ( ! autoHide && pages.length === 1 ) }"><a href="" ng-click="setCurrent(pageNumber)">{{ pageNumber }}</a></li><li ng-if="directionLinks" ng-class="{ disabled : pagination.current == pagination.last }"><a href="" ng-click="setCurrent(pagination.current + 1)">&rsaquo;</a></li><li ng-if="boundaryLinks"  ng-class="{ disabled : pagination.current == pagination.last }"><a href="" ng-click="setCurrent(pagination.last)">&raquo;</a></li></ul>');
+    }
+
+    function dirPaginationControlsDirective(paginationService, paginationTemplate) {
+
+        var numberRegex = /^\d+$/;
+
+        return {
+            restrict: 'AE',
+            templateUrl: function(elem, attrs) {
+                return attrs.templateUrl || paginationTemplate.getPath();
+            },
+            scope: {
+                maxSize: '=?',
+                onPageChange: '&?',
+                paginationId: '=?',
+                autoHide: '=?'
+            },
+            link: dirPaginationControlsLinkFn
+        };
+
+        function dirPaginationControlsLinkFn(scope, element, attrs) {
+
+            // rawId is the un-interpolated value of the pagination-id attribute. This is only important when the corresponding dir-paginate directive has
+            // not yet been linked (e.g. if it is inside an ng-if block), and in that case it prevents this controls directive from assuming that there is
+            // no corresponding dir-paginate directive and wrongly throwing an exception.
+            var rawId = attrs.paginationId ||  DEFAULT_ID;
+            var paginationId = scope.paginationId || attrs.paginationId ||  DEFAULT_ID;
+
+            if (!paginationService.isRegistered(paginationId) && !paginationService.isRegistered(rawId)) {
+                var idMessage = (paginationId !== DEFAULT_ID) ? ' (id: ' + paginationId + ') ' : ' ';
+                console.warn('Pagination directive: the pagination controls' + idMessage + 'cannot be used without the corresponding pagination directive, which was not found at link time.');
+            }
+
+            if (!scope.maxSize) { scope.maxSize = 9; }
+            scope.autoHide = scope.autoHide === undefined ? true : scope.autoHide;
+            scope.directionLinks = angular.isDefined(attrs.directionLinks) ? scope.$parent.$eval(attrs.directionLinks) : true;
+            scope.boundaryLinks = angular.isDefined(attrs.boundaryLinks) ? scope.$parent.$eval(attrs.boundaryLinks) : false;
+
+            var paginationRange = Math.max(scope.maxSize, 5);
+            scope.pages = [];
+            scope.pagination = {
+                last: 1,
+                current: 1
+            };
+            scope.range = {
+                lower: 1,
+                upper: 1,
+                total: 1
+            };
+
+            scope.$watch(function() {
+                if (paginationService.isRegistered(paginationId)) {
+                    return (paginationService.getCollectionLength(paginationId) + 1) * paginationService.getItemsPerPage(paginationId);
+                }
+            }, function(length) {
+                if (0 < length) {
+                    generatePagination();
+                }
+            });
+
+            scope.$watch(function() {
+                if (paginationService.isRegistered(paginationId)) {
+                    return (paginationService.getItemsPerPage(paginationId));
+                }
+            }, function(current, previous) {
+                if (current != previous && typeof previous !== 'undefined') {
+                    goToPage(scope.pagination.current);
+                }
+            });
+
+            scope.$watch(function() {
+                if (paginationService.isRegistered(paginationId)) {
+                    return paginationService.getCurrentPage(paginationId);
+                }
+            }, function(currentPage, previousPage) {
+                if (currentPage != previousPage) {
+                    goToPage(currentPage);
+                }
+            });
+
+            scope.setCurrent = function(num) {
+                if (paginationService.isRegistered(paginationId) && isValidPageNumber(num)) {
+                    num = parseInt(num, 10);
+                    paginationService.setCurrentPage(paginationId, num);
+                }
+            };
+
+            /**
+             * Custom "track by" function which allows for duplicate "..." entries on long lists,
+             * yet fixes the problem of wrongly-highlighted links which happens when using
+             * "track by $index" - see https://github.com/michaelbromley/angularUtils/issues/153
+             * @param id
+             * @param index
+             * @returns {string}
+             */
+            scope.tracker = function(id, index) {
+                return id + '_' + index;
+            };
+
+            function goToPage(num) {
+                if (paginationService.isRegistered(paginationId) && isValidPageNumber(num)) {
+                    scope.pages = generatePagesArray(num, paginationService.getCollectionLength(paginationId), paginationService.getItemsPerPage(paginationId), paginationRange);
+                    scope.pagination.current = num;
+                    updateRangeValues();
+
+                    // if a callback has been set, then call it with the page number as an argument
+                    if (scope.onPageChange) {
+                        scope.onPageChange({ newPageNumber : num });
+                    }
+                }
+            }
+
+            function generatePagination() {
+                if (paginationService.isRegistered(paginationId)) {
+                    var page = parseInt(paginationService.getCurrentPage(paginationId)) || 1;
+                    scope.pages = generatePagesArray(page, paginationService.getCollectionLength(paginationId), paginationService.getItemsPerPage(paginationId), paginationRange);
+                    scope.pagination.current = page;
+                    scope.pagination.last = scope.pages[scope.pages.length - 1];
+                    if (scope.pagination.last < scope.pagination.current) {
+                        scope.setCurrent(scope.pagination.last);
+                    } else {
+                        updateRangeValues();
+                    }
+                }
+            }
+
+            /**
+             * This function updates the values (lower, upper, total) of the `scope.range` object, which can be used in the pagination
+             * template to display the current page range, e.g. "showing 21 - 40 of 144 results";
+             */
+            function updateRangeValues() {
+                if (paginationService.isRegistered(paginationId)) {
+                    var currentPage = paginationService.getCurrentPage(paginationId),
+                        itemsPerPage = paginationService.getItemsPerPage(paginationId),
+                        totalItems = paginationService.getCollectionLength(paginationId);
+
+                    scope.range.lower = (currentPage - 1) * itemsPerPage + 1;
+                    scope.range.upper = Math.min(currentPage * itemsPerPage, totalItems);
+                    scope.range.total = totalItems;
+                }
+            }
+            function isValidPageNumber(num) {
+                return (numberRegex.test(num) && (0 < num && num <= scope.pagination.last));
+            }
+        }
+
+        /**
+         * Generate an array of page numbers (or the '...' string) which is used in an ng-repeat to generate the
+         * links used in pagination
+         *
+         * @param currentPage
+         * @param rowsPerPage
+         * @param paginationRange
+         * @param collectionLength
+         * @returns {Array}
+         */
+        function generatePagesArray(currentPage, collectionLength, rowsPerPage, paginationRange) {
+            var pages = [];
+            var totalPages = Math.ceil(collectionLength / rowsPerPage);
+            var halfWay = Math.ceil(paginationRange / 2);
+            var position;
+
+            if (currentPage <= halfWay) {
+                position = 'start';
+            } else if (totalPages - halfWay < currentPage) {
+                position = 'end';
+            } else {
+                position = 'middle';
+            }
+
+            var ellipsesNeeded = paginationRange < totalPages;
+            var i = 1;
+            while (i <= totalPages && i <= paginationRange) {
+                var pageNumber = calculatePageNumber(i, currentPage, paginationRange, totalPages);
+
+                var openingEllipsesNeeded = (i === 2 && (position === 'middle' || position === 'end'));
+                var closingEllipsesNeeded = (i === paginationRange - 1 && (position === 'middle' || position === 'start'));
+                if (ellipsesNeeded && (openingEllipsesNeeded || closingEllipsesNeeded)) {
+                    pages.push('...');
+                } else {
+                    pages.push(pageNumber);
+                }
+                i ++;
+            }
+            return pages;
+        }
+
+        /**
+         * Given the position in the sequence of pagination links [i], figure out what page number corresponds to that position.
+         *
+         * @param i
+         * @param currentPage
+         * @param paginationRange
+         * @param totalPages
+         * @returns {*}
+         */
+        function calculatePageNumber(i, currentPage, paginationRange, totalPages) {
+            var halfWay = Math.ceil(paginationRange/2);
+            if (i === paginationRange) {
+                return totalPages;
+            } else if (i === 1) {
+                return i;
+            } else if (paginationRange < totalPages) {
+                if (totalPages - halfWay < currentPage) {
+                    return totalPages - paginationRange + i;
+                } else if (halfWay < currentPage) {
+                    return currentPage - halfWay + i;
+                } else {
+                    return i;
+                }
+            } else {
+                return i;
+            }
+        }
+    }
+
+    /**
+     * This filter slices the collection into pages based on the current page number and number of items per page.
+     * @param paginationService
+     * @returns {Function}
+     */
+    function itemsPerPageFilter(paginationService) {
+
+        return function(collection, itemsPerPage, paginationId) {
+            if (typeof (paginationId) === 'undefined') {
+                paginationId = DEFAULT_ID;
+            }
+            if (!paginationService.isRegistered(paginationId)) {
+                throw 'pagination directive: the itemsPerPage id argument (id: ' + paginationId + ') does not match a registered pagination-id.';
+            }
+            var end;
+            var start;
+            if (angular.isObject(collection)) {
+                itemsPerPage = parseInt(itemsPerPage) || 9999999999;
+                if (paginationService.isAsyncMode(paginationId)) {
+                    start = 0;
+                } else {
+                    start = (paginationService.getCurrentPage(paginationId) - 1) * itemsPerPage;
+                }
+                end = start + itemsPerPage;
+                paginationService.setItemsPerPage(paginationId, itemsPerPage);
+
+                if (collection instanceof Array) {
+                    // the array just needs to be sliced
+                    return collection.slice(start, end);
+                } else {
+                    // in the case of an object, we need to get an array of keys, slice that, then map back to
+                    // the original object.
+                    var slicedObject = {};
+                    angular.forEach(keys(collection).slice(start, end), function(key) {
+                        slicedObject[key] = collection[key];
+                    });
+                    return slicedObject;
+                }
+            } else {
+                return collection;
+            }
+        };
+    }
+
+    /**
+     * Shim for the Object.keys() method which does not exist in IE < 9
+     * @param obj
+     * @returns {Array}
+     */
+    function keys(obj) {
+        if (!Object.keys) {
+            var objKeys = [];
+            for (var i in obj) {
+                if (obj.hasOwnProperty(i)) {
+                    objKeys.push(i);
+                }
+            }
+            return objKeys;
+        } else {
+            return Object.keys(obj);
+        }
+    }
+
+    /**
+     * This service allows the various parts of the module to communicate and stay in sync.
+     */
+    function paginationService() {
+
+        var instances = {};
+        var lastRegisteredInstance;
+
+        this.registerInstance = function(instanceId) {
+            if (typeof instances[instanceId] === 'undefined') {
+                instances[instanceId] = {
+                    asyncMode: false
+                };
+                lastRegisteredInstance = instanceId;
+            }
+        };
+
+        this.isRegistered = function(instanceId) {
+            return (typeof instances[instanceId] !== 'undefined');
+        };
+
+        this.getLastInstanceId = function() {
+            return lastRegisteredInstance;
+        };
+
+        this.setCurrentPageParser = function(instanceId, val, scope) {
+            instances[instanceId].currentPageParser = val;
+            instances[instanceId].context = scope;
+        };
+        this.setCurrentPage = function(instanceId, val) {
+            instances[instanceId].currentPageParser.assign(instances[instanceId].context, val);
+        };
+        this.getCurrentPage = function(instanceId) {
+            var parser = instances[instanceId].currentPageParser;
+            return parser ? parser(instances[instanceId].context) : 1;
+        };
+
+        this.setItemsPerPage = function(instanceId, val) {
+            instances[instanceId].itemsPerPage = val;
+        };
+        this.getItemsPerPage = function(instanceId) {
+            return instances[instanceId].itemsPerPage;
+        };
+
+        this.setCollectionLength = function(instanceId, val) {
+            instances[instanceId].collectionLength = val;
+        };
+        this.getCollectionLength = function(instanceId) {
+            return instances[instanceId].collectionLength;
+        };
+
+        this.setAsyncModeTrue = function(instanceId) {
+            instances[instanceId].asyncMode = true;
+        };
+
+        this.isAsyncMode = function(instanceId) {
+            return instances[instanceId].asyncMode;
+        };
+    }
+
+    /**
+     * This provider allows global configuration of the template path used by the dir-pagination-controls directive.
+     */
+    function paginationTemplateProvider() {
+
+        var templatePath = 'angularUtils.directives.dirPagination.template';
+
+        this.setPath = function(path) {
+            templatePath = path;
+        };
+
+        this.$get = function() {
+            return {
+                getPath: function() {
+                    return templatePath;
+                }
+            };
+        };
+    }
+})();
+;
 'use strict';
 
 // Init the app configuration module for AngularJS app
 var AppConfig = (function() {
     // Init module configuration options
     var appModuleName = 'app';
-    var appModuleVendorDependencies = ['ngResource', 'ngRoute', 'ngAnimate', 'mgcrea.ngStrap'];
+    var appModuleVendorDependencies = [
+        'ngResource',
+        'ngRoute',
+        'ngAnimate',
+        'mgcrea.ngStrap',
+        'angularUtils.directives.dirPagination'
+    ];
 
     // Add a new vertical module
     var registerModule = function(moduleName, dependencies) {
@@ -38325,22 +38904,854 @@ angular.element(document).ready(function() {
 ;
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
-        controller: 'indexController',
-        templateUrl: 'templates/index.html'
+        controller: 'startPageController',
+        templateUrl: 'templates/startPage.html',
+        controllerAs: 'startPageCtrl',
+        reloadOnSearch: false
+    }).when('/kontakt', {
+        controller: 'contactController',
+        templateUrl: 'templates/contact.html',
+        controllerAs: 'contactCtrl',
+        reloadOnSearch: false
+    }).when('/behandlingstilbud', {
+        controller: 'behandlingstilbudController',
+        templateUrl: 'templates/behandlingstilbud/list.html',
+        controllerAs: 'behandlingstilbudCtrl'
+    }).when('/behandlingstilbud/:id', {
+        controller: 'hospitalController',
+        templateUrl: 'templates/behandlingstilbud/view.html',
+        controllerAs: 'hospitalCtrl'
+    }).when('/nyheter', {
+        controller: 'newsController',
+        templateUrl: 'templates/news/list.html',
+        controllerAs: 'newsCtrl'
+    }).when('/nyheter/:id', {
+        controller: 'articleController',
+        templateUrl: 'templates/news/view.html',
+        controllerAs: 'articleCtrl'
     }).otherwise({
         redirectTo: '/'
     });
 
-}]).run(
-    ['$rootScope',
-        function ($rootScope) {
+}]).run(['$rootScope', function ($rootScope) {
 
 
-        }
-    ]
-);
+}]);
 ;
-app.controller('indexController', ['$scope', function ($scope) {
+app.controller('articleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
+        var self = this;
+        var articleId = $routeParams.id;
+
+        $location.hash('main-menu');
+
+        function getArticle() {
+
+            NewsManager.getArticle(articleId, function (err, article) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.article = article;
+            });
+        }
+
+        getArticle();
+    }]);;
+app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, HospitalManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.hospitalPage = GeneralHelpers.getLocalData('hospitalPage') || 1;
+        $scope.resultater = 10;
+
+        this.setCoordinates = function (lat, long) {
+            $scope.$parent.coordinates = {
+                latitude: lat,
+                longitude: long
+            };
+        };
+
+        this.redirect = function (address) {
+            if (address.indexOf('http') === -1) {
+                address = 'http://' + address;
+            }
+
+            window.location.href = address;
+        };
+
+        function getHospitalsCount () {
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+            var behandling = GeneralHelpers.getLocalData('behandling');
+            var underkategori = GeneralHelpers.getLocalData('underkategori');
+
+            var searchData = {
+                fylke: fylke,
+                textSearch: textSearch,
+                treatment: behandling,
+                subTreatment: underkategori
+            };
+
+            HospitalManager.getHospitalsCount(searchData, function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+                $scope.noHospitalsFound = result.count === '0';
+            });
+        }
+
+        getHospitalsCount();
+
+        this.refreshHospitals = function () {
+            if (!$scope.$parent.searchResponse) {
+                GeneralHelpers.saveAsLocalData('hospitalPage', $scope.hospitalPage);
+            }
+
+            getHospitals();
+        };
+
+        function getHospitals () {
+            var behandling = GeneralHelpers.getLocalData('behandling');
+            var underkategori = GeneralHelpers.getLocalData('underkategori');
+            var fylke = GeneralHelpers.getLocalData('fylke');
+            var textSearch = GeneralHelpers.getLocalData('tekstsok');
+
+            var searchData = {
+                limit: $scope.resultater,
+                page: $scope.hospitalPage,
+                fylke: fylke,
+                textSearch: textSearch,
+                treatment: behandling,
+                subTreatment: underkategori
+            };
+
+            $scope.pending = true;
+
+            HospitalManager.getHospitalsList(searchData, function(err, hospitals) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                if ($scope.$parent) {
+                    $scope.$parent.searchResponse = false;
+                }
+
+                self.hospitals = hospitals;
+            });
+        }
+
+        getHospitals();
+}]);;
+app.controller('contactController', ['$scope', 'UserManager', 'GeneralHelpers',
+    function ($scope, UserManager, GeneralHelpers) {
+
+        var self = this;
+
+        this.sendEmail = function () {
+
+            if ($scope.sendEmailForm.$valid) {
+
+                UserManager.sendEmail(self.email, function(err, response) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    } else {
+                        alert('success');
+                        $scope.sendEmailForm.$submitted = false;
+                        self.email = {};
+                    }
+                });
+            }
+        };
+    }]);;
+app.controller('hospitalController', ['$scope', '$routeParams', '$location', 'HospitalManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, HospitalManager, GeneralHelpers) {
+        var self = this;
+        var hospitalId = $routeParams.id;
+
+        $location.hash('main-menu');
+
+        function getHospital () {
+
+            HospitalManager.getHospital(hospitalId, function(err, hospital) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.hospital = hospital;
+            });
+        }
+
+        getHospital();
+    }]);;
+app.controller('newsController', ['$scope', 'NewsManager', 'GeneralHelpers',
+    function ($scope, NewsManager, GeneralHelpers) {
+        var self = this;
+
+        $scope.newsPage = GeneralHelpers.getLocalData('newsPage') || 1;
+        $scope.resultater = 10;
+
+        function getNewsCount () {
+            NewsManager.getNewsCount(function(err, result) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.totalItems = result.count;
+            });
+        }
+
+        getNewsCount();
+
+        this.refreshNews = function () {
+            GeneralHelpers.saveAsLocalData('newsPage', $scope.newsPage);
+
+            getNews();
+        };
+
+        function getNews () {
+
+            $scope.pending = true;
+
+            NewsManager.getNewsList({limit: $scope.resultater, page: $scope.newsPage}, function(err, news) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.pending = false;
+
+                self.news = news;
+            });
+        }
+
+        getNews();
+    }]);
+;
+app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'RegionManager', 'TreatmentManager',
+    'WebRecommendationsManager', 'GeneralHelpers',
+    function ($scope, $location, UserManager, RegionManager, TreatmentManager, WebRecommendationsManager, GeneralHelpers) {
+
+        $scope.chosenFylke = GeneralHelpers.getLocalData('fylke') || 'Alle';
+        $scope.chosenBehandling = +GeneralHelpers.getLocalData('behandling') || null;
+        $scope.chosenUnderkategori = +GeneralHelpers.getLocalData('underkategori') || null;
 
 
+        RegionManager.getFylkes(function (err, fylkes) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (fylkes && fylkes.length) {
+                fylkes.unshift({
+                    fylke: 'Alle'
+                });
+            }
+
+            $scope.fylkes = fylkes;
+        });
+
+        TreatmentManager.getTreaments(function (err, treaments) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+            if (treaments && treaments.length) {
+                treaments.unshift({
+                    id: null,
+                    name: 'Alle'
+                });
+            }
+
+            $scope.behandlings = treaments;
+        });
+
+        $scope.getUnderkategoris = function () {
+
+            if ($scope.chosenBehandling) {
+                TreatmentManager.getSubTreatments($scope.chosenBehandling, function (err, subTreaments) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+                    if (subTreaments && subTreaments.length) {
+                        subTreaments.unshift({
+                            id: null,
+                            name: 'Alle'
+                        });
+
+                        $scope.underkategoris = subTreaments;
+
+                    } else {
+                        setUnderkategoriEmpty();
+                    }
+                });
+            } else {
+
+                setUnderkategoriEmpty();
+            }
+        };
+
+        $scope.getUnderkategoris();
+
+        $scope.search = function () {
+            GeneralHelpers.saveAsLocalData('hospitalPage', 1);
+            GeneralHelpers.saveAsLocalData('behandling', $scope.chosenBehandling);
+            GeneralHelpers.saveAsLocalData('fylke', $scope.chosenFylke);
+            GeneralHelpers.saveAsLocalData('underkategori', $scope.chosenUnderkategori);
+            GeneralHelpers.saveAsLocalData('tekstsok', $scope.tekstsok);
+
+
+            $scope.$parent.searchResponse = true;
+
+            $location.path('behandlingstilbud');
+        };
+
+        $scope.signIn = function () {
+
+            if ($scope.signInForm.$valid) {
+                UserManager.signIn($scope.loginParams, function (err) {
+                    if (err) {
+                        $scope.$parent.isAuthenticated = false;
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.$parent.isAuthenticated = true;
+                });
+            }
+        };
+
+        function setUnderkategoriEmpty() {
+
+            $scope.underkategoris = [
+                {
+                    id: null,
+                    name: 'Alle'
+                }
+            ];
+        }
+
+        /**
+         *  Share with facebook function
+         */
+        $scope.shareFB = function () {
+            var data = getShareableInfo();
+            FB.ui({
+                method: 'share',
+                name: data.name,
+                href: data.link,
+                description: data.description,
+                picture: data.pictureUrl
+            }, function (response) {
+                console.log(response);
+            });
+        };
+
+        /**
+         *  Share with twitter function
+         */
+        $scope.shareTwitter = function () {
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var text = encodeURI(data.description);
+
+            return "http://twitter.com/intent/tweet?url=" + url + "&text=" + text;
+        };
+
+        /**
+         *  Share with google+ function
+         */
+        $scope.shareGoogle = function(){
+            var data = getShareableInfo();
+            return 'https://plus.google.com/share?url={' + data.link + '}';
+
+            //return data;
+        };
+
+        /**
+         *  Share with blogger function
+         */
+        $scope.shareBlogger = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var imageCode = '<img src="http://placehold.it/350x350" style="float: left; margin-right: 20px;"/>';
+            var text = encodeURI(imageCode + data.description);
+
+            return 'https://www.blogger.com/blog-this.g?u=' + url + '&n=' + name + '&t=' + text;
+        };
+
+        /**
+         *  Share with yahoo function
+         */
+        $scope.shareYahoo = function(){
+            var data = getShareableInfo();
+
+            var url = encodeURI(data.link);
+            var name = encodeURI(data.name);
+            var text = encodeURI(data.description);
+
+            return 'http://compose.mail.yahoo.com/?subject=' + name + '&body='   + text + ' \n' + url;
+        };
+
+
+        /**
+         * Encode URI wrapper
+         * @param text
+         * @returns {string}
+         */
+        $scope.urlEncoder = function (text) {
+            return encodeURI(text);
+        };
+
+
+         //ymsgr:im?+&msg=<?=$currentPageURL;?>
+        /**
+         * You can specify share information here
+         * @returns {{name: string, link: string, description: string, pictureUrl: string}}
+         */
+        function getShareableInfo() {
+            var data = {
+                name: 'FinnBehandling',
+                link: 'http://facebook.com',
+                description: 'FinnBehandling - best site ever... Some other description for test purpose',
+                pictureUrl: 'http://placehold.it/350x350'
+            };
+            return data;
+        }
+
+        function getWebRecommendations () {
+
+            WebRecommendationsManager.getRecommendationsList({}, function (err, webRecommendations) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    $scope.webRecommendations = webRecommendations;
+                });
+        }
+
+        getWebRecommendations();
+}]);
+;
+app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
+    function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
+
+        var self = this;
+
+        function getStaticData () {
+
+            StaticDataManager.getStaticData(function(err, staticData) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.staticData = staticData ? staticData.text : '';
+            });
+        }
+
+        function getNews () {
+
+            var params = {
+                limit: 3
+            };
+
+            NewsManager.getNewsList(params, function(err, hospitals) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.news = hospitals;
+            });
+        }
+
+        getStaticData();
+        getNews();
+}]);;
+app.directive('gmap', function () {
+    return {
+        restrict: "A",
+        scope: {
+            latitude: "=",
+            longitude: "=",
+            address: "=",
+            result: "="
+        },
+        template: "<div id='map-canvas'  style='height: 400px; width: 600px; border-radius: 6px'></div>",
+        link: function (scope, elem, attr) {
+
+            if (attr.result) {
+                var myLatlng = new google.maps.LatLng(40, 0);
+                var mapOptions = {
+                    zoom: 1,
+                    center: myLatlng,
+                    scrollwheel: true,
+                    navigationControl: true,
+                    mapTypeControl: false,
+                    scaleControl: false,
+                    draggable: true
+                };
+
+                var geocoder = new google.maps.Geocoder();
+                var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    if (scope.marker instanceof google.maps.Marker) {
+                        scope.marker.setMap(null);
+                    }
+
+                    scope.marker = new google.maps.Marker({
+                        position: event.latLng,
+                        map: map
+                    });
+
+                    map.setCenter(event.latLng);
+
+                    scope.latitude = event.latLng.A;
+                    scope.longitude = event.latLng.F;
+
+                    geocoder.geocode({
+                        latLng: event.latLng
+                    }, function (responses) {
+                        var responsesIsExists = responses && responses.length;
+                        var resultOptions = {
+                            latitude: scope.latitude,
+                            longitude: scope.longitude
+                        };
+
+                        resultOptions.address = responsesIsExists ? responses[0].formatted_address : '';
+
+                        if (scope.result) {
+                            scope.result(resultOptions);
+                            scope.$apply();
+                        }
+                    });
+                });
+            }
+
+
+            if (attr.address) {
+                scope.$watch('address', function () {
+                    geocoder.geocode({
+                            address: scope.address,
+                            region: 'no'
+                        },
+                        function (results, status) {
+                            if (status.toLowerCase() == 'ok') {
+                                if (scope.marker instanceof google.maps.Marker) {
+                                    scope.marker.setMap(null);
+                                }
+
+                                var coords = new google.maps.LatLng(
+                                    results[0]['geometry']['location'].lat(),
+                                    results[0]['geometry']['location'].lng()
+                                );
+
+                                map.setCenter(coords);
+
+                                if (scope.result) {
+                                    scope.result({
+                                        latitude: results[0]['geometry']['location'].lat(),
+                                        longitude: results[0]['geometry']['location'].lng()
+                                    });
+                                    scope.$apply();
+                                }
+
+                                map.setCenter(coords);
+
+                                scope.marker = new google.maps.Marker({
+                                    position: coords,
+                                    map: map
+                                });
+                            }
+                        }
+                    );
+                });
+            }
+
+            if (attr.latitude && attr.longitude) {
+                scope.$watchGroup(['latitude', 'longitude'], function () {
+                    var myLatlng = new google.maps.LatLng(scope.latitude, scope.longitude);
+                    var mapOptions = {
+                        zoom: 6,
+                        center: myLatlng,
+                        scrollwheel: true,
+                        navigationControl: true,
+                        mapTypeControl: false,
+                        scaleControl: false,
+                        draggable: true
+                    };
+
+                    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+                    var marker = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map
+                    });
+
+                    marker.setMap(map);
+                });
+            }
+        }
+    }
+});;
+app.factory('GeneralHelpers', ['$rootScope', '$location', function ($rootScope, $location) {
+    "use strict";
+    var self = this;
+
+    this.saveAsLocalData = function (key, value) {
+        $location.search(key, value).replace();
+        $rootScope[key] = value;
+    };
+
+    this.getLocalData = function (key) {
+        var locationSearch = $location.search();
+
+        if ($rootScope[key]) {
+
+            $location.search(key, $rootScope[key]).replace();
+            return $rootScope[key];
+
+        } else if (locationSearch[key]) {
+
+            $rootScope[key] = locationSearch[key];
+            return locationSearch[key];
+        }
+    };
+
+    this.showErrorMessage = function (err) {
+        switch (err.status) {
+            case 400:
+                if (err.message) {
+                    $rootScope.errMsg = err.message;
+                } else {
+                    $rootScope.errMsg = 'Bad Request. The request was invalid or cannot be otherwise served.';
+                }
+                alert($rootScope.errMsg);
+                break;
+            case 404:
+                $rootScope.errMsg = 'Page not found ';
+                alert($rootScope.errMsg);
+                break;
+            case 500:
+                $rootScope.errMsg = 'Something is broken. Please contact to site administrator.';
+                alert($rootScope.errMsg);
+                break;
+            case 401:
+            case 403:
+                window.location = '/';
+                break;
+            case 413:
+                $rootScope.errMsg = 'File is too big.';
+                alert($rootScope.errMsg);
+                break;
+            default:
+                console.log(err);
+        }
+    };
+
+    return this;
+}]);;
+app.factory('HospitalManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getHospitalsList = function (params, callback) {
+        $http({
+            url: '/hospitals',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospital = function (id, callback) {
+        $http({
+            url: '/hospitals/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getHospitalsCount = function (params, callback) {
+        $http({
+            url: '/hospitals/count',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('NewsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getNewsList = function (params, callback) {
+        $http({
+            url: '/news',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getArticle = function (id, callback) {
+        $http({
+            url: '/news/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getNewsCount = function (callback) {
+        $http({
+            url: '/news/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('RegionManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getFylkes = function (callback) {
+        $http({
+            url: '/regions/fylkes',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('StaticDataManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getStaticData = function (callback) {
+        $http({
+            url: '/staticData',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('TreatmentManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getTreaments = function (callback) {
+        $http({
+            url: '/treatment',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getSubTreatments = function (id, callback) {
+        $http({
+            url: '/treatment/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('UserManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.signIn = function (data, callback) {
+        $http({
+            url: '/user/signIn',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.sendEmail = function (data, callback) {
+        $http({
+            url: '/user/sendEmail',
+            method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
+}]);;
+app.factory('WebRecommendationsManager', ['$http', function ($http) {
+    "use strict";
+    var self = this;
+
+    this.getRecommendationsList = function (params, callback) {
+        $http({
+            url: '/webRecommendations',
+            method: "GET",
+            params: params
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendation = function (id, callback) {
+        $http({
+            url: '/webRecommendations/' + id,
+            method: "GET"
+        }).then(function (response) {
+
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getWebRecommendationsCount = function (callback) {
+        $http({
+            url: '/webRecommendations/count',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    return this;
 }]);

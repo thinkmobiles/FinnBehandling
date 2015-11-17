@@ -1,0 +1,34 @@
+<div class="repeat-title"></div>
+<div class="hospitals-list clearfix">
+    <div ng-show="pending">
+        <h3>Loading...</h3>
+    </div>
+
+    <div dir-paginate="advertisement in advertisements | itemsPerPage: resultater" total-items="totalItems" current-page="advertisementsPage"
+         pagination-id="advertisements"
+         class="hospital-item" style="padding-right: 25px;">
+        <div style="display: inline-block">
+            <h4 class="col-md-12 dynamic-font-lg" ng-bind-html="advertisement.text"></h4>
+            <div class="col-md-5 clearfix">
+                <h5 class="col-md-12 dynamic-font-md">[startdate] {{advertisement.created_at | date: "d MMM, y"}} [/startdate]</h5>
+                <h5 class="col-md-12 dynamic-font-md">[enddate] {{advertisement.updated_at | date: "d MMM, y"}} [/enddate]</h5>
+            </div>
+            <div class="col-md-8 clearfix">
+                <a class="pull-left dynamic-font-md-lg" href="#/anonser">Les mer...</a>
+                <a class="pull-left dynamic-font-md-lg" href="#/anonser/{{advertisement.id}}">Rediger</a>
+                <a class="pull-right dynamic-font-md-lg" ng-click="advertisementsCtrl.deleteAdvertisement(advertisement.id)">Slett</a>
+            </div>
+            <div class="col-md-8 clearfix">
+                <a class="pull-left dynamic-font-md-lg" href="#/anonser/new">Legg til ny</a>
+                <a class="pull-right dynamic-font-md-lg" href="#/anonser">Vis historie</a>
+            </div>
+        </div>
+    </div>
+
+    <dir-pagination-controls
+            on-page-change="advertisementsCtrl.refreshAdvertisements()"
+            pagination-id="advertisements"
+            class="dynamic-font-md">
+
+    </dir-pagination-controls>
+</div>
