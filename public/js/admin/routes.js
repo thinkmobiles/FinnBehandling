@@ -62,6 +62,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
         controllerAs: 'editHospitalCtrl'
+    }).when('/hospitals', {
+        controller: 'listHospitalController',
+        templateUrl: 'templates/hospital/hospital-list.html',
+        controllerAs: 'listHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',

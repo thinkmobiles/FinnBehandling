@@ -54,7 +54,61 @@ var News = function (PostGre) {
                 require: true
             })
             .asCallback(function(err, news){
+                if (err) {
+                    return next(err);
+                }
 
+                res.status(200).send(news);
+            });
+    };
+
+    this.getStaticNews = function (req, res, next) {
+
+        /**
+         * __Type__ 'GET'
+         * __Content-Type__ 'application/json'
+         *
+         * This __method__ allows get _all static news_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/news/static
+         *
+         * @example Response example:
+         *
+         * [
+         *   {
+         *      "id": 0,
+         *      "subject": "Clinic research2",
+         *      "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *      "source": "Newspaper 2",
+         *      "created_at": "2015-09-29T13:39:44.644Z",
+         *      "updated_at": "2015-09-29T13:39:44.644Z"
+         *  },
+         *  {
+         *     "id": 1,
+         *     "subject": "Clinic research updated",
+         *     "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *     "source": "Newspaper updated",
+         *     "created_at": "2015-09-29T13:39:39.870Z",
+         *     "updated_at": "2015-09-29T13:48:39.981Z"
+         *  }
+         * ]
+         *
+         * @method getStaticNews
+         * @instance
+         */
+
+        News
+            .query(function (qb) {
+                qb.whereIn('id', [1, 2, 3]);
+                qb.orderBy('id');
+            })
+            .fetchAll({
+                withRelated: [
+                    'image'
+                ]
+            })
+            .asCallback(function (err, news) {
                 if (err) {
                     return next(err);
                 }
@@ -107,6 +161,7 @@ var News = function (PostGre) {
 
         News
             .query(function (qb) {
+                qb.whereNotIn('id', [1, 2, 3]);
                 qb.limit( limitIsValid ? limit : 25 );
                 qb.offset( offsetIsValid ? (page - 1) * limit : 0 );
             })
@@ -147,6 +202,7 @@ var News = function (PostGre) {
          */
 
         PostGre.knex(TABLES.NEWS)
+            .whereNotIn('id', [1, 2, 3])
             .count()
             .asCallback(function (err, queryResult) {
 

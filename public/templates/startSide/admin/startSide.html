@@ -1,37 +1,37 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
 
-    <h4 class="col-md-12 blue dynamic-font-lg">VELCOMMEN</h4>
+    <h6 class="col-md-12 bold blue">VELCOMMEN</h6>
 
-    <div style="margin-top: 25px; padding: 15px; border: 1px solid grey; border-radius: 5px">
+    <div style="margin-top: 25px; padding: 15px 15px 0; border: 2px solid #f0f0f0; border-radius: 5px">
 
-        <div style="padding: 0 15px; border: 1px solid grey">
+        <div style="padding: 0 15px; border: 1px solid #cdcdcd">
 
             <h5 style="margin-top: 0;" class="dynamic-font-md"> {{startSideCtrl.startSide.text | limitTo: 800}}
                 {{startSideCtrl.startSide.text.length > 800 ? '...' : ''}} </h5>
 
-            <div class="row clearfix">
-                <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/startside">Les mer...</a>
-                <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/startside/edit">Rediger</a>
-                <a class="col-md-1 pull-right dynamic-font-md-lg" href="#">Slett</a>
+            <div class="clearfix">
+                <a class="col-md-2 pull-left" href="#/startside">Les mer...</a>
+                <a class="pull-left" href="#/startside/edit">Rediger</a>
+                <a class="pull-right" href="#">Slett</a>
             </div>
         </div>
-        <div class="row clearfix">
-            <a class="col-md-2 pull-left dynamic-font-md-lg" href="#">Legg til ny</a>
-            <a class="col-md-2 pull-right dynamic-font-md-lg" href="#">Tidligere nyheter</a>
+        <div class="clearfix">
+            <a class="pull-left" href="#">Legg til ny</a>
+            <a class="pull-right" href="#">Tidligere nyheter</a>
         </div>
     </div>
 
     <div ng-repeat="news in startSideCtrl.saticNews" style="display: inline-block">
 
-            <h4 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 blue dynamic-font-lg">NYHET VENSTRE</h4>
-            <h4 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 blue dynamic-font-lg">NYHET MYDTEN</h4>
-            <h4 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 blue dynamic-font-lg">NYHET H?YRE</h4>
+            <h6 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 bold blue">NYHET VENSTRE</h6>
+            <h6 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 bold blue">NYHET MYDTEN</h6>
+            <h6 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 bold blue">NYHET H?YRE</h6>
 
-        <div style="margin-top: 25px; padding: 15px; border: 1px solid grey; border-radius: 5px">
+        <div style="margin-top: 25px; padding: 15px 15px 0; border: 2px solid #f0f0f0; border-radius: 5px">
 
 
-            <div style="padding: 0 15px; border: 1px solid grey">
+            <div style="padding: 0 15px; border: 1px solid #cdcdcd">
 
                 <h4 class="col-md-12 dynamic-font-lg">{{news.subject}}</h4>
 
@@ -40,15 +40,15 @@
                         {{news.content.length > 800 ? '...' : ''}} </h5>
                 </div>
 
-                <div class="row clearfix">
-                    <a class="col-md-2 pull-left dynamic-font-md-lg">Les mer...</a>
-                    <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/nyheter/{{news.id}}">Rediger</a>
-                    <a class="col-md-1 pull-right dynamic-font-md-lg">Slett</a>
+                <div class="clearfix">
+                    <a class="col-md-2 pull-left">Les mer...</a>
+                    <a class="pull-left" href="#/nyheter/{{news.id}}">Rediger</a>
+                    <a class="pull-right">Slett</a>
                 </div>
             </div>
-            <div class="row clearfix">
-                <a class="col-md-2 pull-left dynamic-font-md-lg">Legg til ny</a>
-                <a class="col-md-2 pull-right dynamic-font-md-lg">Tidligere nyheter</a>
+            <div class="clearfix">
+                <a class="pull-left">Legg til ny</a>
+                <a class="pull-right">Tidligere nyheter</a>
             </div>
         </div>
 

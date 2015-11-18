@@ -20,6 +20,8 @@ var Regions = function (PostGre) {
          * __Content-Type__ `application/json`
          *
          * This __method__ allows get _all fylkes_
+         * Can take optional query parameter `postCode` and return one "fylke" by postcode
+         * please look at second example
          *
          * @example Request example:
          *         http://192.168.88.250:8787/regions/fylkes
@@ -36,7 +38,6 @@ var Regions = function (PostGre) {
          *  {"fylke":"Nord-Trøndelag"}
          *  ]
          *
-         *  Can take optional query parameter `postCode` and return one "fylke" by postcode
          *
          *  @example Request example:
          *         http://192.168.88.250:8787/regions/fylkes?postCode=1111
@@ -53,12 +54,14 @@ var Regions = function (PostGre) {
 
         RegionsList
             .query(function (qb) {
+                qb.select(
+                    PostGre.knex.raw('DISTINCT ON (fylke) id, poststed, kommunenavn, fylke')
+                );
+
                 if(postCode){
                     qb.where('postnummer', postCode)
                 }
                 qb.whereNot('fylke', null);
-                qb.distinct('fylke');
-                qb.select('id', 'poststed', 'fylke', 'kommunenavn');
             })
             .fetchAll()
             .asCallback(function(err, result){

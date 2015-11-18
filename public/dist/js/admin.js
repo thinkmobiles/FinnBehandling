@@ -73102,6 +73102,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
         controllerAs: 'editHospitalCtrl'
+    }).when('/hospitals', {
+        controller: 'listHospitalController',
+        templateUrl: 'templates/hospital/hospital-list.html',
+        controllerAs: 'listHospitalCtrl'
     }).when('/webRecommendations', {
         controller: 'webRecommendationsController',
         templateUrl: 'templates/webRecommendations/admin/list.html',
@@ -73232,11 +73236,20 @@ app.controller('blank', ['$scope',
     function ($scope) {
 
     }]);;
-app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers',
-    function ($scope, ConflictsManager, GeneralHelpers) {
+app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers', 'HospitalsManager',
+    function ($scope, ConflictsManager, GeneralHelpers, HospitalsManager) {
         var self = this;
 
-        function getConflicts () {
+        self.hospitals = [];
+
+        HospitalsManager.getHospitalsList('', function(err, data){
+            if (!err) {
+                self.hospitals = data;
+            }
+        });
+
+
+        function getConflicts() {
 
             ConflictsManager.getConflictsList(function (err, conflicts) {
                 if (err) {
@@ -73672,6 +73685,88 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         };
 
     }]);;
+/**
+ * Created by vasylhoshovsky on 17.11.15.
+ */
+app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'RegionsManager', 'TreatmentsManager', 'GeneralHelpers',
+    function ($scope, HospitalsManager, RegionsManager, TreatmentsManager, GeneralHelpers) {
+
+        var vm = this;
+
+        vm.fylkes = [];
+        vm.chosenFylke = 'Alle';
+
+        vm.categories = [];
+        vm.chosenCategory = 'Alle';
+
+        vm.searchText = '';
+
+        vm.currentPage = 1;
+        vm.resultCount = 5;
+        vm.resultCountVariants = [5, 10, 25, 50, 100, 200];
+
+        vm.hospitals = [];
+
+        vm.search = search;
+        vm.deleteHospital = deleteHospital;
+
+
+        search();
+
+        RegionsManager.getFylkes(function (err, data) {
+            if (!err) {
+                //console.log(data);
+                vm.fylkes = data;
+            }
+        });
+
+        TreatmentsManager.getTreatments(function (err, data) {
+            if (!err) {
+                vm.categories = data;
+            }
+        });
+
+        /**
+         * GET hospitals with applied filters
+         */
+        function search() {
+            HospitalsManager.getHospitalsList(getFilters(), function (err, data) {
+                if (!err) {
+                    vm.hospitals = data;
+                }
+            });
+        }
+
+        /**
+         * Prepare and return filter object for GET hospitals query
+         * @returns {{}}
+         */
+        function getFilters() {
+            var filters = {};
+
+            filters.limit = vm.resultCount + 1;
+            filters.page = vm.currentPage;
+            filters.fylke = vm.chosenFylke;
+            filters.textSearch = vm.searchText;
+            filters.treatment = vm.chosenCategory !== 'Alle'? vm.chosenCategory : null;
+
+            return filters;
+        }
+
+        /**
+         * Delete specified hospital from database
+         * @param hospital to be deleted
+         */
+        function deleteHospital(hospital) {
+            HospitalsManager.deleteHospital(hospital.id, function (err, data) {
+                if (!err) {
+                    search();
+                }
+            });
+        }
+
+
+    }]);;
 app.controller('updateArticleController', ['$scope', '$routeParams', '$location', 'NewsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, NewsManager, GeneralHelpers) {
         var self = this;
@@ -73875,6 +73970,7 @@ app.controller('updateStartSideController', ['$scope', '$routeParams', '$locatio
 app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
     function($scope, StartSideManager, NewsManager, GeneralHelpers){
         var self = this;
+        self.saticNews = [];
 
         (function getStartSide () {
 
@@ -73893,12 +73989,12 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
 
         function getStaticNews () {
 
-            NewsManager.getNewsList({limit: 3}, function(err, news) {
+            StartSideManager.getStaticNews(function(err, staticNews) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
-                console.log(news);
-                self.saticNews = news;
+
+                self.saticNews = staticNews;
             });
         }
 
@@ -74576,6 +74672,16 @@ app.factory('StartSideManager', ['$http', function ($http) {
             if (callback)
                 callback(response);
         });
+    };
+
+    this.getStaticNews = function (callback) {
+        $http({
+            url: '/news/static',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
     };
 
     return this;
