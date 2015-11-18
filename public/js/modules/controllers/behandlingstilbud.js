@@ -74,7 +74,7 @@ app.controller('behandlingstilbudController', ['$scope', 'HospitalManager', 'Gen
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
-
+                console.log(hospitals);
                 $scope.pending = false;
 
                 if ($scope.$parent) {
