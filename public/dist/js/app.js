@@ -39336,10 +39336,11 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
         getWebRecommendations();
 }]);
 ;
-app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManager', 'GeneralHelpers',
-    function ($scope, NewsManager, StaticDataManager, GeneralHelpers) {
+app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHelpers',
+    function ($scope, StaticDataManager, GeneralHelpers) {
 
         var self = this;
+        self.news = [];
 
         function getStaticData () {
 
@@ -39354,16 +39355,12 @@ app.controller('startPageController', ['$scope', 'NewsManager', 'StaticDataManag
 
         function getNews () {
 
-            var params = {
-                limit: 3
-            };
-
-            NewsManager.getNewsList(params, function(err, hospitals) {
+            StaticDataManager.getStaticNews(function(err, staticNews) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                self.news = hospitals;
+                self.news = staticNews;
             });
         }
 
@@ -39612,7 +39609,6 @@ app.factory('NewsManager', ['$http', function ($http) {
             url: '/news/' + id,
             method: "GET"
         }).then(function (response) {
-
             if (callback)
                 callback(null, response.data);
         }, callback);
@@ -39653,6 +39649,16 @@ app.factory('StaticDataManager', ['$http', function ($http) {
     this.getStaticData = function (callback) {
         $http({
             url: '/staticData',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    this.getStaticNews = function (callback) {
+        $http({
+            url: '/news/static',
             method: "GET"
         }).then(function (response) {
             if (callback)
