@@ -26,5 +26,15 @@ app.factory('StartSideManager', ['$http', function ($http) {
         });
     };
 
+    this.getStaticNews = function (callback) {
+        $http({
+            url: '/news/static',
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
     return this;
 }]);

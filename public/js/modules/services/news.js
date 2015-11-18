@@ -18,7 +18,6 @@ app.factory('NewsManager', ['$http', function ($http) {
             url: '/news/' + id,
             method: "GET"
         }).then(function (response) {
-
             if (callback)
                 callback(null, response.data);
         }, callback);

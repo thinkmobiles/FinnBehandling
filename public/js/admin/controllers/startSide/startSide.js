@@ -1,6 +1,7 @@
 app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
     function($scope, StartSideManager, NewsManager, GeneralHelpers){
         var self = this;
+        self.saticNews = [];
 
         (function getStartSide () {
 
@@ -19,12 +20,12 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
 
         function getStaticNews () {
 
-            NewsManager.getNewsList({limit: 3}, function(err, news) {
+            StartSideManager.getStaticNews(function(err, staticNews) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
-                console.log(news);
-                self.saticNews = news;
+
+                self.saticNews = staticNews;
             });
         }
 
