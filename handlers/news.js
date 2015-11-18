@@ -100,7 +100,7 @@ var News = function (PostGre) {
 
         News
             .query(function (qb) {
-                qb.whereIn('id', [0, 1, 2]);
+                qb.whereIn('id', [1, 2, 3]);
                 qb.orderBy('id');
             })
             .fetchAll({
@@ -161,7 +161,7 @@ var News = function (PostGre) {
 
         News
             .query(function (qb) {
-                qb.whereNotIn('id', [0, 1, 2]);
+                qb.whereNotIn('id', [1, 2, 3]);
                 qb.limit( limitIsValid ? limit : 25 );
                 qb.offset( offsetIsValid ? (page - 1) * limit : 0 );
             })
@@ -202,7 +202,7 @@ var News = function (PostGre) {
          */
 
         PostGre.knex(TABLES.NEWS)
-            .whereNotIn('id', [0, 1, 2])
+            .whereNotIn('id', [1, 2, 3])
             .count()
             .asCallback(function (err, queryResult) {
 
