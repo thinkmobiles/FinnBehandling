@@ -237,7 +237,7 @@ module.exports = function (postGre, ParentModel) {
                 .asCallback(callback);
         },
 
-        getAllAdmin: function (options, callback) {
+        getAllForAdmin: function (options, callback) {
 
             assert(callback);
 
