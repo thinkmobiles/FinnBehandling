@@ -1,8 +1,17 @@
-app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers',
-    function ($scope, ConflictsManager, GeneralHelpers) {
+app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers', 'HospitalsManager',
+    function ($scope, ConflictsManager, GeneralHelpers, HospitalsManager) {
         var self = this;
 
-        function getConflicts () {
+        self.hospitals = [];
+
+        HospitalsManager.getHospitalsList('', function(err, data){
+            if (!err) {
+                self.hospitals = data;
+            }
+        });
+
+
+        function getConflicts() {
 
             ConflictsManager.getConflictsList(function (err, conflicts) {
                 if (err) {

@@ -4,21 +4,78 @@
         <h3>Loading...</h3>
     </div>
 
-    <table class="table table-striped table-condensed table-bordered table-hover">
-        <thead>
-        <tr>
-            <th class="field1">Senter Name&nbsp;<a ng-click="sort_by('field1')"><i class="icon-sort"></i></a></th>
-            <th class="field2">Website activatet&nbsp;<a ng-click="sort_by('field2')"><i class="icon-sort"></i></a></th>
-            <th class="field3">Registering online&nbsp;<a ng-click="sort_by('field3')"><i class="icon-sort"></i></a></th>
-            <th class="field4">Webside eier&nbsp;<a ng-click="sort_by('field4')"><i class="icon-sort"></i></a></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="item in Items">
-            <td><a>{{item.name}}</a></td>
-        </tr>
-        </tbody>
-    </table>
+
+    <!-- WEB ADDRESS CHECKING -->
+    <div>
+        WEB ADDRESS CHECKING
+        <div class="row">
+            <div class="col-md-4">Last updated at: {{'todo'}}</div>
+            <div class="col-md-6 pull-right">
+                <div class="row">
+                    <a class="col-md-3">
+                        Show all
+                    </a>
+                    <a class="col-md-3">
+                        Show valid
+                    </a>
+                    <a class="col-md-3">
+                        Show invalid
+                    </a>
+                    <a class="col-md-3">
+                        Update statistic
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped table-condensed table-bordered table-hover">
+            <thead>
+            <tr>
+                <th class="field1">Behandlingssenter&nbsp;<a ng-click="sort_by('field1')"><i class="icon-sort"></i></a></th>
+                <th class="field4">Website&nbsp;<a ng-click="sort_by('field4')"><i class="icon-sort"></i></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr  dir-paginate="hospital in conflictsCtrl.hospitals | itemsPerPage:10" pagination-id="hospitals">
+                <td><a href="#/hospital/{{hospital.id}}">{{hospital.name}}</a></td>
+                <td>
+                    <div>{{hospital.web_address ? '(+)' : '(-)'}}</div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <div class="row">
+            <div class="col-md-6 ">
+                <div class="row">
+                    <div class="col-md-3">
+                        (+) - Valid
+                    </div>
+                    <div class="col-md-3">
+                        (-) - Invalid
+                    </div>
+                    <div class="col-md-5">
+                        (!) - Not Available
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pull-right">
+                <dir-pagination-controls
+                        max-size="5"
+                        direction-links="true"
+                        pagination-id="hospitals">
+                </dir-pagination-controls>
+            </div>
+
+        </div>
+
+    </div>
+
+    <br/><br/><br/><br/>
+
+
+    <!-- ZIP conflicts -->
 
     <a ng-click="conflictsCtrl.updateZipCodes()">Update Zip codes</a>
 
@@ -26,19 +83,21 @@
         <thead>
         <tr>
             <th class="name">Senter Name&nbsp;<a ng-click="sort('name')"><i class="icon-sort"></i></a></th>
-            <th class="zipCode">Conflicted Zip Code&nbsp;<a ng-click="sort('zipCode')"><i class="icon-sort"></i></a></th>
+            <th class="zipCode">Conflicted Zip Code&nbsp;<a ng-click="sort('zipCode')"><i class="icon-sort"></i></a>
+            </th>
         </tr>
         </thead>
         <tbody>
-        <tr dir-paginate="conflict in conflicts | itemsPerPage:5">
-            <td><a href="#">{{conflict.name}}</a></td>
+        <tr dir-paginate="conflict in conflicts | itemsPerPage:5" pagination-id="zip">
+            <td><a href="#/">{{conflict.name}}</a></td>
             <td>{{conflict.postcode}}</td>
         </tr>
         </tbody>
     </table>
     <dir-pagination-controls
             max-size="5"
-            direction-links="true">
+            direction-links="true"
+            pagination-id="zip">
     </dir-pagination-controls>
 
 </div>
