@@ -54,14 +54,13 @@ var Regions = function (PostGre) {
         RegionsList
             .query(function (qb) {
                 qb.select(
-                    PostGre.knex.raw('ON (fylke) id, poststed, kommunenavn, fylke')
+                    PostGre.knex.raw('DISTINCT ON (fylke) id, poststed, kommunenavn, fylke')
                 );
 
                 if(postCode){
                     qb.where('postnummer', postCode)
                 }
                 qb.whereNot('fylke', null);
-                qb.distinct('fylke');
             })
             .fetchAll()
             .asCallback(function(err, result){
