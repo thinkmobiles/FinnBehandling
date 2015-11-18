@@ -13,7 +13,7 @@
                             class="pull-right form-control side-input dynamic-font-md"
                             ng-model="listHospitalCtrl.chosenFylke"
                             ng-change="listHospitalCtrl.search()"
-                            ng-options="fylke as fylke for fylke in listHospitalCtrl.fylkes">
+                            ng-options="fylke.fylke as fylke.fylke for fylke in listHospitalCtrl.fylkes">
                         <option value="" selected>Alle</option>
                     </select>
                 </div>
@@ -72,10 +72,13 @@
         <div class="col-md-9">
             <dir-pagination-controls
                     max-size="5"
-                    direction-links="true">
+                    direction-links="true"
+                    on-page-change="listHospitalCtrl.pageChanged(newPageNumber)"
+                    >
             </dir-pagination-controls>
             <div class="row"
                  dir-paginate="hospital in listHospitalCtrl.hospitals | itemsPerPage:listHospitalCtrl.resultCount"
+                 total-items="listHospitalCtrl.resultTotal" current-page="listHospitalCtrl.currentPage"
                  ng-class="{'grey': $even}">
                 <div class="col-md-12">
                     <h4 class="blue"><a href="admin#/hospital/{{hospital.id}}">{{hospital.name}}</a></h4>
