@@ -7,8 +7,8 @@
 
         <div style="padding: 0 15px; border: 1px solid #cdcdcd">
 
-            <h5 style="margin-top: 0;" class="dynamic-font-md"> {{startSideCtrl.startSide.text | limitTo: 800}}
-                {{startSideCtrl.startSide.text.length > 800 ? '...' : ''}} </h5>
+            <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="startSideCtrl.startSide.text | limitTo: 800">
+                <span ng-show="startSideCtrl.startSide.text.length > 800">...</span></h5>
 
             <div class="clearfix">
                 <a class="col-md-2 pull-left" href="#/startside">Les mer...</a>
@@ -36,8 +36,7 @@
                 <h4 class="col-md-12 dynamic-font-lg">{{news.subject}}</h4>
 
                 <div class="clearfix">
-                    <h5 style="margin-top: 0;" class="dynamic-font-md"> {{news.content | limitTo: 800}}
-                        {{news.content.length > 800 ? '...' : ''}} </h5>
+                    <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="news.content | limitTo: 800 "></h5>
                 </div>
 
                 <div class="clearfix">
