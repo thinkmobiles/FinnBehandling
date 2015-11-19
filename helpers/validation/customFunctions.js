@@ -39,13 +39,13 @@ module.exports = function (postGre) {
             assert(callback);
 
             postGre.Models[TABLES.HOSPITALS].where(function () {
-                this.where('name', validatedOptions.name).andWhereNot('id', options.id)
+                this.where('name', validatedOptions.name)
             })
                 .fetch()
                 .asCallback(function (err, hospital) {
                     var nonUniqueNameError;
 
-                    if (err || (hospital && hospital.id !== parseInt(options.hospital_id))) {
+                    if (err || (hospital && hospital.id !== parseInt(options.id))) {
                         nonUniqueNameError = err || new Error(RESPONSES.NON_UNIQUE_NAME_ERROR);
                         nonUniqueNameError.status = 400;
 
