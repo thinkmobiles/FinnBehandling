@@ -3,9 +3,9 @@
 
     <h6 class="col-md-12 bold blue">VELCOMMEN</h6>
 
-    <div style="margin-top: 25px; padding: 15px 15px 0; border: 2px solid #f0f0f0; border-radius: 5px">
+    <div class="text-box">
 
-        <div style="padding: 0 15px; border: 1px solid #cdcdcd">
+        <div class="inside">
 
             <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="startSideCtrl.startSide.text | limitTo: 800">
                 <span ng-show="startSideCtrl.startSide.text.length > 800">...</span></h5>
@@ -22,16 +22,15 @@
         </div>
     </div>
 
-    <div ng-repeat="news in startSideCtrl.saticNews" style="display: inline-block">
+    <div ng-repeat="news in startSideCtrl.saticNews">
 
             <h6 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 bold blue">NYHET VENSTRE</h6>
             <h6 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 bold blue">NYHET MYDTEN</h6>
             <h6 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 bold blue">NYHET H?YRE</h6>
 
-        <div style="margin-top: 25px; padding: 15px 15px 0; border: 2px solid #f0f0f0; border-radius: 5px">
+        <div class="text-box">
 
-
-            <div style="padding: 0 15px; border: 1px solid #cdcdcd">
+            <div class="inside">
 
                 <h4 class="col-md-12 dynamic-font-lg">{{news.subject}}</h4>
 

@@ -8425,6 +8425,16 @@ button.close {
     line-height: 36px;
     background: #009ec8;
     min-width: 1200px;
+    position: absolute;
+    left: 0;
+}
+#top-menu .inner-block{
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+#top-menu+.inner-block{
+    padding-top: 36px;
 }
 
 #top-menu-list {
@@ -8595,6 +8605,26 @@ button.close {
     padding: 10px;
     border-radius: 5px;
     margin-top: 6px;
+}
+.hospitals-list h6{
+    background: #fff none repeat scroll 0 0;
+    display: inline;
+    margin-left: 10px;
+    margin-top: 22px;
+    width: auto;
+}
+.hospitals-list .text-box{
+    margin-top: 25px;
+    padding: 20px 15px 0;
+    border: 2px solid #f0f0f0;
+    border-radius: 5px;
+}
+.hospitals-list .text-box .inside{
+    padding: 10px 15px;
+    border: 1px solid #cdcdcd
+}
+.hospitals-list .text-box .inside+.clearfix{
+    padding-top: 10px;
 }
 
 .hospital-item {
