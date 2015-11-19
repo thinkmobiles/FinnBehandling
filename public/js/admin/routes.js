@@ -14,14 +14,14 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 
     $routeProvider.when('/', {
-        controller: 'conflictsController',
+        controller: 'adminController',
         templateUrl: 'templates/admin.html',
-        controllerAs: 'conflictsCtrl',
+        controllerAs: 'adminCtrl',
         reloadOnSearch: false
     }).when('/admin', {
-        controller: 'conflictsController',
+        controller: 'adminController',
         templateUrl: 'templates/admin.html',
-        controllerAs: 'conflictsCtrl'
+        controllerAs: 'adminCtrl'
     }).when('/nyheter', {
         controller: 'newsController',
         templateUrl: 'templates/news/admin/list.html',
