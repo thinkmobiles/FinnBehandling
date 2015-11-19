@@ -323,24 +323,26 @@ Hospitals = function (PostGre) {
 
         if (options.admin) {
 
-            Hospital.getAllAdmin(options, function (err, hospitals) {
+            Hospital.getAllForAdmin(options, function (err, hospitals) {
 
                 if (err) {
                     return next(err);
                 }
 
-                return res.status(200).send(hospitals);
+                res.status(200).send(hospitals);
+            });
+
+        } else {
+
+            Hospital.getAllHospitals(options, function (err, hospitals) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send(hospitals);
             });
         }
-
-        Hospital.getAllHospitals(options, function (err, hospitals) {
-
-            if (err) {
-                return next(err);
-            }
-
-            res.status(200).send(hospitals);
-        });
     };
 
     this.getHospitalsCount = function (req, res, next) {

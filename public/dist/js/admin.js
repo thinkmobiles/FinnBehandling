@@ -73054,9 +73054,9 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 
     $routeProvider.when('/', {
-        controller: 'blank',
-        templateUrl: 'templates/index.html',
-        controllerAs: 'blank',
+        controller: 'conflictsController',
+        templateUrl: 'templates/admin.html',
+        controllerAs: 'conflictsCtrl',
         reloadOnSearch: false
     }).when('/admin', {
         controller: 'conflictsController',
@@ -73502,7 +73502,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 phone_number: self.hospital.phone_number,
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
-                address: self.hospital.address
+                address: self.hospital.address,
+                logo: self.hospital.picture
 
             };
 
@@ -73702,20 +73703,20 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
         vm.searchText = '';
 
         vm.currentPage = 1;
-        vm.resultCount = 5;
+        vm.resultCount = 25;
+        vm.resultTotal = 0;
         vm.resultCountVariants = [5, 10, 25, 50, 100, 200];
 
         vm.hospitals = [];
 
         vm.search = search;
         vm.deleteHospital = deleteHospital;
-
+        vm.pageChanged = pageChanged;
 
         search();
 
         RegionsManager.getFylkes(function (err, data) {
             if (!err) {
-                //console.log(data);
                 vm.fylkes = data;
             }
         });
@@ -73726,15 +73727,31 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
             }
         });
 
+        function pageChanged(newPageNumber) {
+            vm.currentPage = newPageNumber;
+            search();
+        }
+
         /**
          * GET hospitals with applied filters
          */
         function search() {
-            HospitalsManager.getHospitalsList(getFilters(), function (err, data) {
+            var filters = getFilters();
+
+            HospitalsManager.getHospitalsCount(filters, function(err, data){
                 if (!err) {
-                    vm.hospitals = data;
+                    vm.resultTotal = parseInt(data.count);
                 }
             });
+
+            HospitalsManager.getHospitalsList(filters, function (err, data) {
+                if (!err) {
+                    vm.hospitals = data;
+                    console.log(data)
+                }
+            });
+
+
         }
 
         /**
@@ -73744,7 +73761,7 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
         function getFilters() {
             var filters = {};
 
-            filters.limit = vm.resultCount + 1;
+            filters.limit = vm.resultCount;
             filters.page = vm.currentPage;
             filters.fylke = vm.chosenFylke;
             filters.textSearch = vm.searchText;

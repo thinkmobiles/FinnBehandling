@@ -1,5 +1,5 @@
-app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHelpers',
-    function ($scope, StaticDataManager, GeneralHelpers) {
+app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHelpers', '$sce',
+    function ($scope, StaticDataManager, GeneralHelpers, $sce) {
 
         var self = this;
         self.news = [];
@@ -11,7 +11,7 @@ app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHe
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                self.staticData = staticData ? staticData.text : '';
+                self.staticData = staticData ? $sce.trustAsHtml(staticData.text) : '';
             });
         }
 
