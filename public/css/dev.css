@@ -236,6 +236,10 @@
     display: inline-block;
     width: 45%;
 }
+#fylke,
+#tekstsøk{
+    width: 65%;
+}
 
 .side-input-sm {
     display: inline-block;
