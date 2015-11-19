@@ -11,9 +11,8 @@
     Mauris fermentum mi eget quam bibendum hendrerit.
 
 </div>-->
-<div id="start-page-static" class="dynamic-font-md">
-    {{startPageCtrl.staticData}}
-
+<div id="start-page-static" class="dynamic-font-md" >
+    <h5 class="ng-binding" ng-bind-html="startPageCtrl.staticData | trust"></h5>
 </div>
 
 <div class="repeat-title"></div>
@@ -23,6 +22,8 @@
         <img ng-src="{{article.image.image_url}}"/>
         <h5 class="dynamic-font-md"> {{article.subject}} </h5>
         <h5 class="dynamic-font-md"> {{article.created_at | date: "d MMM, y"}} </h5>
-        <h6  class="dynamic-font-sm"> {{article.content}} </h6>
+        <div class="dynamic-font-sm">
+             <span ng-bind-html="article.content | limitTo:  article.limit | trust"></span><span>{{article.content.length > article.limit ? '...' : ''}}</span></div>
+        <a ng-click="startPageCtrl.toggleLimit(article)">{{article.content.length > article.limit ? 'Les mer...' : 'Skjul'}}</a>
     </div>
 </div>
