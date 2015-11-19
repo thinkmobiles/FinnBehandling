@@ -8505,6 +8505,28 @@ button.close {
     border: none !important;
 }
 
+#secondary-menu-list {
+    border: 1px solid #CDCDCD;
+    border-radius: 5px;
+    list-style: none;
+    width: 1080px;
+    padding: 0;
+}
+
+#secondary-menu-list li {
+    border-right: 1px solid #CDCDCD;
+    vertical-align: middle;
+    display:inline-block;
+    width: 200px;
+    padding: 3px;
+    cursor: pointer;
+    font-size: 11.0pt;
+}
+
+#secondary-menu-list li:last-child {
+    border: none !important;
+}
+
 .advertising {
     background: #eee;
     width: 100%;
@@ -8588,6 +8610,7 @@ button.close {
 .grey {
     background: #ebebeb;
 }
+
 
 .margin-top {
     margin-top: 10px !important;

@@ -73054,9 +73054,9 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 
     $routeProvider.when('/', {
-        controller: 'blank',
-        templateUrl: 'templates/index.html',
-        controllerAs: 'blank',
+        controller: 'conflictsController',
+        templateUrl: 'templates/admin.html',
+        controllerAs: 'conflictsCtrl',
         reloadOnSearch: false
     }).when('/admin', {
         controller: 'conflictsController',
@@ -73502,7 +73502,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 phone_number: self.hospital.phone_number,
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
-                address: self.hospital.address
+                address: self.hospital.address,
+                logo: self.hospital.picture
 
             };
 
@@ -73746,6 +73747,7 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
             HospitalsManager.getHospitalsList(filters, function (err, data) {
                 if (!err) {
                     vm.hospitals = data;
+                    console.log(data)
                 }
             });
 
