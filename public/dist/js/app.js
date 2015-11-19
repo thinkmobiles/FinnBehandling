@@ -39349,7 +39349,6 @@ app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHe
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
 
-                console.log(staticData);
                 self.staticData = staticData ? $sce.trustAsHtml(staticData.text) : '';
             });
         }
