@@ -226,7 +226,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 phone_number: self.hospital.phone_number,
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
-                address: self.hospital.address
+                address: self.hospital.address,
+                logo: self.hospital.picture
 
             };
 
