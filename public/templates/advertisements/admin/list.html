@@ -6,22 +6,22 @@
 
     <div dir-paginate="advertisement in advertisements | itemsPerPage: resultater" total-items="totalItems" current-page="advertisementsPage"
          pagination-id="advertisements"
-         class="hospital-item clearfix" style="padding-right: 25px;">
-        <h4 class="col-md-12 dynamic-font-lg" ng-bind-html="advertisement.text"></h4>
-        <div class="inside clearfix">
+         class="hospital-item" style="padding-right: 25px;">
+        <div style="display: inline-block">
+            <h4 class="col-md-12 dynamic-font-lg" ng-bind-html="advertisement.text"></h4>
             <div class="col-md-5 clearfix">
                 <h5 class="col-md-12 dynamic-font-md">[startdate] {{advertisement.created_at | date: "d MMM, y"}} [/startdate]</h5>
                 <h5 class="col-md-12 dynamic-font-md">[enddate] {{advertisement.updated_at | date: "d MMM, y"}} [/enddate]</h5>
             </div>
-            <div class="col-md-12 clearfix">
-                <a class="col-md-2 pull-left dynamic-font-md-lg" href="#/anonser">Les mer...</a>
+            <div class="col-md-8 clearfix">
+                <a class="pull-left dynamic-font-md-lg" href="#/anonser">Les mer...</a>
                 <a class="pull-left dynamic-font-md-lg" href="#/anonser/{{advertisement.id}}">Rediger</a>
                 <a class="pull-right dynamic-font-md-lg" ng-click="advertisementsCtrl.deleteAdvertisement(advertisement.id)">Slett</a>
             </div>
-        </div>
-        <div class="col-md-12 clearfix">
-            <a class="pull-left dynamic-font-md-lg" href="#/anonser/new">Legg til ny</a>
-            <a class="pull-right dynamic-font-md-lg" href="#/anonser">Vis historie</a>
+            <div class="col-md-8 clearfix">
+                <a class="pull-left dynamic-font-md-lg" href="#/anonser/new">Legg til ny</a>
+                <a class="pull-right dynamic-font-md-lg" href="#/anonser">Vis historie</a>
+            </div>
         </div>
     </div>
 
