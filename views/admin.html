@@ -63,11 +63,13 @@
                 </ul>
             </div>
 
-            <div id="secondary-menu">
-                <ul id="secondary-menu-list" class="row">
-                    <li class="text-center dynamic-font-md col-md-2"><a href="#/admin">ADMIN</a></li>
-                    <li class="text-center dynamic-font-md col-md-2"><a href="#/hospitals">GODKJENTE SENTERE</a></li>
-                </ul>
+            <div ng-controller="adminController as vm">
+                <div  ng-show="vm.isSubMenuShown()" id="secondary-menu">
+                    <ul id="secondary-menu-list" class="row">
+                        <li class="text-center dynamic-font-md col-md-2"><a href="#/admin">ADMIN</a></li>
+                        <li class="text-center dynamic-font-md col-md-2"><a href="#/hospitals">GODKJENTE SENTERE</a></li>
+                    </ul>
+                </div>
             </div>
 
             <div class="content row">
