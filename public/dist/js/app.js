@@ -38895,7 +38895,15 @@ var AppConfig = (function() {
 })();;
 'use strict';
 
-var app = angular.module(AppConfig.appModuleName, AppConfig.appModuleVendorDependencies);
+var app = angular.module(AppConfig.appModuleName, AppConfig.appModuleVendorDependencies).filter('trust', [
+    '$sce',
+    function($sce) {
+        return function(value, type) {
+            // Defaults to treating trusted text as `html`
+            return $sce.trustAs(type || 'html', value);
+        }
+    }
+]);
 //Then define the init function for starting up the app
 angular.element(document).ready(function() {
     //Then init the app
@@ -39336,36 +39344,50 @@ app.controller('sideBarController', ['$scope', '$location', 'UserManager', 'Regi
         getWebRecommendations();
 }]);
 ;
-app.controller('startPageController', ['$scope', 'StaticDataManager', 'GeneralHelpers', '$sce',
-    function ($scope, StaticDataManager, GeneralHelpers, $sce) {
+app.controller('startPageController', ['$scope', '$sce', 'StaticDataManager', 'GeneralHelpers',
+    function ($scope, $sce, StaticDataManager, GeneralHelpers) {
 
-        var self = this;
-        self.news = [];
+    var self = this;
+    self.news = [];
+    self.toggleLimit = toggleLimit;
 
-        function getStaticData () {
-
-            StaticDataManager.getStaticData(function(err, staticData) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
-
-                self.staticData = staticData ? $sce.trustAsHtml(staticData.text) : '';
-            });
+    function toggleLimit (article) {
+        if (article.limit === 800) {
+            article.limit = article.content.length;
+        } else {
+            article.limit = 800;
         }
+    }
 
-        function getNews () {
+    function getStaticData () {
 
-            StaticDataManager.getStaticNews(function(err, staticNews) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
+        StaticDataManager.getStaticData(function(err, staticData) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
 
-                self.news = staticNews;
-            });
-        }
+            self.staticData = staticData ? staticData.text : '';
+        });
+    }
 
-        getStaticData();
-        getNews();
+    function getNews () {
+
+        StaticDataManager.getStaticNews(function(err, staticNews) {
+            if (err) {
+                return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+            }
+
+            self.news = staticNews;
+
+            for (var i = self.news.length-1; i >= 0; i--) {
+                self.news[i].limit = 800;
+            }
+        });
+    }
+
+
+    getStaticData();
+    getNews();
 }]);;
 app.directive('gmap', function () {
     return {
