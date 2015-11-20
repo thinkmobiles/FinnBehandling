@@ -73424,7 +73424,6 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
                     self.treatments[i].isSelected = true;
-                    console.log(self.treatments[i].subTreatments);
                     if (self.treatments[i].subTreatments) {
                         for (var j = self.treatments[i].subTreatments.length - 1; j >= 0; j--) {
                             if (self.hospital.sub_treatments && self.hospital.sub_treatments.indexOf(self.treatments[i].subTreatments[j].id) >= 0) {
@@ -73503,7 +73502,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
                 address: self.hospital.address,
-                logo: self.hospital.picture
+                logo: self.hospital.logo
 
             };
 
@@ -73542,6 +73541,8 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 }
 
                 self.hospital = hospital;
+                self.old_logo = hospital.logo;
+
                 processSubTreatments(self.hospital);
                 updateForm();
             });
@@ -73656,7 +73657,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
         function cropResult (croppedImageBase64, type) {
             self.hospital[type] = croppedImageBase64;
-        };
+        }
 
         function checkImageType (name) {
             var imageContent = self[name];
@@ -73747,7 +73748,6 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
             HospitalsManager.getHospitalsList(filters, function (err, data) {
                 if (!err) {
                     vm.hospitals = data;
-                    console.log(data)
                 }
             });
 
