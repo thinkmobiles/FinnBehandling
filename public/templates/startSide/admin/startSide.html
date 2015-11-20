@@ -13,7 +13,7 @@
             <div class="clearfix">
                 <a class="col-md-2 pull-left" href="#/startside">Les mer...</a>
                 <a class="pull-left" href="#/startside/edit">Rediger</a>
-                <a ng-hide="true" class="pull-right" href="#">Slett</a>
+                <a class="pull-right" href="#">Slett</a>
             </div>
         </div>
         <div class="clearfix">
@@ -24,9 +24,9 @@
 
     <div ng-repeat="news in startSideCtrl.saticNews">
 
-            <h6 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 bold blue">NYHET VENSTRE</h6>
-            <h6 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 bold blue">NYHET MYDTEN</h6>
-            <h6 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 bold blue">NYHET H?YRE</h6>
+        <h6 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 bold blue">NYHET VENSTRE</h6>
+        <h6 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 bold blue">NYHET MYDTEN</h6>
+        <h6 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 bold blue">NYHET H?YRE</h6>
 
         <div class="text-box">
 
@@ -41,7 +41,7 @@
                 <div class="clearfix">
                     <a class="col-md-2 pull-left">Les mer...</a>
                     <a class="pull-left" href="#/nyheter/{{news.id}}">Rediger</a>
-                    <a ng-hide="true" class="pull-right">Slett</a>
+                    <a class="pull-right">Slett</a>
                 </div>
             </div>
             <div class="clearfix">
