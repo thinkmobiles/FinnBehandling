@@ -221,27 +221,45 @@
         <div class="row">
             <div class="col-md-2">* Bilde:</div>
 
-            <div class="col-md-6">
-                <input
-                    id="picture"
-                    type="file"
-                    name="picture"
-                    accept="image/jpeg,image/png,image/gif"
-                    fileread
-                    crop-result="editHospitalCtrl.cropResult"
-                    ng-change="editHospitalCtrl.checkImageType('picture')"
-                    ng-model="editHospitalCtrl.hospital.picture"/>
+            <div class="col-md-2 pull-right">Standardsymbol: <input type="checkbox" class="pull-right"
+                                                                    ng-model="editHospitalCtrl.hospital.standardSymbol">
+            </div>
 
-                <div ng-show='editHospitalCtrl.hospital.picture' style="z-index: 2; position: relative; left: 0; top: 0; height: 200px; margin: 5px;">
-                    <img ng-src="{{editHospitalCtrl.hospital.picture}}" width="150" height="150">
+            <div class="image-container" ng-class="{'slim': !editHospitalCtrl.logo}">
+                <div class="clients-photo">
+                    <div ng-show='editHospitalCtrl.logo' style="z-index: 2; position: relative; left: 0; top: 0">
+                        <a ng-click="editHospitalCtrl.removeImage('logo')" class="remove-image">X</a>
+                        <img ng-src="{{editHospitalCtrl.logo}}">
+                    </div>
+                    <input
+                            id="logo"
+                            type="file"
+                            name="logo"
+                            ng-model="editHospitalCtrl.logo"
+                            accept="image/jpeg,image/png,image/gif"
+                            fileread
+                            crop-result="editHospitalCtrl.cropResult"
+                            ng-change="editHospitalCtrl.checkImageType('logo')"
+                            >
+                </div>
+                <div class="slider-block">
+                    <div id="logo-slider"></div>
                 </div>
             </div>
 
-            <div class="col-md-2">Standardsymbol: <input type="checkbox" class="pull-right"
-                                                         ng-model="editHospitalCtrl.hospital.standardSymbol"></div>
+            <div class="row">
+                <div class="col-md-8"
+                     ng-show='!editHospitalCtrl.logo && editHospitalCtrl.old_logo && editHospitalCtrl.old_logo.image_url'>
+                    <img class="pull-right" style="max-height: 445px"
+                         ng-src="{{editHospitalCtrl.old_logo.image_url}}">
+                </div>
+            </div>
+
+
         </div>
 
         <br/>
+
 
     </div>
 
