@@ -1,25 +1,61 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix" style="padding: 32px">
-    <h1 class="blue bold">Update advertisement</h1>
+    <h1 class="blue bold">{{ editAdvertisementCtrl.pageTitle }}</h1>
     <br/>
 
     <form
             role="form"
             class="one-block"
-            name="updateAdvertisementForm"
-            ng-submit="updateAdvertisementCtrl.updateAdvertisement()"
+            name="editAdvertisementForm"
+            ng-submit="editAdvertisementCtrl.saveAdvertisement()"
             novalidate>
 
+
+        <!-- banner -->
+        <div class="image-container" ng-class="{'slim': !editAdvertisementCtrl.image}">
+            <div class="clients-photo">
+                <div ng-show='editAdvertisementCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
+                    <a ng-click="editAdvertisementCtrl.removeImage('image')" class="remove-image">X</a>
+                    <img ng-src="{{editAdvertisementCtrl.image}}">
+                </div>
+                <input
+                        id="image"
+                        type="file"
+                        name="image"
+                        ng-model="editAdvertisementCtrl.image"
+                        accept="image/jpeg,image/png,image/gif"
+                        fileread
+                        crop-result="editAdvertisementCtrl.cropResult"
+                        ng-change="editAdvertisementCtrl.checkImageType('image')"
+                        >
+            </div>
+            <div class="slider-block">
+                <div id="logo-slider"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8"
+                 ng-show='!editAdvertisementCtrl.image && editAdvertisementCtrl.old_logo && editAdvertisementCtrl.old_logo.image_url'>
+                <img class="pull-right" style="max-height: 445px"
+                     ng-src="{{editAdvertisementCtrl.old_logo.image_url}}">
+            </div>
+        </div>
+
+
+        <br>
+
+        <!-- text editor -->
         <div class="form-group clearfix">
 
             <div
                     text-angular
                     required
-                    ng-model="updateAdvertisementCtrl.advertisement.text">
+                    ng-model="editAdvertisementCtrl.advertisement.text">
 
             </div>
-            <div style="color:red" ng-show="updateAdvertisementForm.$submitted && updateAdvertisementForm.text.$invalid">
-                <p ng-show="updateAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
+            <div style="color:red" ng-show="editAdvertisementForm.$submitted && editAdvertisementForm.text.$invalid">
+                <p ng-show="editAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
             </div>
         </div>
 

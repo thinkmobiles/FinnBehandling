@@ -73079,13 +73079,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         templateUrl: 'templates/advertisements/admin/list.html',
         controllerAs: 'advertisementsCtrl'
     }).when('/anonser/new', {
-        controller: 'newAdvertisementController',
-        templateUrl: 'templates/advertisements/admin/new.html',
-        controllerAs: 'newAdvertisementCtrl'
-    }).when('/anonser/:id', {
-        controller: 'updateAdvertisementController',
+        controller: 'editAdvertisementController',
         templateUrl: 'templates/advertisements/admin/edit.html',
-        controllerAs: 'updateAdvertisementCtrl'
+        controllerAs: 'editAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'editAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'editAdvertisementCtrl'
     }).when('/startside', {
         controller: 'startSideController',
         templateUrl: 'templates/startSide/admin/startSide.html',
@@ -73228,25 +73228,46 @@ app.controller('advertisementsController', ['$scope', 'AdvertisementsManager', '
             });
         };
     }]);;
-app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+app.controller('editAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, AdvertisementsManager, GeneralHelpers) {
         var self = this;
         var advertisementId = $routeParams.id;
 
-        function getAdvertisement () {
+        self.saveAdvertisement = saveAdvertisement;
+        self.cropResult = cropResult;
+        self.checkImageType = checkImageType;
+        self.removeImage = removeImage;
 
-            AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
+        self.pageTitle = 'Create advertisement';
+        self.advertisement = {};
 
-                self.advertisement = advertisement;
-            });
+
+        function getAdvertisement() {
+            if (advertisementId) {
+                AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.advertisement = advertisement;
+                    self.pageTitle = 'Update advertisement';
+                    self.old_logo = advertisement.image;
+                });
+            }
         }
 
         getAdvertisement();
 
-        this.updateAdvertisement = function () {
+        function saveAdvertisement() {
+            if (advertisementId) {
+                updateAdvertisement();
+            } else {
+                createAdvertisement();
+            }
+        }
+
+
+        function updateAdvertisement() {
 
             AdvertisementsManager.updateAdvertisement(advertisementId, self.advertisement, function (err, advertisement) {
                 if (err) {
@@ -73257,15 +73278,12 @@ app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$loc
 
                 $location.path('anonser');
             });
-        };
-    }]);;
-app.controller('newAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, AdvertisementManager, GeneralHelpers){
-        var self = this;
 
-        this.createAdvertisement = function () {
+        }
 
-            AdvertisementManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
+        function createAdvertisement() {
+
+            AdvertisementsManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -73274,7 +73292,39 @@ app.controller('newAdvertisementController', ['$scope', '$routeParams', '$locati
 
                 $location.path('anonser');
             });
-        };
+        }
+
+        function cropResult (croppedImageBase64, type) {
+            self.advertisement[type] = croppedImageBase64;
+        }
+
+        function checkImageType (name) {
+            var imageContent = self[name];
+
+            /*if (!imageContent) {
+             return;
+             }
+
+             Client.checkFileType(imageContent, function (err, response) {
+             if (err) {
+             self.removeImage(name);
+             return ErrMsg.show({message: err.data.error, status: err.status});
+             }
+
+             if (!response.validImage) {
+             self.removeImage(name);
+             return alert ('File is not image');
+             }
+             });*/
+        }
+
+        function removeImage(name) {
+            self.advertisement[name] = null;
+            self[name] = null;
+            $('#' + name).val(null);
+            $( '#' + name + '-slider').slider('disable');
+        }
+
     }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
@@ -73689,14 +73739,14 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
              return alert ('File is not image');
              }
              });*/
-        };
+        }
 
         function removeImage(name) {
             self.hospital[name] = null;
             self[name] = null;
             $('#' + name).val(null);
             $( '#' + name + '-slider').slider('disable');
-        };
+        }
 
     }]);;
 /**

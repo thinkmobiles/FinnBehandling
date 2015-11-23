@@ -39,13 +39,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         templateUrl: 'templates/advertisements/admin/list.html',
         controllerAs: 'advertisementsCtrl'
     }).when('/anonser/new', {
-        controller: 'newAdvertisementController',
-        templateUrl: 'templates/advertisements/admin/new.html',
-        controllerAs: 'newAdvertisementCtrl'
-    }).when('/anonser/:id', {
-        controller: 'updateAdvertisementController',
+        controller: 'editAdvertisementController',
         templateUrl: 'templates/advertisements/admin/edit.html',
-        controllerAs: 'updateAdvertisementCtrl'
+        controllerAs: 'editAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'editAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'editAdvertisementCtrl'
     }).when('/startside', {
         controller: 'startSideController',
         templateUrl: 'templates/startSide/admin/startSide.html',
