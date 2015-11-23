@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Create Payment</title>
+</head>
+<body>
+<h1>PayPal REST API</h1>
+
+<div id="paypal">
+    <p> Create a new PayPal Payment</p>
+
+    <form action="/members/payment/create" method="POST">
+        <input type='hidden' name='method' value='paypal'>
+        <label for='amount'> Amount</label>
+        <input type='text' id='amount' name='amount' required>
+        <label for='currency'>Currency</label>
+        <input type='text' id='currency' maxlength='3' name='currency' placeholder='USD' required>
+        <label for='description'>Description</label>
+        <input type='text' id='description' name='description' placeholder='Optional'>
+        <button type='submit'>Create Payment</button>
+    </form>
+</div>
+</body>
+</html>
