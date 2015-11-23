@@ -69,7 +69,7 @@
                     </ul>
                 </div>
 
-                <div class="content row">
+                <div class="content row" ng-controller="startPageController as startPageCtrl">
                     <div id="side-bar" class="col-md-3" ng-controller="sideBarController">
                         <h2 class="title">
                             <span class="text blue dynamic-font-md-lg">Velg</span>
@@ -257,7 +257,7 @@
                     </div>
 
                     <div class="col-md-9">
-                        <div class="advertising"></div>
+                        <div ng-show="startPageCtrl.advertisement" class="advertising">sdds</div>
                         <div class="page-content clearfix" ng-view></div>
                     </div>
                 </div>

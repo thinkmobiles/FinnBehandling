@@ -12,6 +12,8 @@ var TABLES = require('../constants/tables');
 var Advertisement = function (PostGre) {
 
     var Advertisement = PostGre.Models[TABLES.ADVERTISEMENT];
+    var Image = require('../helpers/images');
+    var image = new Image(PostGre);
 
     this.getOneAdvertisement = function (req, res, next){
 
@@ -48,7 +50,11 @@ var Advertisement = function (PostGre) {
 
         Advertisement
             .forge({id: advertisementId})
-            .fetch()
+            .fetch({
+                withRelated: [
+                    'image'
+                ]
+            })
             .asCallback(function(err, advertisement){
 
                 if (err) {
@@ -98,7 +104,11 @@ var Advertisement = function (PostGre) {
                 qb.limit( limitIsValid ? limit : 25 );
                 qb.offset( offsetIsValid ? (page - 1) * limit : 0 );
             })
-            .fetchAll()
+            .fetchAll({
+                withRelated: [
+                    'image'
+                ]
+            })
             .asCallback(function (err, advertisements) {
 
                 if (err) {
@@ -167,18 +177,35 @@ var Advertisement = function (PostGre) {
 
         var options = req.body;
 
-        Advertisement.createValid(options, function (err, result) {
+        Advertisement.createValid(options, function (err, advertisement) {
 
             if (err) {
 
                 return next(err);
             }
 
+            if (options.image) {
+                var  imageParams = {
+                    imageUrl: options.image,
+                    imageable_id: advertisement.id,
+                    imageable_type: TABLES.ADVERTISEMENT,
+                    imageable_field: 'image'
+                };
 
-            res.status(201).send({
-                success: RESPONSES.WAS_CREATED,
-                advertisement: result
-            });
+                image.newImage(imageParams, function () {
+
+                    res.status(201).send({
+                        success: RESPONSES.WAS_CREATED,
+                        article: advertisement
+                    });
+
+                });
+            } else {
+                res.status(201).send({
+                    success: RESPONSES.WAS_CREATED,
+                    advertisement: advertisement
+                });
+            }
 
         });
     };
@@ -224,10 +251,29 @@ var Advertisement = function (PostGre) {
                 return next(err);
             }
 
-            res.status(200).send({
-                success: RESPONSES.UPDATED_SUCCESS,
-                advertisement: result
-            });
+            if (options.image && typeof options.image === 'string') {
+
+                var  imageParams = {
+                    imageUrl: options.image,
+                    imageable_id: result.id,
+                    imageable_type: TABLES.ADVERTISEMENT,
+                    imageable_field: 'image'
+                };
+
+                image.updateOrCreateImageByClientProfileId(imageParams, function () {
+
+                    res.status(200).send({
+                        success: RESPONSES.UPDATED_SUCCESS,
+                        article: result
+                    });
+                });
+            } else {
+
+                res.status(201).send({
+                    success: RESPONSES.WAS_CREATED,
+                    advertisement: result
+                });
+            }
         });
     };
 
