@@ -73054,14 +73054,14 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 
 
     $routeProvider.when('/', {
-        controller: 'adminController',
+        controller: 'conflictsController',
         templateUrl: 'templates/admin.html',
-        controllerAs: 'adminCtrl',
+        controllerAs: 'conflictsCtrl',
         reloadOnSearch: false
     }).when('/admin', {
-        controller: 'adminController',
+        controller: 'conflictsController',
         templateUrl: 'templates/admin.html',
-        controllerAs: 'adminCtrl'
+        controllerAs: 'conflictsCtrl'
     }).when('/nyheter', {
         controller: 'newsController',
         templateUrl: 'templates/news/admin/list.html',
@@ -73125,50 +73125,6 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
 }]).run(['$rootScope', function ($rootScope) {
 
 }]);;
-app.controller('adminController', ['$scope', '$location', 'ConflictsManager', 'GeneralHelpers', 'HospitalsManager',
-    function ($scope, $location, ConflictsManager, GeneralHelpers, HospitalsManager) {
-        var self = this;
-
-        self.hospitals = [];
-        self.$location = $location;
-        self.isSubMenuShown = isSubMenuShown;
-
-        HospitalsManager.getHospitalsList('', function(err, data){
-            if (!err) {
-                self.hospitals = data;
-            }
-        });
-
-
-        function getConflicts() {
-
-            ConflictsManager.getConflictsList(function (err, conflicts) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
-
-                $scope.conflicts = conflicts;
-            });
-        }
-
-        getConflicts();
-
-        this.updateZipCodes = function () {
-
-            ConflictsManager.updateDb(function (err, response) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
-
-                alert("Zip codes updated successful");
-            });
-        };
-
-        function isSubMenuShown () {
-            return $location.path() ==='/admin' || $location.path() === '/hospitals';
-        }
-
-    }]);;
 app.controller('advertisementsController', ['$scope', 'AdvertisementsManager', 'GeneralHelpers',
     function ($scope, AdvertisementsManager, GeneralHelpers) {
         var self = this;
@@ -73278,6 +73234,44 @@ app.controller('newAdvertisementController', ['$scope', '$routeParams', '$locati
     }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
+
+    }]);;
+app.controller('conflictsController', ['$scope', 'ConflictsManager', 'GeneralHelpers', 'HospitalsManager',
+    function ($scope, ConflictsManager, GeneralHelpers, HospitalsManager) {
+        var self = this;
+
+        self.hospitals = [];
+
+        HospitalsManager.getHospitalsList('', function(err, data){
+            if (!err) {
+                self.hospitals = data;
+            }
+        });
+
+
+        function getConflicts() {
+
+            ConflictsManager.getConflictsList(function (err, conflicts) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                $scope.conflicts = conflicts;
+            });
+        }
+
+        getConflicts();
+
+        this.updateZipCodes = function () {
+
+            ConflictsManager.updateDb(function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert("Zip codes updated successful");
+            });
+        };
 
     }]);;
 app.controller('editHospitalController', ['$scope', '$routeParams', '$location', 'HospitalsManager', 'TreatmentsManager', 'RegionsManager', 'GeneralHelpers',
@@ -73430,6 +73424,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 if (self.hospital.treatment_ids && self.hospital.treatment_ids.indexOf(self.treatments[i].id) >= 0) {
                     self.treatments[i].isSelected = true;
+                    console.log(self.treatments[i].subTreatments);
                     if (self.treatments[i].subTreatments) {
                         for (var j = self.treatments[i].subTreatments.length - 1; j >= 0; j--) {
                             if (self.hospital.sub_treatments && self.hospital.sub_treatments.indexOf(self.treatments[i].subTreatments[j].id) >= 0) {
@@ -73508,7 +73503,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
                 address: self.hospital.address,
-                logo: self.hospital.logo
+                logo: self.hospital.picture
 
             };
 
@@ -73547,8 +73542,6 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 }
 
                 self.hospital = hospital;
-                self.old_logo = hospital.logo;
-
                 processSubTreatments(self.hospital);
                 updateForm();
 
@@ -73667,7 +73660,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
         function cropResult (croppedImageBase64, type) {
             self.hospital[type] = croppedImageBase64;
-        }
+        };
 
         function checkImageType (name) {
             var imageContent = self[name];
@@ -73758,6 +73751,7 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
             HospitalsManager.getHospitalsList(filters, function (err, data) {
                 if (!err) {
                     vm.hospitals = data;
+                    console.log(data)
                 }
             });
 
