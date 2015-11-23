@@ -73551,6 +73551,10 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 processSubTreatments(self.hospital);
                 updateForm();
+
+                if (!self.hospial.city && self.hozpital.postcode) {
+                    getRegion();
+                }
             });
         }
 
@@ -73575,7 +73579,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
         }
 
         /**
-         * Fetch region by zip code as soon as
+         * Fetch region by zip code
          */
         function getRegion() {
             if (self.hospital.postcode && self.hospital.postcode.length !== 4) {
