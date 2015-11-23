@@ -1,6 +1,3 @@
-/**
- * Created by Roman on 23.02.2015.
- */
 var cluster = require('cluster');
 
 /*if( cluster.isMaster ) {
