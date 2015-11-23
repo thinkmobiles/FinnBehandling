@@ -56891,7 +56891,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 web_address: self.hospital.web_address,
                 postcode: self.hospital.postcode,
                 address: self.hospital.address,
-                logo: self.hospital.picture
+                logo: self.hospital.logo
 
             };
 
