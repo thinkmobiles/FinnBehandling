@@ -59,7 +59,6 @@ app.controller('listHospitalController', ['$scope', 'HospitalsManager', 'Regions
             HospitalsManager.getHospitalsList(filters, function (err, data) {
                 if (!err) {
                     vm.hospitals = data;
-                    console.log(data)
                 }
             });
 

@@ -11,6 +11,16 @@
     line-height: 36px;
     background: #009ec8;
     min-width: 1200px;
+    position: absolute;
+    left: 0;
+}
+#top-menu .inner-block{
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+#top-menu+.inner-block{
+    padding-top: 36px;
 }
 
 #top-menu-list {
