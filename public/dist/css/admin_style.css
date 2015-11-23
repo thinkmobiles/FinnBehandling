@@ -8612,26 +8612,6 @@ button.close {
     padding: 10px;
     margin-top: 15px;
 }
-.hospitals-list .hospital-item h4{
-    background: #fff none repeat scroll 0 0;
-    display: inline;
-    margin-left: 10px;
-    margin-top: -10px;
-    width: auto;
-}
-.hospitals-list .hospital-item{
-    margin-top: 25px;
-    padding: 20px 15px 0;
-    border: 2px solid #f0f0f0;
-    border-radius: 5px;
-}
-.hospitals-list  .hospital-item .inside{
-    padding: 30px 15px 10px;
-    border: 1px solid #cdcdcd
-}
-.hospitals-list .hospital-item .inside+.clearfix{
-    padding-top: 10px;
-}
 
 .hospital-item-paid {
     border: 6px solid #009ec8;
