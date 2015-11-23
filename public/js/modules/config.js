@@ -4,13 +4,7 @@
 var AppConfig = (function() {
     // Init module configuration options
     var appModuleName = 'app';
-    var appModuleVendorDependencies = [
-        'ngResource',
-        'ngRoute',
-        'ngAnimate',
-        'mgcrea.ngStrap',
-        'angularUtils.directives.dirPagination'
-    ];
+    var appModuleVendorDependencies = ['ngResource', 'ngRoute', 'ngAnimate', 'mgcrea.ngStrap'];
 
     // Add a new vertical module
     var registerModule = function(moduleName, dependencies) {

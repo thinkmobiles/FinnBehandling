@@ -1,7 +1,7 @@
 ﻿module.exports = function () {
     "use strict";
     var config = {
-        db: process.env.REDIS_DB_KEY,
+        db: 7,
         host: process.env.REDIS_HOST,
         port: parseInt(process.env.REDIS_PORT) || 6379
     };
