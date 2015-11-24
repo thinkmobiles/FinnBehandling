@@ -4,9 +4,6 @@ app.controller('editAdvertisementController', ['$scope', '$routeParams', '$locat
         var advertisementId = $routeParams.id;
 
         self.saveAdvertisement = saveAdvertisement;
-        self.cropResult = cropResult;
-        self.checkImageType = checkImageType;
-        self.removeImage = removeImage;
 
         self.pageTitle = 'Create advertisement';
         self.advertisement = {};
@@ -64,35 +61,6 @@ app.controller('editAdvertisementController', ['$scope', '$routeParams', '$locat
             });
         }
 
-        function cropResult (croppedImageBase64, type) {
-            self.advertisement[type] = croppedImageBase64;
-        }
 
-        function checkImageType (name) {
-            var imageContent = self[name];
-
-            /*if (!imageContent) {
-             return;
-             }
-
-             Client.checkFileType(imageContent, function (err, response) {
-             if (err) {
-             self.removeImage(name);
-             return ErrMsg.show({message: err.data.error, status: err.status});
-             }
-
-             if (!response.validImage) {
-             self.removeImage(name);
-             return alert ('File is not image');
-             }
-             });*/
-        }
-
-        function removeImage(name) {
-            self.advertisement[name] = null;
-            self[name] = null;
-            $('#' + name).val(null);
-            $( '#' + name + '-slider').slider('disable');
-        }
 
     }]);

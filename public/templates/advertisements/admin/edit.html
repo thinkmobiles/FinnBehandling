@@ -11,39 +11,6 @@
             novalidate>
 
 
-        <!-- banner -->
-        <div class="image-container" ng-class="{'slim': !editAdvertisementCtrl.image}">
-            <div class="clients-photo">
-                <div ng-show='editAdvertisementCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
-                    <a ng-click="editAdvertisementCtrl.removeImage('image')" class="remove-image">X</a>
-                    <img ng-src="{{editAdvertisementCtrl.image}}">
-                </div>
-                <input
-                        id="image"
-                        type="file"
-                        name="image"
-                        ng-model="editAdvertisementCtrl.image"
-                        accept="image/jpeg,image/png,image/gif"
-                        fileread
-                        crop-result="editAdvertisementCtrl.cropResult"
-                        ng-change="editAdvertisementCtrl.checkImageType('image')"
-                        >
-            </div>
-            <div class="slider-block">
-                <div id="logo-slider"></div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-8"
-                 ng-show='!editAdvertisementCtrl.image && editAdvertisementCtrl.old_logo && editAdvertisementCtrl.old_logo.image_url'>
-                <img class="pull-right" style="max-height: 445px"
-                     ng-src="{{editAdvertisementCtrl.old_logo.image_url}}">
-            </div>
-        </div>
-
-
-        <br>
 
         <!-- text editor -->
         <div class="form-group clearfix">
