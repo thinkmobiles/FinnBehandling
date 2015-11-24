@@ -14,7 +14,7 @@ var StaticNews = function (PostGre) {
     var Image = require('../helpers/images');
     var image = new Image(PostGre);
 
-    this.getArticle = function (req, res, next){
+    this.getArticlesByPosition = function (req, res, next){
 
         /**
          * __Type__ `GET`
@@ -23,7 +23,7 @@ var StaticNews = function (PostGre) {
          * This __method__ allows get _one article_
          *
          * @example Request example:
-         *         http://192.168.88.250:8787/staticNews/:id
+         *         http://192.168.88.250:8787/staticNews/:position
          *
          * @example Response example:
          *
@@ -42,10 +42,10 @@ var StaticNews = function (PostGre) {
          * @instance
          */
 
-        var staticNewsId = req.params.id;
+        var position = req.params.position;
 
         StaticNews
-            .forge({id: staticNewsId})
+            .forge({position: position})
             .fetch({
                 withRelated: [
                     'image'
@@ -61,7 +61,7 @@ var StaticNews = function (PostGre) {
             });
     };
 
-    this.getStaticNews = function (req, res, next) {
+    this.getLastStaticNews = function (req, res, next) {
 
         /**
          * __Type__ 'GET'

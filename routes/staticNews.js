@@ -5,12 +5,12 @@ var staticNewsHandler = require('../handlers/staticNews');
 module.exports = function (PostGre) {
     var newsHandler = new staticNewsHandler(PostGre);
 
-    staticNewsRouter.route('/').get(newsHandler.getStaticNews);
+    staticNewsRouter.route('/').get(newsHandler.getLastStaticNews);
     staticNewsRouter.route('/').post(newsHandler.createArticle);
 
     //newsRouter.route('/count').get(newsHandler.getStaticNewsCount);
 
-    staticNewsRouter.route('/:position').get(newsHandler.getArticle);
+    staticNewsRouter.route('/:position').get(newsHandler.getArticlesByPosition);
     staticNewsRouter.route('/:id').put(newsHandler.updateArticle);
     staticNewsRouter.route('/:id').delete(newsHandler.removeArticle);
 
