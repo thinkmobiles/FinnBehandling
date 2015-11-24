@@ -29,6 +29,7 @@ var Models = function (PostGre) {
     this[TABLES.TREATMENTS_LIST] = require('./treatmentsList')(PostGre, Model);
     this[TABLES.SUB_TREATMENTS] = require('./subTreatment')(PostGre, Model);
     this[TABLES.SUB_TREATMENTS_LIST] = require('./subTreatmentsList')(PostGre, Model);
+    this[TABLES.STATIC_NEWS] = require('./staticNews')(PostGre, Model);
 
 };
 module.exports = Models;

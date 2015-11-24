@@ -1,3 +1,4 @@
+"use strict";
 var factoryGirl = require('factory-girl');
 var factory = new factoryGirl.Factory();
 var faker = require('faker');
@@ -83,6 +84,22 @@ module.exports = function (db) {
         },
         source: function() {
             return faker.lorem.sentence(1, 3);
+        }
+    });
+
+    factory.define('static_news_article', db.Models[TABLES.STATIC_NEWS], {
+        subject: function() {
+            return faker.lorem.sentence(1, 0);
+        },
+        content: function() {
+            return faker.lorem.paragraphs(15);
+        },
+        source: function() {
+            return faker.lorem.sentence(1, 3);
+        },
+        position: function() {
+            var position = randomFrom(3);
+            return (position === 0) ? 'left' : ((position === 1) ? 'center' : 'right');
         }
     });
 

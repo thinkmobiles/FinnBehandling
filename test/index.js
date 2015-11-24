@@ -45,6 +45,7 @@ describe('Handlers', function () {
     require('./handlers/regions');
     require('./handlers/treatments');
     require('./handlers/webRecommendations');
+    require('./handlers/staticNews');
 });
 
 after(function (done) {

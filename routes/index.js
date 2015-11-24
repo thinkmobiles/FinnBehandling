@@ -18,6 +18,7 @@ module.exports = function (app, PostGre) {
     var treatmentRouter = require('./treatment')(PostGre);
     var adminRouter = require('./admin')(PostGre);
     var webRecommendationsRouter = require('./webRecommendations')(PostGre);
+    var staticNewsRouter = require('./staticNews')(PostGre);
 
 
 
@@ -42,6 +43,8 @@ module.exports = function (app, PostGre) {
     app.use('/regions', regionsRouter);
 
     app.use('/staticData', staticDataRouter);
+
+    app.use('/staticNews', staticNewsRouter);
 
     app.use('/advertisement', advertisementRouter);
 

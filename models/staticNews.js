@@ -1,4 +1,4 @@
-var TABLES = require('./constants/tables');
+var TABLES = require('../constants/tables');
 var imageUploaderConfig = {
     type: 'FileSystem',
     directory: process.env.LOCAL_IMAGE_STORAGE
