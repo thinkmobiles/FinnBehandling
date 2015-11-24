@@ -1,4 +1,9 @@
 var TABLES = require('../constants/tables');
+var imageUploaderConfig = {
+    type: 'FileSystem',
+    directory: process.env.LOCAL_IMAGE_STORAGE
+};
+var removeImage = require('../helpers/imageUploader/imageUploader')(imageUploaderConfig).removeImage;
 var Validation = require('../helpers/validation/main');
 
 function assert(fn) {
@@ -12,7 +17,16 @@ module.exports = function (postGre, ParentModel) {
 
     return ParentModel.extend({
         hasTimestamps: true,
-        tableName: TABLES.ADVERTISEMENT
+        tableName: TABLES.ADVERTISEMENT,
+
+        image: function () {
+            return this.morphOne(postGre.Models[TABLES.IMAGES], 'imageable');
+        },
+
+        removeAllDependencies: function (model) {
+
+            deleteAdvertisementImage(model.id);
+        }
     }, {
         create: {
             text: ['required', 'isString']
@@ -69,5 +83,27 @@ module.exports = function (postGre, ParentModel) {
 
     function validation (options) {
         return new Validation.Check(options);
+    }
+
+    function deleteAdvertisementImage (advertisementId) {
+
+        postGre.Models[TABLES.IMAGES]
+            .fetchWhere({
+                imageable_id: advertisementId,
+                imageable_type: TABLES.NEWS,
+                imageable_field: 'image'
+            })
+            .then(function (model) {
+
+                removeImage(model.attributes['name'], 'images', function (err) {
+
+                    if (!err) {
+
+                        model
+                            .destroy()
+                            .asCallback();
+                    }
+                });
+            });
     }
 };
