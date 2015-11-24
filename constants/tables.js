@@ -9,5 +9,6 @@ module.exports = {
     NEWS: 'tb_news',
     WEB_RECOMMENDATIONS: 'tb_web_recommendations',
     STATIC_DATA: 'tb_static_data',
-    ADVERTISEMENT: 'tb_advertisement'
+    ADVERTISEMENT: 'tb_advertisement',
+    STATIC_NEWS: 'tb_static_news'
 };
