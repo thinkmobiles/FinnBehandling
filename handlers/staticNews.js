@@ -45,8 +45,10 @@ var StaticNews = function (PostGre) {
         var position = req.params.position;
 
         StaticNews
-            .forge({position: position})
-            .fetch({
+            .query(function (qb) {
+                qb.where(TABLES.STATIC_NEWS + '.position', position);
+            })
+            .fetchAll({
                 withRelated: [
                     'image'
                 ],
