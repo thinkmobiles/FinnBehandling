@@ -51,8 +51,7 @@ module.exports = function (knex) {
             addExtentionUUID,
             addExtentionPostGIS,
             addExtentionPostGISTopology,
-            createTables,
-            createDefaultArticles
+            createTables
         ], function(errors) {
             if (errors) {
                 console.log('===============================');
@@ -85,83 +84,6 @@ module.exports = function (knex) {
                 }
             })
     }
-
-    function createDefaultArticles(callback){
-        knex(TABLES.NEWS)
-            .select()
-            .then(function (result) {
-                if (result.length < 1) {
-
-                    var articles = generateDefaultArticles();
-
-                    knex(TABLES.NEWS)
-                        .insert(articles)
-                        .then(function () {
-                            console.log('default articles are Created!');
-                            callback();
-                        })
-                        .catch(function (err) {
-                            console.log('default articles Creation Error: ' + err);
-                            callback(err);
-                        });
-                } else {
-                    callback();
-                }
-            })
-    }
-
-    function generateDefaultArticles() {
-        var articles = [
-            {
-                id: 1,
-                subject: 'VelVel.',
-                content:
-                    'Odit culpa vel possimus sint libero optio occaecati illo.' +
-                    'Est qui itaque et.' +
-                    'Ea commodi blanditiis.' +
-                    'Temporibus a hic qui nemo explicabo sequi est vero.' +
-                    'Itaque laudantium et quo occaecati omnis.' +
-
-                    'Vel non dolor modi ullam et ex dolorum sed quas.' +
-                    'Enim inventore voluptas enim reprehenderit sed hic provident aut.' +
-                    'Ut et architecto.' +
-
-                    'Aperiam similique quia a aliquam saepe tempore.' +
-                    'Aliquam et sunt.' +
-                    'Quas nemo dolor voluptatem sit in asperiores excepturi non.',
-                source: 'Nesciunt.'
-            }, {
-                id: 2,
-                subject: 'Dolor.',
-                content:
-                    'Vel non dolor modi ullam et ex dolorum sed quas.' +
-                    'Enim inventore voluptas enim reprehenderit sed hic provident aut.' +
-                    'Ut et architecto.' +
-
-                    'Aperiam similique quia a aliquam saepe tempore.' +
-                    'Aliquam et sunt.' +
-                    'Quas nemo dolor voluptatem sit in asperiores excepturi non.',
-                source: 'Enim.'
-            }, {
-                id: 3,
-                subject: 'Lorem.',
-                content:
-                    'Odit culpa vel possimus sint libero optio occaecati illo.' +
-                    'Est qui itaque et.' +
-                    'Ea commodi blanditiis.' +
-                    'Temporibus a hic qui nemo explicabo sequi est vero.' +
-                    'Itaque laudantium et quo occaecati omnis.' +
-
-                    'Aperiam similique quia a aliquam saepe tempore.' +
-                    'Aliquam et sunt.' +
-                    'Quas nemo dolor voluptatem sit in asperiores excepturi non.',
-                source: 'Insput.'
-            }
-        ];
-
-        return articles;
-    }
-
 
     function setDefaultOptions () {
 

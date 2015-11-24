@@ -62,6 +62,16 @@ module.exports = {
                         'id serial NOT NULL, ' +
                         'text text ' +
                         ') WITHOUT OIDS; ',
+    STATIC_NEWS: 'CREATE TABLE IF NOT EXISTS tb_static_news ( ' +
+                        'id serial NOT NULL, ' +
+                        'subject varchar(80), ' +
+                        'content text, ' +
+                        'source varchar(50), ' +
+                        'position varchar(10), ' +
+                        'created_at timestamp without time zone,' +
+                        'updated_at timestamp without time zone,' +
+                        'CONSTRAINT tb_static_news_pkey PRIMARY KEY (id)' +
+                        ') WITHOUT OIDS; ',
     ADVERTISEMENT: 'CREATE TABLE IF NOT EXISTS tb_advertisement ( ' +
                         'id serial NOT NULL, ' +
                         'text text, ' +
