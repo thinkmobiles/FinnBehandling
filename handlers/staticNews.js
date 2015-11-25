@@ -55,7 +55,7 @@ var StaticNews = function (PostGre) {
                     .from(TABLES.STATIC_NEWS)
                     .where(TABLES.STATIC_NEWS + '.position', position)
                     .andWhereNot('id', lastDataId)
-                    .orderBy('created_at');
+                    .orderBy('created_at', 'desc');
             })
             .fetchAll({
                 withRelated: [
@@ -66,6 +66,10 @@ var StaticNews = function (PostGre) {
             .asCallback(function(err, staticNews){
                 if (err) {
                     return next(err);
+                }
+
+                if (!staticNews) {
+                    return res.status(200).send([]);
                 }
 
                 res.status(200).send(staticNews);
@@ -229,7 +233,8 @@ var StaticNews = function (PostGre) {
          *      "position": "left",
          *      "updated_at": "2015-11-25T11:34:57.061Z"
          *      }
-         *      }
+         * }
+         *
          * @param {number} id - id of article
          * @param {string} subject - subject of article (optional)
          * @param {string} content - content of article (optional)
