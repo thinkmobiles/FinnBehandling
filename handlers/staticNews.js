@@ -2,8 +2,8 @@ var RESPONSES = require('../constants/responseMessages');
 var TABLES = require('../constants/tables');
 
 /**
- * @description  News management module
- * @module news
+ * @description  StaticNews management module
+ * @module staticNews
  *
  */
 
@@ -29,17 +29,30 @@ var StaticNews = function (PostGre) {
          *
          * [
          *  {
-         *           "id": 3,
-         *           "subject": "Clinic research updated",
+         *          "id": 3,
+         *          "subject": "Clinic research updated",
          *          "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
          *          "source": "Newspaper updated",
          *          "position": "left",
          *          "created_at": "2015-09-29T13:39:39.870Z",
          *          "updated_at": "2015-09-29T13:48:39.981Z"
+         *  },
+         *  {
+         *      "id": 0,
+         *      "subject": "Clinic research2",
+         *      "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *      "source": "Newspaper 2",
+         *      "position": "left",
+         *      "created_at": "2015-09-29T13:39:44.644Z",
+         *      "updated_at": "2015-09-29T13:39:44.644Z"
          *  }
          * ]
          *
          * @param {number} id - id of article
+         * @param {string} subject - subject of article
+         * @param {string} content - content of article
+         * @param {string} source - source of article
+         * @param {string} position - position of article
          * @method getArticlesByPosition
          * @instance
          */
@@ -60,16 +73,12 @@ var StaticNews = function (PostGre) {
             .fetchAll({
                 withRelated: [
                     'image'
-                ],
-                require: true
+                ]
             })
-            .asCallback(function(err, staticNews){
+            .asCallback(function (err, staticNews) {
+
                 if (err) {
                     return next(err);
-                }
-
-                if (!staticNews) {
-                    return res.status(200).send([]);
                 }
 
                 res.status(200).send(staticNews);
@@ -133,6 +142,7 @@ var StaticNews = function (PostGre) {
                 ]
             })
             .asCallback(function (err, staticNews) {
+
                 if (err) {
                     return next(err);
                 }
@@ -164,7 +174,7 @@ var StaticNews = function (PostGre) {
          *          "updated_at": "2015-11-25T11:23:49.117Z",
          *          "created_at": "2015-11-25T11:23:49.117Z",
          *          "id": 5
-         *          }
+         *      }
          * }
          *
          * @param {string} subject - subject of new article
@@ -226,12 +236,12 @@ var StaticNews = function (PostGre) {
          * {
          *      "success": "was updated successfully",
          *      "article": {
-         *      "id": 5,
-         *      "subject": "Clinic",
-         *      "content": "Lorem ipsum dolor si",
-         *      "source": "Newspaper",
-         *      "position": "left",
-         *      "updated_at": "2015-11-25T11:34:57.061Z"
+         *          "id": 5,
+         *          "subject": "Clinic",
+         *          "content": "Lorem ipsum dolor si",
+         *          "source": "Newspaper",
+         *          "position": "left",
+         *          "updated_at": "2015-11-25T11:34:57.061Z"
          *      }
          * }
          *
