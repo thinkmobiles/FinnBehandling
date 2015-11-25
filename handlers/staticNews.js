@@ -127,7 +127,7 @@ var StaticNews = function (PostGre) {
                             'OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news) AS arr_data ')
                     )
                     .where('rank', 1)
-                    .orderBy(PostGre.knex.raw('(-1.1)^(7-length(position))'));
+                    .orderBy(PostGre.knex.raw('(-2)^(7-length(position))'));
 
             })
             .fetchAll({
