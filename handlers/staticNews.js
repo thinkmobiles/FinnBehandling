@@ -47,12 +47,10 @@ var StaticNews = function (PostGre) {
         StaticNews
             .query(function (qb) {
                 qb
-                    .where(TABLES.STATIC_NEWS + '.position', position)
-                    .andWhereNot('created_at', function() {
-                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
-                            this.max('created_at').from('tb_static_news').where('position', position);
-                        })
+                    .whereNotIn('created_at', function () {
+                        this.max('created_at').from('tb_static_news').where('position', position);
                     })
+                    .andWhere(TABLES.STATIC_NEWS + '.position', position)
                     .orderBy('created_at');
             })
             .fetchAll({
@@ -65,6 +63,8 @@ var StaticNews = function (PostGre) {
                 if (err) {
                     return next(err);
                 }
+
+                var staticNews = staticNews || [];
 
                 res.status(200).send(staticNews);
             });
@@ -112,27 +112,13 @@ var StaticNews = function (PostGre) {
             .query(function (qb) {
 
                 qb
-                    .select('*')
-                    .from('tb_static_news')
-                    .whereIn('created_at', function() {
-                        this.max('created_at').from('tb_static_news').where('position', 'left');
-                    })
-                    .union(function () {
-                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
-                            this.max('created_at').from('tb_static_news').where('position', 'center');
-                        })
-                    })
-                    .union(function () {
-                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
-                            this.max('created_at').from('tb_static_news').where('position', 'right');
-                        });
-                    });
+                    .select('id', 'subject', 'content', 'position', 'created_at', 'rank')
+                    .from(
+                        PostGre.knex.raw('(SELECT id, subject, content, position, created_at, rank()' +
+                            'OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news) AS arr_data ')
+                    )
+                    .where('rank', 1);
 
-                /*qb.raw(SELECT * FROM tb_static_news WHERE position = 'left' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'left')
-                UNION
-                SELECT * FROM tb_static_news WHERE position = 'center' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'center')
-                UNION
-                SELECT * FROM tb_static_news WHERE position = 'right' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'right'));*/
             })
             .fetchAll({
                 withRelated: [
