@@ -38,29 +38,22 @@ var StaticNews = function (PostGre) {
          * }
          *
          * @param {number} id - id of article
-         * @method getArticle
+         * @method getArticlesByPosition
          * @instance
          */
 
         var position = req.params.position;
+        var lastDataId = req.query.staticNewId;
 
         StaticNews
             .query(function (qb) {
 
                 qb
-                    .select('id', 'subject', 'content', 'position', 'created_at', 'rank')
-                    .from(
-                    PostGre.knex.raw('(SELECT id, subject, content, position, created_at, rank()' +
-                        "OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news WHERE position = '"+ position +"' ) AS arr_data ")
-                )
-                    .where('rank', 1);
-
-               /* qb
-                    .whereNotIn('created_at', function () {
-                        this.max('created_at').from('tb_static_news').where('position', position);
-                    })
-                    .andWhere(TABLES.STATIC_NEWS + '.position', position)
-                    .orderBy('created_at');*/
+                    .select('id', 'subject', 'content', 'position', 'created_at')
+                    .from(TABLES.STATIC_NEWS)
+                    .where(TABLES.STATIC_NEWS + '.position', position)
+                    .andWhereNot('id', lastDataId)
+                    .orderBy('created_at');
             })
             .fetchAll({
                 withRelated: [
@@ -113,7 +106,7 @@ var StaticNews = function (PostGre) {
          *  }
          * ]
          *
-         * @method getStaticNews
+         * @method getLastStaticNews
          * @instance
          */
 
