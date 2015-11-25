@@ -64,7 +64,7 @@ var StaticNews = function (PostGre) {
             .query(function (qb) {
 
                 qb
-                    .select('id', 'subject', 'content', 'position', 'created_at')
+                    .select('id', 'subject', 'content', 'source', 'position', 'created_at')
                     .from(TABLES.STATIC_NEWS)
                     .where(TABLES.STATIC_NEWS + '.position', position)
                     .andWhereNot('id', lastDataId)
@@ -127,9 +127,9 @@ var StaticNews = function (PostGre) {
             .query(function (qb) {
 
                 qb
-                    .select('id', 'subject', 'content', 'position', 'created_at', 'rank')
+                    .select('id', 'subject', 'content', 'source', 'position', 'created_at', 'rank')
                     .from(
-                        PostGre.knex.raw('(SELECT id, subject, content, position, created_at, rank()' +
+                        PostGre.knex.raw('(SELECT id, subject, content, source, position, created_at, rank()' +
                             'OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news) AS arr_data ')
                     )
                     .where('rank', 1)

@@ -1,9 +1,9 @@
 var express = require('express');
 var staticNewsRouter = express.Router();
-var staticNewsHandler = require('../handlers/staticNews');
+var StaticNewsHandler = require('../handlers/staticNews');
 
 module.exports = function (PostGre) {
-    var newsHandler = new staticNewsHandler(PostGre);
+    var newsHandler = new StaticNewsHandler(PostGre);
 
     staticNewsRouter.route('/').get(newsHandler.getLastStaticNews);
     staticNewsRouter.route('/').post(newsHandler.createArticle);
