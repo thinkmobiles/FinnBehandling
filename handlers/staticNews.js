@@ -46,7 +46,14 @@ var StaticNews = function (PostGre) {
 
         StaticNews
             .query(function (qb) {
-                qb.where(TABLES.STATIC_NEWS + '.position', position);
+                qb
+                    .where(TABLES.STATIC_NEWS + '.position', position)
+                    .andWhereNot('created_at', function() {
+                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
+                            this.max('created_at').from('tb_static_news').where('position', position);
+                        })
+                    })
+                    .orderBy('created_at');
             })
             .fetchAll({
                 withRelated: [
@@ -104,17 +111,22 @@ var StaticNews = function (PostGre) {
         StaticNews
             .query(function (qb) {
 
-                qb.select('*').from('tb_static_news').whereIn('created_at', function() {
-                    this.max('created_at').from('tb_static_news').where('position', 'left');
-                }).andWhere('position', 'left').union(function () {
-                    this.select('*').from('tb_static_news').whereIn('created_at', function() {
-                        this.max('created_at').from('tb_static_news').where('position', 'center');
-                    }).andWhere('position', 'center').union(function () {
-                        this.select('*').from('tb_static_news').whereIn('created_at', function() {
-                            this.max('created_at').from('tb_static_news').where('position', 'right');
-                        }).andWhere('position', 'right');
+                qb
+                    .select('*')
+                    .from('tb_static_news')
+                    .whereIn('created_at', function() {
+                        this.max('created_at').from('tb_static_news').where('position', 'left');
                     })
-                });
+                    .union(function () {
+                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
+                            this.max('created_at').from('tb_static_news').where('position', 'center');
+                        })
+                    })
+                    .union(function () {
+                        this.select('*').from('tb_static_news').whereIn('created_at', function () {
+                            this.max('created_at').from('tb_static_news').where('position', 'right');
+                        });
+                    });
 
                 /*qb.raw(SELECT * FROM tb_static_news WHERE position = 'left' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'left')
                 UNION
