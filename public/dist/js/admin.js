@@ -73079,13 +73079,13 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         templateUrl: 'templates/advertisements/admin/list.html',
         controllerAs: 'advertisementsCtrl'
     }).when('/anonser/new', {
-        controller: 'newAdvertisementController',
-        templateUrl: 'templates/advertisements/admin/new.html',
-        controllerAs: 'newAdvertisementCtrl'
-    }).when('/anonser/:id', {
-        controller: 'updateAdvertisementController',
+        controller: 'editAdvertisementController',
         templateUrl: 'templates/advertisements/admin/edit.html',
-        controllerAs: 'updateAdvertisementCtrl'
+        controllerAs: 'editAdvertisementCtrl'
+    }).when('/anonser/:id', {
+        controller: 'editAdvertisementController',
+        templateUrl: 'templates/advertisements/admin/edit.html',
+        controllerAs: 'editAdvertisementCtrl'
     }).when('/startside', {
         controller: 'startSideController',
         templateUrl: 'templates/startSide/admin/startSide.html',
@@ -73165,7 +73165,7 @@ app.controller('adminController', ['$scope', '$location', 'ConflictsManager', 'G
         };
 
         function isSubMenuShown () {
-            return $location.path() ==='/admin' || $location.path() === '/hospitals';
+            return $location.path() ==='/admin' || $location.path() === '/hospitals' || $location.path() === '/';
         }
 
     }]);;
@@ -73228,25 +73228,43 @@ app.controller('advertisementsController', ['$scope', 'AdvertisementsManager', '
             });
         };
     }]);;
-app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+app.controller('editAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, AdvertisementsManager, GeneralHelpers) {
         var self = this;
         var advertisementId = $routeParams.id;
 
-        function getAdvertisement () {
+        self.saveAdvertisement = saveAdvertisement;
 
-            AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
+        self.pageTitle = 'Create advertisement';
+        self.advertisement = {};
 
-                self.advertisement = advertisement;
-            });
+
+        function getAdvertisement() {
+            if (advertisementId) {
+                AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.advertisement = advertisement;
+                    self.pageTitle = 'Update advertisement';
+                    self.old_logo = advertisement.image;
+                });
+            }
         }
 
         getAdvertisement();
 
-        this.updateAdvertisement = function () {
+        function saveAdvertisement() {
+            if (advertisementId) {
+                updateAdvertisement();
+            } else {
+                createAdvertisement();
+            }
+        }
+
+
+        function updateAdvertisement() {
 
             AdvertisementsManager.updateAdvertisement(advertisementId, self.advertisement, function (err, advertisement) {
                 if (err) {
@@ -73257,15 +73275,12 @@ app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$loc
 
                 $location.path('anonser');
             });
-        };
-    }]);;
-app.controller('newAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
-    function ($scope, $routeParams, $location, AdvertisementManager, GeneralHelpers){
-        var self = this;
 
-        this.createAdvertisement = function () {
+        }
 
-            AdvertisementManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
+        function createAdvertisement() {
+
+            AdvertisementsManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -73274,7 +73289,10 @@ app.controller('newAdvertisementController', ['$scope', '$routeParams', '$locati
 
                 $location.path('anonser');
             });
-        };
+        }
+
+
+
     }]);;
 app.controller('blank', ['$scope',
     function ($scope) {
@@ -73374,11 +73392,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
          */
         function processSubTreatments(hospital) {
             self.hospital.treatment_ids = [];
-            for (var i = hospital.sub_treatments.length - 1; i >= 0; i--) {
-                if (hospital.sub_treatments[i].treatment_id && self.hospital.treatment_ids.indexOf(hospital.sub_treatments[i].treatment_id) < 0) {
-                    self.hospital.treatment_ids.push(hospital.sub_treatments[i].treatment_id);
+            if (hospital.sub_treatments) {
+                for (var i = hospital.sub_treatments.length - 1; i >= 0; i--) {
+                    if (hospital.sub_treatments[i].treatment_id && self.hospital.treatment_ids.indexOf(hospital.sub_treatments[i].treatment_id) < 0) {
+                        self.hospital.treatment_ids.push(hospital.sub_treatments[i].treatment_id);
+                    }
+                    self.hospital.sub_treatments[i] = hospital.sub_treatments[i].id;
                 }
-                self.hospital.sub_treatments[i] = hospital.sub_treatments[i].id;
             }
         }
 
@@ -73552,7 +73572,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 processSubTreatments(self.hospital);
                 updateForm();
 
-                if (!self.hospial.city && self.hozpital.postcode) {
+                if (!self.hospital.city && self.hospital.postcode) {
                     getRegion();
                 }
             });
@@ -73687,14 +73707,14 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
              return alert ('File is not image');
              }
              });*/
-        };
+        }
 
         function removeImage(name) {
             self.hospital[name] = null;
             self[name] = null;
             $('#' + name).val(null);
             $( '#' + name + '-slider').slider('disable');
-        };
+        }
 
     }]);;
 /**

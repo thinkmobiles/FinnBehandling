@@ -1,22 +1,40 @@
-app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
+app.controller('editAdvertisementController', ['$scope', '$routeParams', '$location', 'AdvertisementsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, AdvertisementsManager, GeneralHelpers) {
         var self = this;
         var advertisementId = $routeParams.id;
 
-        function getAdvertisement () {
+        self.saveAdvertisement = saveAdvertisement;
 
-            AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
-                if (err) {
-                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
-                }
+        self.pageTitle = 'Create advertisement';
+        self.advertisement = {};
 
-                self.advertisement = advertisement;
-            });
+
+        function getAdvertisement() {
+            if (advertisementId) {
+                AdvertisementsManager.getOneAdvertisement(advertisementId, function (err, advertisement) {
+                    if (err) {
+                        return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                    }
+
+                    self.advertisement = advertisement;
+                    self.pageTitle = 'Update advertisement';
+                    self.old_logo = advertisement.image;
+                });
+            }
         }
 
         getAdvertisement();
 
-        this.updateAdvertisement = function () {
+        function saveAdvertisement() {
+            if (advertisementId) {
+                updateAdvertisement();
+            } else {
+                createAdvertisement();
+            }
+        }
+
+
+        function updateAdvertisement() {
 
             AdvertisementsManager.updateAdvertisement(advertisementId, self.advertisement, function (err, advertisement) {
                 if (err) {
@@ -27,5 +45,22 @@ app.controller('updateAdvertisementController', ['$scope', '$routeParams', '$loc
 
                 $location.path('anonser');
             });
-        };
+
+        }
+
+        function createAdvertisement() {
+
+            AdvertisementsManager.createAdvertisement(self.advertisement, function (err, adveertisement) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert(' Advertisement successfully created');
+
+                $location.path('anonser');
+            });
+        }
+
+
+
     }]);

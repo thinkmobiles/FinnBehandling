@@ -92,11 +92,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
          */
         function processSubTreatments(hospital) {
             self.hospital.treatment_ids = [];
-            for (var i = hospital.sub_treatments.length - 1; i >= 0; i--) {
-                if (hospital.sub_treatments[i].treatment_id && self.hospital.treatment_ids.indexOf(hospital.sub_treatments[i].treatment_id) < 0) {
-                    self.hospital.treatment_ids.push(hospital.sub_treatments[i].treatment_id);
+            if (hospital.sub_treatments) {
+                for (var i = hospital.sub_treatments.length - 1; i >= 0; i--) {
+                    if (hospital.sub_treatments[i].treatment_id && self.hospital.treatment_ids.indexOf(hospital.sub_treatments[i].treatment_id) < 0) {
+                        self.hospital.treatment_ids.push(hospital.sub_treatments[i].treatment_id);
+                    }
+                    self.hospital.sub_treatments[i] = hospital.sub_treatments[i].id;
                 }
-                self.hospital.sub_treatments[i] = hospital.sub_treatments[i].id;
             }
         }
 
@@ -270,7 +272,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
                 processSubTreatments(self.hospital);
                 updateForm();
 
-                if (!self.hospial.city && self.hozpital.postcode) {
+                if (!self.hospital.city && self.hospital.postcode) {
                     getRegion();
                 }
             });
@@ -405,13 +407,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
              return alert ('File is not image');
              }
              });*/
-        };
+        }
 
         function removeImage(name) {
             self.hospital[name] = null;
             self[name] = null;
             $('#' + name).val(null);
             $( '#' + name + '-slider').slider('disable');
-        };
+        }
 
     }]);

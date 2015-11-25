@@ -24,6 +24,6 @@
         <h5 class="dynamic-font-md"> {{article.created_at | date: "d MMM, y"}} </h5>
         <div class="dynamic-font-sm">
              <span ng-bind-html="article.content | limitTo:  article.limit | trust"></span><span>{{article.content.length > article.limit ? '...' : ''}}</span></div>
-        <a ng-click="startPageCtrl.toggleLimit(article)">{{article.content.length > article.limit ? 'Les mer...' : 'Skjul'}}</a>
+        <a href ng-click="startPageCtrl.toggleLimit(article)">{{article.content.length < article.limit ? '' : (article.showAll === true) ? 'Skjul' : 'Les mer...'}}</a>
     </div>
 </div>

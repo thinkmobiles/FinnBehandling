@@ -8783,6 +8783,27 @@ footer {
 .form-invalid-border {
     border-color: red;
 }
+
+.hospitals-list h6{
+         background: #fff none repeat scroll 0 0;
+         display: inline;
+         margin-left: 10px;
+         margin-top: -22px;
+         width: auto;
+     }
+.hospitals-list .text-box{
+         margin-top: 25px;
+         padding: 20px 15px 0;
+         border: 2px solid #f0f0f0;
+         border-radius: 5px;
+     }
+.hospitals-list  .text-box .inside{
+         padding: 10px 15px;
+         border: 1px solid #cdcdcd
+     }
+.hospitals-list .text-box .inside+.clearfix{
+         padding-top: 10px;
+     }
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)

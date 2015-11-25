@@ -38,7 +38,7 @@ app.controller('adminController', ['$scope', '$location', 'ConflictsManager', 'G
         };
 
         function isSubMenuShown () {
-            return $location.path() ==='/admin' || $location.path() === '/hospitals';
+            return $location.path() ==='/admin' || $location.path() === '/hospitals' || $location.path() === '/';
         }
 
     }]);

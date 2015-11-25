@@ -1,25 +1,28 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix" style="padding: 32px">
-    <h1 class="blue bold">Update advertisement</h1>
+    <h1 class="blue bold">{{ editAdvertisementCtrl.pageTitle }}</h1>
     <br/>
 
     <form
             role="form"
             class="one-block"
-            name="updateAdvertisementForm"
-            ng-submit="updateAdvertisementCtrl.updateAdvertisement()"
+            name="editAdvertisementForm"
+            ng-submit="editAdvertisementCtrl.saveAdvertisement()"
             novalidate>
 
+
+
+        <!-- text editor -->
         <div class="form-group clearfix">
 
             <div
                     text-angular
                     required
-                    ng-model="updateAdvertisementCtrl.advertisement.text">
+                    ng-model="editAdvertisementCtrl.advertisement.text">
 
             </div>
-            <div style="color:red" ng-show="updateAdvertisementForm.$submitted && updateAdvertisementForm.text.$invalid">
-                <p ng-show="updateAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
+            <div style="color:red" ng-show="editAdvertisementForm.$submitted && editAdvertisementForm.text.$invalid">
+                <p ng-show="editAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
             </div>
         </div>
 
