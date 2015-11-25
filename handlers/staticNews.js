@@ -46,12 +46,21 @@ var StaticNews = function (PostGre) {
 
         StaticNews
             .query(function (qb) {
+
                 qb
+                    .select('id', 'subject', 'content', 'position', 'created_at', 'rank')
+                    .from(
+                    PostGre.knex.raw('(SELECT id, subject, content, position, created_at, rank()' +
+                        "OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news WHERE position = '"+ position +"' ) AS arr_data ")
+                )
+                    .where('rank', 1);
+
+               /* qb
                     .whereNotIn('created_at', function () {
                         this.max('created_at').from('tb_static_news').where('position', position);
                     })
                     .andWhere(TABLES.STATIC_NEWS + '.position', position)
-                    .orderBy('created_at');
+                    .orderBy('created_at');*/
             })
             .fetchAll({
                 withRelated: [
@@ -117,7 +126,8 @@ var StaticNews = function (PostGre) {
                         PostGre.knex.raw('(SELECT id, subject, content, position, created_at, rank()' +
                             'OVER (PARTITION BY position ORDER BY created_at DESC ) FROM tb_static_news) AS arr_data ')
                     )
-                    .where('rank', 1);
+                    .where('rank', 1)
+                    .orderBy(PostGre.knex.raw('(-1.1)^(7-length(position))'));
 
             })
             .fetchAll({
