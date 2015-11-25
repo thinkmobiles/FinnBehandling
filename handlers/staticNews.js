@@ -103,7 +103,24 @@ var StaticNews = function (PostGre) {
 
         StaticNews
             .query(function (qb) {
-                qb.orderBy('updated_at');
+
+                qb.select('*').from('tb_static_news').whereIn('created_at', function() {
+                    this.max('created_at').from('tb_static_news').where('position', 'left');
+                }).andWhere('position', 'left').union(function () {
+                    this.select('*').from('tb_static_news').whereIn('created_at', function() {
+                        this.max('created_at').from('tb_static_news').where('position', 'center');
+                    }).andWhere('position', 'center').union(function () {
+                        this.select('*').from('tb_static_news').whereIn('created_at', function() {
+                            this.max('created_at').from('tb_static_news').where('position', 'right');
+                        }).andWhere('position', 'right');
+                    })
+                });
+
+                /*qb.raw(SELECT * FROM tb_static_news WHERE position = 'left' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'left')
+                UNION
+                SELECT * FROM tb_static_news WHERE position = 'center' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'center')
+                UNION
+                SELECT * FROM tb_static_news WHERE position = 'right' AND created_at in (SELECT max(created_at) FROM tb_static_news WHERE position = 'right'));*/
             })
             .fetchAll({
                 withRelated: [
