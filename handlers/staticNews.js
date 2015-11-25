@@ -27,15 +27,17 @@ var StaticNews = function (PostGre) {
          *
          * @example Response example:
          *
-         * {
-         *       "id": 3,
-         *       "subject": "Clinic research updated",
-         *       "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
-         *       "source": "Newspaper updated",
-         *       "position": "left",
-         *       "created_at": "2015-09-29T13:39:39.870Z",
-         *       "updated_at": "2015-09-29T13:48:39.981Z"
-         * }
+         * [
+         *  {
+         *           "id": 3,
+         *           "subject": "Clinic research updated",
+         *          "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *          "source": "Newspaper updated",
+         *          "position": "left",
+         *          "created_at": "2015-09-29T13:39:39.870Z",
+         *          "updated_at": "2015-09-29T13:48:39.981Z"
+         *  }
+         * ]
          *
          * @param {number} id - id of article
          * @method getArticlesByPosition
@@ -65,8 +67,6 @@ var StaticNews = function (PostGre) {
                 if (err) {
                     return next(err);
                 }
-
-                var staticNews = staticNews || [];
 
                 res.status(200).send(staticNews);
             });
@@ -151,13 +151,22 @@ var StaticNews = function (PostGre) {
          * @example Response example:
          *
          * {
-         *     "subject": "Clinic research",
-         *     "content": "Lorem ipsum dolor si",
-         *     "source": "Newspaper"
+         *      "success": "Was created successfully",
+         *      "article": {
+         *          "subject": "Clinic research",
+         *          "content": "Lorem ipsum dolor si",
+         *          "source": "Newspaper",
+         *          "position": "left",
+         *          "updated_at": "2015-11-25T11:23:49.117Z",
+         *          "created_at": "2015-11-25T11:23:49.117Z",
+         *          "id": 5
+         *          }
          * }
+         *
          * @param {string} subject - subject of new article
          * @param {string} content - content of new article
          * @param {string} source - source of new article
+         * @param {string} position - position of new article
          * @method createArticle
          * @instance
          */
@@ -211,11 +220,16 @@ var StaticNews = function (PostGre) {
          * @example Response example:
          *
          * {
-         *     "subject": "Clinic research",
-         *     "content": "Lorem ipsum dolor si",
-         *     "source": "Newspaper",
-         *     "position": "left"
-         * }
+         *      "success": "was updated successfully",
+         *      "article": {
+         *      "id": 5,
+         *      "subject": "Clinic",
+         *      "content": "Lorem ipsum dolor si",
+         *      "source": "Newspaper",
+         *      "position": "left",
+         *      "updated_at": "2015-11-25T11:34:57.061Z"
+         *      }
+         *      }
          * @param {number} id - id of article
          * @param {string} subject - subject of article (optional)
          * @param {string} content - content of article (optional)
