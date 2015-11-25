@@ -14,7 +14,7 @@ app.factory('StaticDataManager', ['$http', function ($http) {
 
     this.getStaticNews = function (callback) {
         $http({
-            url: '/news/static',
+            url: '/staticNews',
             method: "GET"
         }).then(function (response) {
             if (callback)

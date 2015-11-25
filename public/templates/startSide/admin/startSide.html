@@ -1,13 +1,16 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix">
 
+    <br/>
+
     <h6 class="col-md-12 bold blue">VELCOMMEN</h6>
 
     <div class="text-box">
 
         <div class="inside">
 
-            <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="startSideCtrl.startSide.text | limitTo: 800">
+            <h5 style="margin-top: 0;" class="dynamic-font-md"
+                ng-bind-html="startSideCtrl.startSide.text | limitTo: 800">
                 <span ng-show="startSideCtrl.startSide.text.length > 800">...</span></h5>
 
             <div class="clearfix">
@@ -22,11 +25,12 @@
         </div>
     </div>
 
-    <div ng-repeat="news in startSideCtrl.saticNews">
+    <!-- outter loop (current news) -->
+    <div ng-repeat="news in startSideCtrl.staticNews">
 
-        <h6 ng-if="news.id === startSideCtrl.saticNews[0].id" class="col-md-12 bold blue">NYHET VENSTRE</h6>
-        <h6 ng-if="news.id === startSideCtrl.saticNews[1].id" class="col-md-12 bold blue">NYHET MYDTEN</h6>
-        <h6 ng-if="news.id === startSideCtrl.saticNews[2].id" class="col-md-12 bold blue">NYHET H?YRE</h6>
+        <h6 ng-if="news.position === 'left'" class="col-md-12 bold blue">NYHET VENSTRE</h6>
+        <h6 ng-if="news.position === 'center'" class="col-md-12 bold blue">NYHET MYDTEN</h6>
+        <h6 ng-if="news.position === 'right'" class="col-md-12 bold blue">NYHET H?YRE</h6>
 
         <div class="text-box">
 
@@ -41,15 +45,37 @@
                 <div class="clearfix">
                     <a class="col-md-2 pull-left">Les mer...</a>
                     <a class="pull-left" href="#/nyheter/{{news.id}}">Rediger</a>
-                    <a ng-hide="true" class="pull-right">Slett</a>
+                    <a  class="pull-right">Slett</a>
                 </div>
             </div>
             <div class="clearfix">
                 <a class="pull-left">Legg til ny</a>
-                <a class="pull-right">Tidligere nyheter</a>
+                <a class="pull-right" href="javascript:;" ng-click="startSideCtrl.showArchiveToggle(news.position, news.id)">Tidligere nyheter</a>
             </div>
+
+            <!-- inner loop (archive) -->
+            <div class="inside" ng-show="startSideCtrl.isArchiveShown(news.position)">
+
+                <div ng-repeat="archivedNew in startSideCtrl.staticNewsArchive[news.position]" class="inside">
+                    <h4 class="col-md-12 dynamic-font-lg">{{archivedNew.subject}}</h4>
+
+                    <div class="clearfix">
+                        <h5 style="margin-top: 0;" class="dynamic-font-md"
+                            ng-bind-html="archivedNew.content | limitTo: 800 "></h5>
+                    </div>
+
+                    <div class="clearfix">
+                        <a class="col-md-2 pull-left">Les mer...</a>
+                        <a class="pull-left" href="#/nyheter/{{archivedNew.id}}">Rediger</a>
+                        <a class="pull-right">Slett</a>
+                    </div>
+                </div>
+            </div>
+            <!-- end of inner loop -->
+
         </div>
 
     </div>
+    <!-- end of outter loop -->
 
 </div>

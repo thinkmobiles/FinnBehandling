@@ -39,7 +39,6 @@ app.controller('startPageController', ['$scope', '$sce', 'StaticDataManager', 'G
                 for (var i = self.news.length-1; i >= 0; i--) {
                     self.news[i].limit = 800;
                     self.news[i].showAll = false;
-                    console.log(self.news[i]);
                 }
             });
         }

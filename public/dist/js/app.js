@@ -39385,7 +39385,6 @@ app.controller('startPageController', ['$scope', '$sce', 'StaticDataManager', 'G
                 for (var i = self.news.length-1; i >= 0; i--) {
                     self.news[i].limit = 800;
                     self.news[i].showAll = false;
-                    console.log(self.news[i]);
                 }
             });
         }
@@ -39685,7 +39684,7 @@ app.factory('StaticDataManager', ['$http', function ($http) {
 
     this.getStaticNews = function (callback) {
         $http({
-            url: '/news/static',
+            url: '/staticNews',
             method: "GET"
         }).then(function (response) {
             if (callback)
