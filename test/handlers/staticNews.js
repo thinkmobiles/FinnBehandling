@@ -136,7 +136,7 @@ describe('StaticNews', function () {
     it('should get all articles by position', function (done) {
 
         agent
-            .get('/StaticNews/' + 'left/?staticNewId=90')
+            .get('/StaticNews/branch/' + 'left/?staticNewId=90')
             .expect(200)
             .end(function (err, res) {
                 if (err) {
@@ -167,7 +167,6 @@ describe('StaticNews', function () {
                 }
 
                 var article = res.body;
-                console.log(article);
 
                 expect(article).to.be.not.empty;
                 expect(article).to.be.instanceOf(Array);
@@ -180,6 +179,31 @@ describe('StaticNews', function () {
 
                 done();
             });
+    });
+
+    it('should get one article', function (done) {
+
+        agent
+            .get('/staticNews/' + articleId)
+            .expect(200)
+            .end(function (err, res) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                var article = res.body;
+
+                expect(article).to.be.exist;
+                expect(article).to.be.instanceOf(Object);
+                expect(article).to.have.property('subject');
+                expect(article).to.have.property('content');
+                expect(article).to.have.property('source');
+                expect(article).to.have.property('position');
+
+                done();
+            });
+
     });
 
     it('should update article', function (done) {
