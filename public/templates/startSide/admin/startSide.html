@@ -37,13 +37,13 @@
                 <h4 class="col-md-12 dynamic-font-lg">{{news.subject}}</h4>
 
                 <div class="clearfix">
-                    <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="news.content | limitTo: 800 "></h5>
+                    <h5 style="margin-top: 0;" class="dynamic-font-md" ng-bind-html="news.content | limitTo: news.limit "></h5>
                 </div>
 
                 <div class="clearfix">
-                    <a class="col-md-2 pull-left">Les mer...</a>
+                    <a class="col-md-2 pull-left" href="javascript:;" ng-click="startSideCtrl.toggleLimit(news, 800)">{{news.content.length < news.limit ? '' : (news.showAll === true) ? 'Lukk' : 'Les mer...'}}</a>
                     <a class="pull-left" href="#/staticNews/{{news.id}}">Rediger</a>
-                    <a class="pull-right">Slett</a>
+                    <a class="pull-right" href="javascript:;" ng-click="startSideCtrl.deleteStaticNew(news.id)">Slett</a>
                 </div>
             </div>
             <div class="clearfix">
@@ -60,12 +60,13 @@
 
                     <div class="clearfix">
                         <h5 style="margin-top: 0;" class="dynamic-font-md"
-                            ng-bind-html="archivedNew.content | limitTo: 800 "></h5>
+                            ng-bind-html="archivedNew.content | limitTo: archivedNew.limit "></h5>
                     </div>
 
                     <div class="clearfix">
+                        <a class="col-md-2 pull-left" href="javascript:;" ng-click="startSideCtrl.toggleLimit(archivedNew, 400)">{{archivedNew.content.length < archivedNew.limit ? '' : (archivedNew.showAll === true) ? 'Lukk' : 'Les mer...'}}</a>
                         <a class="pull-left" href="#/staticNews/{{archivedNew.id}}">Rediger</a>
-                        <a class="pull-right">Slett</a>
+                        <a class="pull-right" href="javascript:;" ng-click="startSideCtrl.deleteStaticNew(archivedNew.id)">Slett</a>
                     </div>
                 </div>
             </div>
