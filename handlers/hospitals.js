@@ -78,7 +78,7 @@ Hospitals = function (PostGre) {
                 }
             ];
 
-            if (options.logo) {
+            if (options.logo && typeof options.logo === 'string') {
                 var  imageParams = {
                     imageUrl: options.logo,
                     imageable_id: hospitalId,
@@ -167,7 +167,7 @@ Hospitals = function (PostGre) {
                 }
             ];
 
-            if (options.logo) {
+            if (options.logo && typeof options.logo === 'string') {
                 var  imageParams = {
                     imageUrl: options.logo,
                     imageable_id: hospitalId,
