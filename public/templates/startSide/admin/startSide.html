@@ -14,15 +14,13 @@
                 <span ng-show="startSideCtrl.startSide.text.length > 800">...</span></h5>
 
             <div class="clearfix">
-                <a class="col-md-2 pull-left" href="#/startside">Les mer...</a>
+                <!--<a class="col-md-2 pull-left" href="#/startside">Les mer...</a>-->
                 <a class="pull-left" href="#/startside/edit">Rediger</a>
-                <a ng-hide="true" class="pull-right" href="#">Slett</a>
+                <!--<a class="pull-right" href="#">Slett</a>-->
             </div>
         </div>
-        <div class="clearfix">
-            <a class="pull-left" href="#">Legg til ny</a>
-            <a class="pull-right" href="#">Tidligere nyheter</a>
-        </div>
+        <br/>
+
     </div>
 
     <!-- outter loop (current news) -->
@@ -44,13 +42,14 @@
 
                 <div class="clearfix">
                     <a class="col-md-2 pull-left">Les mer...</a>
-                    <a class="pull-left" href="#/nyheter/{{news.id}}">Rediger</a>
-                    <a  class="pull-right">Slett</a>
+                    <a class="pull-left" href="#/staticNews/{{news.id}}">Rediger</a>
+                    <a class="pull-right">Slett</a>
                 </div>
             </div>
             <div class="clearfix">
-                <a class="pull-left">Legg til ny</a>
-                <a class="pull-right" href="javascript:;" ng-click="startSideCtrl.showArchiveToggle(news.position, news.id)">Tidligere nyheter</a>
+                <a class="pull-left" href="#/staticNews/new/{{news.position}}">Legg til ny</a>
+                <a class="pull-right" href="javascript:;"
+                   ng-click="startSideCtrl.showArchiveToggle(news.position, news.id)">Tidligere nyheter</a>
             </div>
 
             <!-- inner loop (archive) -->
@@ -65,8 +64,7 @@
                     </div>
 
                     <div class="clearfix">
-                        <a class="col-md-2 pull-left">Les mer...</a>
-                        <a class="pull-left" href="#/nyheter/{{archivedNew.id}}">Rediger</a>
+                        <a class="pull-left" href="#/staticNews/{{archivedNew.id}}">Rediger</a>
                         <a class="pull-right">Slett</a>
                     </div>
                 </div>

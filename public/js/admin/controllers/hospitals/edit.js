@@ -407,13 +407,13 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
              return alert ('File is not image');
              }
              });*/
-        };
+        }
 
         function removeImage(name) {
             self.hospital[name] = null;
             self[name] = null;
             $('#' + name).val(null);
             $( '#' + name + '-slider').slider('disable');
-        };
+        }
 
     }]);

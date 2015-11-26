@@ -1,13 +1,13 @@
 <div class="repeat-title"></div>
 <div class="hospitals-list clearfix" style="padding: 32px">
-    <h1 class="blue bold">Update article</h1>
+    <h1 class="blue bold">{{editStaticNewCtrl.title}}</h1>
     <br/>
 
     <form
             role="form"
             class="one-block"
             name="updateArticleForm"
-            ng-submit="updateArticleCtrl.updateArticle()"
+            ng-submit="editStaticNewCtrl.saveStaticNew()"
             novalidate>
 
         <div class="form-group">
@@ -21,7 +21,7 @@
                     id="subject"
                     class="form-control side-input dynamic-font-md"
                     required
-                    ng-model="updateArticleCtrl.article.subject"/>
+                    ng-model="editStaticNewCtrl.staticNew.subject"/>
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.subject.$invalid">
                 <p ng-show="updateArticleForm.subject.$error.required">Feltet skal utfylles</p>
             </div>
@@ -38,27 +38,27 @@
                     id="source"
                     class="form-control side-input dynamic-font-md"
                     required
-                    ng-model="updateArticleCtrl.article.source"/>
+                    ng-model="editStaticNewCtrl.staticNew.source"/>
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.source.$invalid">
                 <p ng-show="updateArticleForm.source.$error.required">Feltet skal utfylles</p>
             </div>
         </div>
 
-        <div class="image-container" ng-class="{'slim': !updateArticleCtrl.image}">
+        <div class="image-container" ng-class="{'slim': !editStaticNewCtrl.image}">
             <div class="clients-photo" >
-                <div ng-show='updateArticleCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
-                    <a ng-click="updateArticleCtrl.removeImage('image')"  class="remove-image">X</a>
-                    <img ng-src="{{updateArticleCtrl.image}}">
+                <div ng-show='editStaticNewCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
+                    <a ng-click="editStaticNewCtrl.removeImage('image')"  class="remove-image">X</a>
+                    <img ng-src="{{editStaticNewCtrl.image}}">
                 </div>
                 <input
                         id="image"
                         type="file"
                         name="image"
-                        ng-model="updateArticleCtrl.image"
+                        ng-model="editStaticNewCtrl.image"
                         accept="image/jpeg,image/png,image/gif"
                         fileread
-                        crop-result="updateArticleCtrl.cropResult"
-                        ng-change="updateArticleCtrl.checkImageType('image')"
+                        crop-result="editStaticNewCtrl.cropResult"
+                        ng-change="editStaticNewCtrl.checkImageType('image')"
                         >
             </div>
             <div class="slider-block">
@@ -66,8 +66,8 @@
             </div>
         </div>
 
-        <div ng-show='!updateArticleCtrl.image && updateArticleCtrl.oldImage && updateArticleCtrl.oldImage.image_url'>
-            <img style="max-height: 445px" ng-src="{{updateArticleCtrl.oldImage.image_url}}">
+        <div ng-show='!editStaticNewCtrl.image && editStaticNewCtrl.oldImage && editStaticNewCtrl.oldImage.image_url'>
+            <img style="max-height: 445px" ng-src="{{editStaticNewCtrl.oldImage.image_url}}">
         </div>
 
         <br/>
@@ -77,7 +77,7 @@
             <div
                     text-angular
                     required
-                    ng-model="updateArticleCtrl.article.content">
+                    ng-model="editStaticNewCtrl.staticNew.content">
 
             </div>
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.content.$invalid">
@@ -86,7 +86,7 @@
         </div>
 
         <div class="form-group">
-            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Update</button>
+            <button class="pull-right btn btn-default btn-lg dynamic-font-md">Save</button>
         </div>
     </form>
     <br/>

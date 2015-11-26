@@ -47,9 +47,19 @@ app.factory('StartSideManager', ['$http', function ($http) {
         }, callback);
     };
 
-    self.editStaticNews = function (data, callback) {
+    self.getStaticNew = function (id, callback) {
         $http({
-            url: '/staticNews/' + branch,
+            url: '/staticNews/' + id,
+            method: "GET"
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    self.editStaticNews = function (id, data, callback) {
+        $http({
+            url: '/staticNews/' + id,
             method: "PUT",
             data: data
         }).then(function (response) {
@@ -60,7 +70,7 @@ app.factory('StartSideManager', ['$http', function ($http) {
 
     self.createStaticNews = function (data, callback) {
         $http({
-            url: '/staticNews/' + branch,
+            url: '/staticNews',
             method: "POST",
             data: data
         }).then(function (response) {
@@ -72,8 +82,7 @@ app.factory('StartSideManager', ['$http', function ($http) {
     self.deleteStaticNews = function (id, callback) {
         $http({
             url: '/staticNews/' + id,
-            method: "DELETE",
-            data: data
+            method: "DELETE"
         }).then(function (response) {
             if (callback)
                 callback(null, response.data);

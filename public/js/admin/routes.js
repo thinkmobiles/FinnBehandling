@@ -58,6 +58,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'editStaticNewController',
         templateUrl: 'templates/startSide/admin/staticNewEdit.html',
         controllerAs: 'editStaticNewCtrl'
+    }).when('/staticNews/new/:position', {
+        controller: 'editStaticNewController',
+        templateUrl: 'templates/startSide/admin/staticNewEdit.html',
+        controllerAs: 'editStaticNewCtrl'
     }).when('/hospital/new', {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
