@@ -86,6 +86,7 @@ Hospitals = function (PostGre) {
                     imageable_field: 'logo'
                 };
 
+
                 functionsToExecute.push(
                     function (callback) {
                         image.newImage(imageParams, callback);

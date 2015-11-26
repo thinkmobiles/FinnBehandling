@@ -22,6 +22,7 @@
                     class="form-control side-input dynamic-font-md"
                     required
                     ng-model="editStaticNewCtrl.staticNew.subject"/>
+
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.subject.$invalid">
                 <p ng-show="updateArticleForm.subject.$error.required">Feltet skal utfylles</p>
             </div>
@@ -39,18 +40,20 @@
                     class="form-control side-input dynamic-font-md"
                     required
                     ng-model="editStaticNewCtrl.staticNew.source"/>
+
             <div style="color:red" ng-show="updateArticleForm.$submitted && updateArticleForm.source.$invalid">
                 <p ng-show="updateArticleForm.source.$error.required">Feltet skal utfylles</p>
             </div>
         </div>
 
         <div class="image-container" ng-class="{'slim': !editStaticNewCtrl.image}">
-            <div class="clients-photo" >
-                <div ng-show='editStaticNewCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0">
-                    <a ng-click="editStaticNewCtrl.removeImage('image')"  class="remove-image">X</a>
+            <div class="clients-photo" style="width: 578px; heigth: 433px;">
+                <div ng-show='editStaticNewCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0;">
+                    <a ng-click="editStaticNewCtrl.removeImage('image')" class="remove-image">X</a>
                     <img ng-src="{{editStaticNewCtrl.image}}">
                 </div>
                 <input
+                        ng-hide='editStaticNewCtrl.image'
                         id="image"
                         type="file"
                         name="image"
@@ -58,6 +61,8 @@
                         accept="image/jpeg,image/png,image/gif"
                         fileread
                         crop-result="editStaticNewCtrl.cropResult"
+                        img-width="578"
+                        img-height="433"
                         ng-change="editStaticNewCtrl.checkImageType('image')"
                         >
             </div>
