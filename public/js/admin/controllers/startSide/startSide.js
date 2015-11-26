@@ -1,5 +1,5 @@
 app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
-    function($scope, StartSideManager, NewsManager, GeneralHelpers){
+    function ($scope, StartSideManager, NewsManager, GeneralHelpers) {
         var self = this;
         self.staticNews = [];
         self.staticNewsArchive = {};
@@ -20,8 +20,8 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
             } else {
                 self.staticNewsArchive[position] = null;
             }
-
         }
+
 
         /**
          * Check if static news archive is not empty for specified branch
@@ -33,11 +33,24 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
             return self.staticNewsArchive[position];
         }
 
-        (function getStartSide () {
+        /**
+         * Delete static new with specified id from db
+         *
+         * @param staticNewId
+         */
+        function deleteStaticNew(staticNewId) {
+            StartSideManager.deleteStaticNew(staticNewId, function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+            });
+        }
+
+        (function getStartSide() {
 
             $scope.pending = true;
 
-            StartSideManager.getStartSide(function(err, startSide) {
+            StartSideManager.getStartSide(function (err, startSide) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -52,10 +65,10 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          * GET an array of three static news (which are not archived)
          * In case of success store response into self.staticNews
          */
-        function getStaticNews () {
+        function getStaticNews() {
 
 
-            StartSideManager.getStaticNews(function(err, staticNews) {
+            StartSideManager.getStaticNews(function (err, staticNews) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -70,10 +83,9 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          *
          * @param position
          */
-        function getStaticNewsArchive (position, staticNewId) {
-            console.log(position, staticNewId)
+        function getStaticNewsArchive(position, staticNewId) {
 
-            StartSideManager.getStaticNewsArchive(position, staticNewId, function(err, staticNewsArchive) {
+            StartSideManager.getStaticNewsArchive(position, staticNewId, function (err, staticNewsArchive) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }

@@ -69,6 +69,17 @@ app.factory('StartSideManager', ['$http', function ($http) {
         }, callback);
     };
 
+    self.deleteStaticNews = function (id, callback) {
+        $http({
+            url: '/staticNews/' + id,
+            method: "DELETE",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
 
     return self;
 }]);

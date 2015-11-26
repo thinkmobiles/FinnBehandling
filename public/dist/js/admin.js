@@ -73094,6 +73094,10 @@ app.config(['$routeProvider', '$provide', function ($routeProvider, $provide) {
         controller: 'updateStartSideController',
         templateUrl: 'templates/startSide/admin/edit.html',
         controllerAs: 'updateStartSideCtrl'
+    }).when('/staticNews/:id', {
+        controller: 'editStaticNewController',
+        templateUrl: 'templates/startSide/admin/staticNewEdit.html',
+        controllerAs: 'editStaticNewCtrl'
     }).when('/hospital/new', {
         controller: 'editHospitalController',
         templateUrl: 'templates/hospital/edit-form.html',
@@ -73997,7 +74001,7 @@ app.controller('updateStartSideController', ['$scope', '$routeParams', '$locatio
         };
     }]);;
 app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManager', 'GeneralHelpers',
-    function($scope, StartSideManager, NewsManager, GeneralHelpers){
+    function ($scope, StartSideManager, NewsManager, GeneralHelpers) {
         var self = this;
         self.staticNews = [];
         self.staticNewsArchive = {};
@@ -74018,8 +74022,8 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
             } else {
                 self.staticNewsArchive[position] = null;
             }
-
         }
+
 
         /**
          * Check if static news archive is not empty for specified branch
@@ -74031,11 +74035,24 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
             return self.staticNewsArchive[position];
         }
 
-        (function getStartSide () {
+        /**
+         * Delete static new with specified id from db
+         *
+         * @param staticNewId
+         */
+        function deleteStaticNew(staticNewId) {
+            StartSideManager.deleteStaticNew(staticNewId, function (err, response) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+            });
+        }
+
+        (function getStartSide() {
 
             $scope.pending = true;
 
-            StartSideManager.getStartSide(function(err, startSide) {
+            StartSideManager.getStartSide(function (err, startSide) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -74050,10 +74067,10 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          * GET an array of three static news (which are not archived)
          * In case of success store response into self.staticNews
          */
-        function getStaticNews () {
+        function getStaticNews() {
 
 
-            StartSideManager.getStaticNews(function(err, staticNews) {
+            StartSideManager.getStaticNews(function (err, staticNews) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -74068,10 +74085,9 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          *
          * @param position
          */
-        function getStaticNewsArchive (position, staticNewId) {
-            console.log(position, staticNewId)
+        function getStaticNewsArchive(position, staticNewId) {
 
-            StartSideManager.getStaticNewsArchive(position, staticNewId, function(err, staticNewsArchive) {
+            StartSideManager.getStaticNewsArchive(position, staticNewId, function (err, staticNewsArchive) {
                 if (err) {
                     return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                 }
@@ -74082,6 +74098,40 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
 
         getStaticNews();
 
+    }]);;
+/**
+ * Created by vasylhoshovsky on 25.11.15.
+ */
+app.controller('editStaticNewController', ['$scope', '$routeParams', '$location', 'StartSideManager', 'GeneralHelpers',
+    function ($scope, $routeParams, $location, StartSideManager, GeneralHelpers) {
+        var self = this;
+        self.staticNewId = $routeParams.id;
+
+
+        function getStaticNew () {
+
+            StartSideManager.getStartSide(function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                self.startSide = startSide;
+            });
+        }
+
+
+        function updateStartSide() {
+
+            StartSideManager.updateStartSide(self.startSide, function(err, startSide) {
+                if (err) {
+                    return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
+                }
+
+                alert('StartSide successfully updated');
+
+                $location.path('startside');
+            });
+        };
     }]);;
 app.controller('updateWebRecommendationController', ['$scope', '$routeParams', '$location', 'WebRecommendationsManager', 'GeneralHelpers',
     function ($scope, $routeParams, $location, WebRecommendationsManager, GeneralHelpers) {
@@ -74792,6 +74842,17 @@ app.factory('StartSideManager', ['$http', function ($http) {
         $http({
             url: '/staticNews/' + branch,
             method: "POST",
+            data: data
+        }).then(function (response) {
+            if (callback)
+                callback(null, response.data);
+        }, callback);
+    };
+
+    self.deleteStaticNews = function (id, callback) {
+        $http({
+            url: '/staticNews/' + id,
+            method: "DELETE",
             data: data
         }).then(function (response) {
             if (callback)
