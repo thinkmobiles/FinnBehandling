@@ -48,10 +48,6 @@ var StaticNews = function (PostGre) {
          *  }
          * ]
          *
-         * @param {number} id - id of article
-         * @param {string} subject - subject of article
-         * @param {string} content - content of article
-         * @param {string} source - source of article
          * @param {string} position - position of article
          * @method getArticlesByPosition
          * @instance
@@ -152,6 +148,32 @@ var StaticNews = function (PostGre) {
     };
 
     this.getOneArticle = function (req, res, next) {
+
+        /**
+         * __Type__ `GET`
+         * __Content-Type__ `application/json`
+         *
+         * This __method__ allows get _one staticNews article_
+         *
+         * @example Request example:
+         *         http://192.168.88.250:8787/staticNews/:id
+         *
+         * @example Response example:
+         *
+         * {
+         *       "id": 3,
+         *       "subject": "Clinic research updated",
+         *       "content": "Lorem ipsum dolor si Lorem ipsum dolor si",
+         *       "source": "Newspaper updated",
+         *       "position": "left",
+         *       "created_at": "2015-09-29T13:39:39.870Z",
+         *       "updated_at": "2015-09-29T13:48:39.981Z"
+         * }
+         *
+         * @param {number} id - id of article
+         * @method getOneArticle
+         * @instance
+         */
 
         var id = req.params.id;
 
