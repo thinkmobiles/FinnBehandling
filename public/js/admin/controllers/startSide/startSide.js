@@ -3,6 +3,7 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
         var self = this;
         self.staticNews = [];
         self.staticNewsArchive = {};
+        self.staticNewsArchiveVisibility = {};
 
 
         self.showArchiveToggle = showArchiveToggle;
@@ -13,7 +14,6 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
 
 
         function toggleLimit (staticNew, limit) {
-            console.log(staticNew)
             if (staticNew.limit === limit) {
                 staticNew.limit = staticNew.content.length;
                 staticNew.showAll = true;
@@ -30,10 +30,11 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          * @param position
          */
         function showArchiveToggle(position, staticNewId) {
-            if (!self.staticNewsArchive[position]) {
+            if (!self.staticNewsArchiveVisibility[position]) {
                 getStaticNewsArchive(position, staticNewId);
+                self.staticNewsArchiveVisibility[position] = true;
             } else {
-                self.staticNewsArchive[position] = null;
+                self.staticNewsArchiveVisibility[position] = false;
             }
         }
 
@@ -45,7 +46,7 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          * @returns {*}
          */
         function isArchiveShown(position) {
-            return self.staticNewsArchive[position];
+            return self.staticNewsArchive[position] && self.staticNewsArchive[position].length && self.staticNewsArchiveVisibility[position];
         }
 
         /**
@@ -55,10 +56,11 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
          */
         function deleteStaticNew(staticNewId) {
             if (confirm('Are you sure?')) {
-                StartSideManager.deleteStaticNew(staticNewId, function (err, response) {
+                StartSideManager.deleteStaticNews(staticNewId, function (err, response) {
                     if (err) {
                         return GeneralHelpers.showErrorMessage({message: err.data.error, status: err.status});
                     }
+                    getStaticNews();
                 });
             }
         }
@@ -95,6 +97,7 @@ app.controller('startSideController', ['$scope', 'StartSideManager', 'NewsManage
                 for (var i = self.staticNews.length-1; i >= 0; i--) {
                     self.staticNews[i].limit = 800;
                     self.staticNews[i].showAll = false;
+                    getStaticNewsArchive(self.staticNews[i].position, self.staticNews[i].id);
                 }
             });
         }
