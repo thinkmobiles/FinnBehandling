@@ -1,16 +1,15 @@
 var express = require('express');
 var staticNewsRouter = express.Router();
-var staticNewsHandler = require('../handlers/staticNews');
+var StaticNewsHandler = require('../handlers/staticNews');
 
 module.exports = function (PostGre) {
-    var newsHandler = new staticNewsHandler(PostGre);
+    var newsHandler = new StaticNewsHandler(PostGre);
 
     staticNewsRouter.route('/').get(newsHandler.getLastStaticNews);
+    staticNewsRouter.route('/branch/:position').get(newsHandler.getArticlesByPosition);
     staticNewsRouter.route('/').post(newsHandler.createArticle);
 
-    //newsRouter.route('/count').get(newsHandler.getStaticNewsCount);
-
-    staticNewsRouter.route('/:position').get(newsHandler.getArticlesByPosition);
+    staticNewsRouter.route('/:id').get(newsHandler.getOneArticle);
     staticNewsRouter.route('/:id').put(newsHandler.updateArticle);
     staticNewsRouter.route('/:id').delete(newsHandler.removeArticle);
 

@@ -146,7 +146,6 @@ var News = function (PostGre) {
          */
 
         PostGre.knex(TABLES.NEWS)
-            .whereNotIn('id', [1, 2, 3])
             .count()
             .asCallback(function (err, queryResult) {
 

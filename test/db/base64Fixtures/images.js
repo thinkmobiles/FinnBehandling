@@ -20,5 +20,18 @@ module.exports = {
         require('./images/newsImage7'),
         require('./images/newsImage8'),
         require('./images/newsImage9')
+    ],
+
+    tb_static_news: [
+        require('./images/newsImage1'),
+        require('./images/newsImage2'),
+        require('./images/newsImage3'),
+        require('./images/newsImage4'),
+        require('./images/newsImage5'),
+        require('./images/newsImage6'),
+        require('./images/newsImage7'),
+        require('./images/newsImage8'),
+        require('./images/newsImage9')
     ]
+
 };
