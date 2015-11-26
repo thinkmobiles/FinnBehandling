@@ -250,7 +250,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 alert('Hospital created successful');
 
-                $location.path('#/hospitals');
+                $location.path('admin#/hospitals');
             });
         }
 
@@ -294,7 +294,7 @@ app.controller('editHospitalController', ['$scope', '$routeParams', '$location',
 
                 alert('Hospital updated successful');
 
-                $location.path('#/hospitals');
+                $location.path('admin#/hospitals');
             });
         }
 
