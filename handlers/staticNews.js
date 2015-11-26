@@ -151,6 +151,28 @@ var StaticNews = function (PostGre) {
             });
     };
 
+    this.getOneArticle = function (req, res, next) {
+
+        var id = req.params.id;
+
+        StaticNews
+            .forge({id: id})
+            .fetch({
+                withRelated: [
+                    'image'
+                ],
+                require: true
+            })
+            .asCallback(function (err, article) {
+
+                if (err) {
+                    return next(err);
+                }
+
+                res.status(200).send(article);
+            });
+    };
+
     this.createArticle = function (req, res, next) {
 
         /**

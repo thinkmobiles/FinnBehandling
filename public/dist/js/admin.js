@@ -58151,7 +58151,7 @@ app.factory('StartSideManager', ['$http', function ($http) {
 
     self.getStaticNewsArchive = function (branch, staticNewId, callback) {
         $http({
-            url: '/staticNews/' + branch,
+            url: '/staticNews/branch/' + branch,
             method: "GET",
             params: {staticNewId: staticNewId}
         }).then(function (response) {
