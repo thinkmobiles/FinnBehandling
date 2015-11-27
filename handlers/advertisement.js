@@ -255,6 +255,7 @@ var Advertisement = function (PostGre) {
 
         options.id = advertisementId;
 
+
         Advertisement.updateValid(options, function (err, result) {
 
             if (err) {

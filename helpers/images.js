@@ -158,7 +158,8 @@ var Images = function (db) {
         Image
             .where({
                 imageable_id: imageParams.imageable_id,
-                imageable_field: imageParams.imageable_field
+                imageable_field: imageParams.imageable_field,
+                imageable_type: imageParams.imageable_type
             })
             .fetch()
             .then(function (model) {
