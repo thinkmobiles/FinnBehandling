@@ -74,6 +74,7 @@ module.exports = {
                         ') WITHOUT OIDS; ',
     ADVERTISEMENT: 'CREATE TABLE IF NOT EXISTS tb_advertisement ( ' +
                         'id serial NOT NULL, ' +
+                        'title varchar(80), ' +
                         'link varchar(255), ' +
                         'created_at timestamp without time zone,' +
                         'updated_at timestamp without time zone' +

@@ -29,11 +29,13 @@ module.exports = function (postGre, ParentModel) {
         }
     }, {
         create: {
+            title: ['isString'],
             link: ['required', 'isString']
         },
 
         update: {
             id: ['required', 'isInt'],
+            title: ['isString'],
             link: ['required', 'isString']
         },
 

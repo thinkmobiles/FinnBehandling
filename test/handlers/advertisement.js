@@ -44,6 +44,7 @@ describe('Advertisements', function () {
 
     it('should create a new advertisement', function (done) {
         var data = {
+            title: 'Example link',
             link: 'www.example.com'
         };
 
@@ -68,6 +69,8 @@ describe('Advertisements', function () {
 
                     expect(advertisement).to.exist;
                     expect(advertisement).to.be.instanceOf(Object);
+                    expect(advertisement).to.have.property('title');
+                    expect(advertisement.title).equal(data.title);
                     expect(advertisement).to.have.property('link');
                     expect(advertisement.link).equal(data.link);
 
@@ -89,6 +92,7 @@ describe('Advertisements', function () {
 
                 expect(advertisement).to.exist;
                 expect(advertisement).to.be.instanceOf(Object);
+                expect(advertisement).to.have.property('title');
                 expect(advertisement).to.have.property('link');
 
                 done();
@@ -111,6 +115,7 @@ describe('Advertisements', function () {
                 expect(advertisements).to.be.instanceOf(Array);
                 expect(advertisements.length).least(4);
                 expect(advertisements[0]).to.be.instanceOf(Object);
+                expect(advertisements[0]).to.have.property('title');
                 expect(advertisements[0]).to.have.property('link');
 
                 done();
@@ -139,6 +144,7 @@ describe('Advertisements', function () {
 
     it('should update advertisement', function (done) {
         var data = {
+            title: 'Example link',
             link: 'www.example.com'
         };
 
@@ -163,6 +169,8 @@ describe('Advertisements', function () {
 
                     expect(advertisement).to.exist;
                     expect(advertisement).to.be.instanceOf(Object);
+                    expect(advertisement).to.have.property('title');
+                    expect(advertisement.title).equal(data.title);
                     expect(advertisement).to.have.property('link');
                     expect(advertisement.link).equal(data.link);
 

@@ -120,6 +120,9 @@ module.exports = function (db) {
     });
 
     factory.define('advertisement', db.Models[TABLES.ADVERTISEMENT], {
+        title: function() {
+            return faker.lorem.sentence(1, 3);
+        },
         link: function() {
             return faker.internet.url('www.example.com');
         }
