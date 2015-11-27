@@ -5,7 +5,9 @@ app.directive('fileread', ['$timeout', function ($timeout) {
         scope: {
             extension: '=',
             maxsize: '@',
-            cropResult: '='
+            cropResult: '=',
+            imgWidth: '@',
+            imgHeight: '@'
         },
         link: function (scope, element, attributes, controller) {
             scope.type = attributes.id;
@@ -145,8 +147,8 @@ app.directive('fileread', ['$timeout', function ($timeout) {
                         }
 
                         imageElement.cropbox({
-                            width: container.width(),
-                            height: container.height(),
+                            width: scope.imgWidth ? scope.imgWidth : container.width(),
+                            height: scope.imgHeight ? scope.imgHeight : container.height(),
                             showControls: 'never'
                         }, function () {
                             var self = this;
