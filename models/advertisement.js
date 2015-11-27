@@ -29,12 +29,12 @@ module.exports = function (postGre, ParentModel) {
         }
     }, {
         create: {
-            text: ['required', 'isString']
+            link: ['required', 'isString']
         },
 
         update: {
             id: ['required', 'isInt'],
-            text: ['required', 'isString']
+            link: ['required', 'isString']
         },
 
         getValidated: function (validatePurpose, options, callback) {
@@ -90,7 +90,7 @@ module.exports = function (postGre, ParentModel) {
         postGre.Models[TABLES.IMAGES]
             .fetchWhere({
                 imageable_id: advertisementId,
-                imageable_type: TABLES.NEWS,
+                imageable_type: TABLES.ADVERTISEMENT,
                 imageable_field: 'image'
             })
             .then(function (model) {
