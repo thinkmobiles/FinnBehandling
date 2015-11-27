@@ -10,18 +10,55 @@
             ng-submit="updateAdvertisementCtrl.updateAdvertisement()"
             novalidate>
 
+
+
+
         <div class="form-group clearfix">
-
-            <div
-                    text-angular
-                    required
-                    ng-model="updateAdvertisementCtrl.advertisement.text">
-
-            </div>
-            <div style="color:red" ng-show="updateAdvertisementForm.$submitted && updateAdvertisementForm.text.$invalid">
-                <p ng-show="updateAdvertisementForm.text.$error.required">Feltet skal utfylles</p>
+            <div class="col-md-3">Tittel:</div>
+            <input type="text" name="title" ng-model="updateAdvertisementCtrl.advertisement.title" class="form-control col-md-6"  required />
+            <div style="color:red" ng-show="updateAdvertisementForm.$submitted && updateAdvertisementForm.title.$invalid">
+                <p ng-show="updateAdvertisementForm.title.$error.required">Feltet skal utfylles</p>
             </div>
         </div>
+
+        <div class="form-group clearfix">
+            <div class="col-md-3">Link:</div>
+            <input type="text" name="link" ng-model="updateAdvertisementCtrl.advertisement.link" class="form-control col-md-6"  required />
+            <div style="color:red" ng-show="updateAdvertisementForm.$submitted && updateAdvertisementForm.link.$invalid">
+                <p ng-show="updateAdvertisementForm.link.$error.required">Feltet skal utfylles</p>
+            </div>
+        </div>
+
+        <div class="image-container" ng-class="{'slim': !updateAdvertisementCtrl.image}">
+            <div class="clients-photo" style="width: 760px; height: 300px;">
+                <div ng-show='updateAdvertisementCtrl.image' style="z-index: 2; position: relative; left: 0; top: 0;">
+                    <a ng-click="updateAdvertisementCtrl.removeImage('image')" class="remove-image">X</a>
+                    <img ng-src="{{updateAdvertisementCtrl.image}}">
+                </div>
+                <input
+                        ng-hide='updateAdvertisementCtrl.image'
+                        id="image"
+                        type="file"
+                        name="image"
+                        ng-model="updateAdvertisementCtrl.image"
+                        accept="image/jpeg,image/png,image/gif"
+                        fileread
+                        crop-result="updateAdvertisementCtrl.cropResult"
+                        img-width="760"
+                        img-height="300"
+                        ng-change="updateAdvertisementCtrl.checkImageType('image')"
+                        >
+            </div>
+            <div class="slider-block">
+                <div id="image-slider" style="height: 300px"></div>
+            </div>
+        </div>
+
+        <div ng-show='!updateAdvertisementCtrl.image && updateAdvertisementCtrl.oldImage && updateAdvertisementCtrl.oldImage.image_url'>
+            <img style="max-height: 445px" ng-src="{{updateAdvertisementCtrl.oldImage.image_url}}">
+        </div>
+
+        <br/>
 
         <div class="form-group">
             <button class="pull-right btn btn-default btn-lg dynamic-font-md">Update</button>
