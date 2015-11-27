@@ -30,10 +30,13 @@ var Advertisement = function (PostGre) {
          *
          * {
          *       "id": 3,
-         *       "text": "Clinic research updated"
+         *       "title": "Example link",
+         *       "link": "www.example.test"
          * }
          *
-         * @param {number} id - id of article
+         * @param {number} id - id of advertisement
+         * @param {string} title - title of advertisement
+         * @param {string} link - link of advertisement
          * @method getOneAdvertisement
          * @instance
          */
@@ -81,11 +84,13 @@ var Advertisement = function (PostGre) {
          * [
          *   {
          *      "id": 4,
-         *      "text": "Clinic research2"
+         *      "title": "Example link",
+         *      "link": "www.example.test"
          *  },
          *  {
          *     "id": 3,
-         *     "text": "Clinic research updated"
+         *     "title": "Example link",
+         *     "link": "www.example.com"
          *  }
          * ]
          *
@@ -168,9 +173,12 @@ var Advertisement = function (PostGre) {
          * @example Response example:
          *
          * {
-         *     "text": "Clinic research"
+         *     "title": "Example link",
+         *     "link": "www.example.test"
          * }
-         * @param {string} text - text of new advertisement
+         *
+         * @param {string} title - title of new advertisement
+         * @param {string} link - link of new advertisement
          * @method createAdvertisement
          * @instance
          */
@@ -224,11 +232,13 @@ var Advertisement = function (PostGre) {
          * @example Response example:
          *
          * {
-         *     "text": "Clinic research"
+         *     "title": "Example link",
+         *     "link": "www.example.test"
          * }
          * @param {number} id - id of advertisement
-         * @param {string} text - text of advertisement
-         * @method updateArticle
+         * @param {string} title - title of advertisement
+         * @param {string} link - link of advertisement
+         * @method updateAdvertisement
          * @instance
          */
 
@@ -269,9 +279,9 @@ var Advertisement = function (PostGre) {
                 });
             } else {
 
-                res.status(201).send({
-                    success: RESPONSES.WAS_CREATED,
-                    advertisement: result
+                res.status(200).send({
+                    success: RESPONSES.UPDATED_SUCCESS,
+                    article: result
                 });
             }
         });
